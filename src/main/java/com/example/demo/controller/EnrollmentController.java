@@ -1,13 +1,22 @@
 package com.example.demo.controller;
 
-import com.example.demo.entity.Enrollment;
-import com.example.demo.service.EnrollmentService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.demo.entity.Enrollment;
+import com.example.demo.service.EnrollmentService;
 
 @RestController
 @RequestMapping("/api/enrollments")
@@ -42,5 +51,10 @@ public class EnrollmentController {
     public ResponseEntity<Void> deleteEnrollment(@PathVariable Long id) {
         boolean deleted = enrollmentService.deleteEnrollment(id);
         return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/course/{courseCode}")
+    public List<Enrollment> getEnrollmentsForCourse(@PathVariable String courseCode) {
+        return enrollmentService.getEnrollmentsByCourse(courseCode);
     }
 }
