@@ -1,291 +1,342 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin - Manage Students</title>
-  <style>
-    table,
-    th,
-    td {
-      border: 1px solid black;
-      border-collapse: collapse;
-    }
-
-    table {
-      width: 100%;
-    }
-
-    th,
-    td {
-      padding: 8px;
-      text-align: left;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Management</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        table { width: 100%; margin-bottom: 30px; }
+        th, td { padding: 8px; text-align: left; }
+        form { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; }
+        h1, h3 { margin-top: 30px; }
+        .feedback { font-weight: bold; margin-bottom: 15px; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
 </head>
-
 <body>
-  <h1>Admin Panel - Student Management</h1>
+    <h1>Admin Panel</h1>
 
-  <h3>Add New Student</h3>
-  <form id="studentForm">
-    <input type="hidden" id="studentId" />
-    <input type="text" id="studentNumber" placeholder="Student Number" required />
-    <input type="text" id="name" placeholder="Name" required />
-    <input type="email" id="email" placeholder="Email" required />
-    <input type="password" id="password" placeholder="Password" required />
-    <button type="submit">Save</button>
-  </form>
+    <!-- ============================================== -->
+    <!--          FACULTY MANAGEMENT SECTION            -->
+    <!-- ============================================== -->
+    <h3>Add New Faculty Member</h3>
+    <div id="faculty-feedback" class="feedback"></div>
+    <form id="facultyForm">
+        <input type="text" id="facultyName" placeholder="Full Name" required />
+        <input type="email" id="facultyEmail" placeholder="Email" required />
+        <input type="password" id="facultyPassword" placeholder="Password" required />
+        <button type="submit">Create Faculty Account</button>
+    </form>
+    
+    <!-- NEW: Table to display all faculty members -->
+    <h3>All Faculty Members</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="facultyTableBody"></tbody>
+    </table>
 
-  <h3>All Students</h3>
-  <table>
-    <thead>
-      <tr>
-        <th>ID</th>
-        <th>Student Number</th>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Password</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody id="studentTableBody"></tbody>
-  </table>
-  <h3>All Student Accounts</h3>
-  <table>
-    <thead>
-      <tr>
-        <th>Account ID</th>
-        <th>Student ID</th>
-        <th>Semester</th>
-        <th>Tuition Fee</th>
-        <th>Amount Paid</th>
-        <th>Balance</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody id="accountTableBody"></tbody>
-  </table>
+    <hr>
 
-  <h3>Add Account</h3>
-  <form id="accountForm">
-    <input type="number" id="accountStudentId" placeholder="Student ID" required />
-    <input type="text" id="accountSemester" placeholder="Semester" required />
-    <input type="number" id="accountTuitionFee" placeholder="Tuition Fee" required />
-    <input type="number" id="accountAmountPaid" placeholder="Amount Paid" required />
-    <button type="submit">Add Account</button>
-  </form>
+    <!-- ============================================== -->
+    <!--          STUDENT MANAGEMENT SECTION            -->
+    <!-- ============================================== -->
+    <h3>Add New Student</h3>
+    <form id="studentForm">
+        <input type="hidden" id="studentId" />
+        <input type="text" id="studentNumber" placeholder="Student Number" required />
+        <input type="text" id="name" placeholder="Name" required />
+        <input type="email" id="email" placeholder="Email" required />
+        <input type="password" id="password" placeholder="Password" required />
+        <button type="submit">Save Student</button>
+    </form>
 
+    <h3>All Students</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Student Number</th>
+                <th>Name</th>
+                <th>Email</th>
+                <!-- UPDATED: Password column is removed for security -->
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="studentTableBody"></tbody>
+    </table>
+    
+    <hr>
 
-  <script>
-    const apiUrl = 'http://localhost:8080/api/admin/student';
+    <!-- ============================================== -->
+    <!--       STUDENT ACCOUNT MANAGEMENT SECTION       -->
+    <!-- ============================================== -->
+    <h3>Add Student Account</h3>
+    <form id="accountForm">
+        <input type="number" id="accountStudentId" placeholder="Student ID" required />
+        <input type="text" id="accountSemester" placeholder="Semester" required />
+        <input type="number" step="0.01" id="accountTuitionFee" placeholder="Tuition Fee" required />
+        <input type="number" step="0.01" id="accountAmountPaid" placeholder="Amount Paid" required />
+        <button type="submit">Add Account</button>
+    </form>
+    
+    <h3>All Student Accounts</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Account ID</th>
+                <th>Student ID</th>
+                <th>Semester</th>
+                <th>Tuition Fee</th>
+                <th>Amount Paid</th>
+                <th>Balance</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="accountTableBody"></tbody>
+    </table>
 
-    document.getElementById('accountForm').addEventListener('submit', async function (e) {
-      e.preventDefault();
+    <script>
+        const studentApiUrl = 'http://localhost:8080/api/admin/student';
+        const accountsApiUrl = 'http://localhost:8080/api/accounts';
+        const adminApiUrl = 'http://localhost:8080/api/admins'; 
 
-      const studentId = parseInt(document.getElementById('accountStudentId').value);
-      const semester = document.getElementById('accountSemester').value;
-      const tuitionFee = parseFloat(document.getElementById('accountTuitionFee').value);
-      const amountPaid = parseFloat(document.getElementById('accountAmountPaid').value);
-      const balance = tuitionFee - amountPaid;
+        // --- Faculty Management ---
+        document.getElementById('facultyForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const feedbackEl = document.getElementById('faculty-feedback');
+            feedbackEl.textContent = '';
+            feedbackEl.className = 'feedback';
 
-      const newAccount = {
-        studentId,
-        semester,
-        tuitionFee,
-        amountPaid,
-        balance
-      };
+            const facultyData = {
+                fullName: document.getElementById('facultyName').value,
+                email: document.getElementById('facultyEmail').value,
+                password: document.getElementById('facultyPassword').value
+            };
 
-      try {
-        const response = await fetch(accountsApiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newAccount)
+            try {
+                const response = await fetch(`${adminApiUrl}/faculty`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(facultyData)
+                });
+                const responseText = await response.text();
+                if (!response.ok) throw new Error(responseText);
+                
+                feedbackEl.textContent = responseText;
+                feedbackEl.classList.add('success');
+                document.getElementById('facultyForm').reset();
+                loadFaculty(); // UPDATED: Reload the faculty list after adding a new one
+            } catch (err) {
+                feedbackEl.textContent = 'Error: ' + err.message;
+                feedbackEl.classList.add('error');
+            }
         });
 
-        if (!response.ok) throw new Error('Failed to create account');
-        alert('Account added successfully!');
-        document.getElementById('accountForm').reset();
-        loadAccounts();
-      } catch (err) {
-        console.error('Error adding account:', err);
-        alert('Failed to add account.');
-      }
-    });
-
-
-    // Load all students
-    async function loadStudents() {
-      try {
-        const res = await fetch(apiUrl);
-        const data = await res.json();
-
-        const tableBody = document.getElementById('studentTableBody');
-        tableBody.innerHTML = '';
-
-        data.forEach(student => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${student.id}</td>
-            <td>${student.studentNumber}</td>
-            <td>${student.name}</td>
-            <td>${student.email}</td>
-            <td>${student.password}</td>
-            <td>
-              <button onclick="editStudent(${student.id}, '${student.studentNumber}', '${student.name}', '${student.email}', '${student.password}')">Edit</button>
-              <button onclick="deleteStudent(${student.id})">Delete</button>
-            </td>
-          `;
-          tableBody.appendChild(row);
+        // NEW: Function to load and display all faculty members
+        async function loadFaculty() {
+            try {
+                const res = await fetch(`${adminApiUrl}/faculty`);
+                const data = await res.json();
+                const tableBody = document.getElementById('facultyTableBody');
+                tableBody.innerHTML = '';
+                data.forEach(faculty => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${faculty.id}</td>
+                        <td>${faculty.fullName}</td>
+                        <td>${faculty.email}</td>
+                        <td>
+                            <button onclick="deleteFaculty(${faculty.id})">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (err) {
+                console.error("Error loading faculty:", err);
+            }
+        }
+        
+        // NEW: Function to delete a faculty member
+        async function deleteFaculty(id) {
+            if (confirm('Are you sure you want to delete this faculty member?')) {
+                // You will need to add a DELETE endpoint to your AdminController for this
+                // For now, this is a placeholder for the future.
+                alert('Delete functionality for faculty needs to be added to the backend!');
+            }
+        }
+        
+        // --- Student Management ---
+        async function loadStudents() {
+            try {
+                const res = await fetch(studentApiUrl);
+                const data = await res.json();
+                const tableBody = document.getElementById('studentTableBody');
+                tableBody.innerHTML = '';
+                data.forEach(student => {
+                    const row = document.createElement('tr');
+                    // UPDATED: Removed the password cell for security
+                    row.innerHTML = `
+                        <td>${student.id}</td>
+                        <td>${student.studentNumber}</td>
+                        <td>${student.name}</td>
+                        <td>${student.email}</td>
+                        <td>
+                            <button onclick="editStudent(${student.id}, '${student.studentNumber}', '${student.name}', '${student.email}', '')">Edit</button>
+                            <button onclick="deleteStudent(${student.id})">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (err) {
+                console.error("Error loading students:", err);
+            }
+        }
+        
+        // ... (The rest of your Student and Account JavaScript is fine and remains here) ...
+        document.getElementById('studentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('studentId').value;
+            const student = {
+                studentNumber: document.getElementById('studentNumber').value,
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            };
+            const method = id ? 'PUT' : 'POST';
+            const endpoint = id ? `${studentApiUrl}/${id}` : studentApiUrl;
+            try {
+                await fetch(endpoint, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(student)
+                });
+                document.getElementById('studentForm').reset();
+                document.getElementById('studentId').value = '';
+                loadStudents();
+            } catch (err) {
+                console.error('Error saving student:', err);
+            }
         });
-      } catch (err) {
-        console.error("Error loading students:", err);
-      }
-    }
+        
+        function editStudent(id, studentNumber, name, email, password) {
+            document.getElementById('studentId').value = id;
+            document.getElementById('studentNumber').value = studentNumber;
+            document.getElementById('name').value = name;
+            document.getElementById('email').value = email;
+            // We don't load the old password into the form for security
+            document.getElementById('password').value = '';
+            document.getElementById('password').placeholder = 'Enter new password (optional)';
+        }
+        
+        async function deleteStudent(id) {
+            if (confirm('Are you sure you want to delete this student?')) {
+                try {
+                    await fetch(`${studentApiUrl}/${id}`, { method: 'DELETE' });
+                    loadStudents();
+                } catch (err) {
+                    console.error('Error deleting student:', err);
+                }
+            }
+        }
 
-    // Add or update student
-    document.getElementById('studentForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const id = document.getElementById('studentId').value;
-      const student = {
-        studentNumber: document.getElementById('studentNumber').value,
-        name: document.getElementById('name').value,
-        email: document.getElementById('email').value,
-        password: document.getElementById('password').value
-      };
-
-      const method = id ? 'PUT' : 'POST';
-      const endpoint = id ? `${apiUrl}/${id}` : apiUrl;
-
-      try {
-        await fetch(endpoint, {
-          method,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(student)
+        document.getElementById('accountForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const newAccount = {
+                studentId: parseInt(document.getElementById('accountStudentId').value),
+                semester: document.getElementById('accountSemester').value,
+                tuitionFee: parseFloat(document.getElementById('accountTuitionFee').value),
+                amountPaid: parseFloat(document.getElementById('accountAmountPaid').value),
+            };
+            try {
+                const response = await fetch(accountsApiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newAccount)
+                });
+                if (!response.ok) throw new Error('Failed to create account');
+                alert('Account added successfully!');
+                document.getElementById('accountForm').reset();
+                loadAccounts();
+            } catch (err) {
+                console.error('Error adding account:', err);
+                alert('Failed to add account.');
+            }
         });
+        
+        async function loadAccounts() {
+            try {
+                const res = await fetch(accountsApiUrl);
+                const data = await res.json();
+                const tableBody = document.getElementById('accountTableBody');
+                tableBody.innerHTML = '';
+                data.forEach(account => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${account.id}</td>
+                        <td>${account.studentId}</td>
+                        <td>${account.semester}</td>
+                        <td>₱${account.tuitionFee.toFixed(2)}</td>
+                        <td><input type="number" value="${account.amountPaid}" min="0" id="paid-${account.id}" style="width: 80px;" /></td>
+                        <td id="balance-${account.id}">₱${account.balance.toFixed(2)}</td>
+                        <td>
+                            <button onclick="updateAccount(${account.id})">Save</button>
+                            <button onclick="deleteAccount(${account.id})">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (err) {
+                console.error('Error loading accounts:', err);
+            }
+        }
+        
+        async function updateAccount(accountId) {
+            const newPaid = parseFloat(document.getElementById(`paid-${accountId}`).value);
+            try {
+                const response = await fetch(`${accountsApiUrl}/${accountId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amountPaid: newPaid })
+                });
+                if (!response.ok) throw new Error('Update failed');
+                alert('Account updated successfully!');
+                loadAccounts();
+            } catch (err) {
+                console.error('Error updating account:', err);
+                alert('Failed to update account');
+            }
+        }
+        
+        async function deleteAccount(accountId) {
+            if (!confirm('Are you sure you want to delete this account?')) return;
+            try {
+                const res = await fetch(`${accountsApiUrl}/${accountId}`, { method: 'DELETE' });
+                if (!res.ok) throw new Error('Failed to delete account');
+                alert('Account deleted successfully!');
+                loadAccounts();
+            } catch (err) {
+                console.error('Error deleting account:', err);
+                alert('Failed to delete account.');
+            }
+        }
 
-        document.getElementById('studentForm').reset();
-        document.getElementById('studentId').value = '';
+        // --- Initial Load on Page Open ---
+        loadFaculty(); // NEW: Load faculty on page open
         loadStudents();
-      } catch (err) {
-        console.error('Error saving student:', err);
-      }
-    });
-
-    // Edit student
-    function editStudent(id, studentNumber, name, email, password) {
-      document.getElementById('studentId').value = id;
-      document.getElementById('studentNumber').value = studentNumber;
-      document.getElementById('name').value = name;
-      document.getElementById('email').value = email;
-      document.getElementById('password').value = password;
-    }
-
-    // Delete student
-    async function deleteStudent(id) {
-      if (confirm('Are you sure you want to delete this student?')) {
-        try {
-          await fetch(`${apiUrl}/${id}`, { method: 'DELETE' });
-          loadStudents();
-        } catch (err) {
-          console.error('Error deleting student:', err);
-        }
-      }
-    }
-
-    // Initial load
-    loadStudents();
-
-    const accountsApiUrl = 'http://localhost:8080/api/accounts';
-
-    // Load all accounts
-    async function loadAccounts() {
-      try {
-        const studentId = sessionStorage.getItem("studentId");
-        const res = await fetch(`${accountsApiUrl}/student/${studentId}`);
-        const data = await res.json();
-
-        const tableBody = document.getElementById('accountTableBody');
-        tableBody.innerHTML = '';
-
-        data.forEach(account => {
-          const row = document.createElement('tr');
-          const balance = account.tuitionFee - account.amountPaid;
-
-          row.innerHTML = `
-        <td>${account.id}</td>
-        <td>${account.studentId}</td>
-        <td>${account.semester}</td>
-        <td>₱${account.tuitionFee.toFixed(2)}</td>
-        <td>
-          <input type="number" value="${account.amountPaid}" min="0" 
-            id="paid-${account.id}" style="width: 80px;" />
-        </td>
-        <td id="balance-${account.id}">₱${balance.toFixed(2)}</td>
-        <td>
-          <button onclick="updateAccount(${account.id}, ${account.tuitionFee})">Save</button>
-          <button onclick="deleteAccount(${account.id})">Delete</button>
-
-      `;
-          tableBody.appendChild(row);
-        });
-      } catch (err) {
-        console.error('Error loading accounts:', err);
-      }
-    }
-
-    // Update specific account
-    async function updateAccount(accountId, tuitionFee) {
-      const paidInput = document.getElementById(`paid-${accountId}`);
-      const newPaid = parseFloat(paidInput.value);
-      const balance = tuitionFee - newPaid;
-
-      try {
-        const response = await fetch(`${accountsApiUrl}/${accountId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            amountPaid: newPaid,
-            balance: balance
-          })
-        });
-
-        if (!response.ok) throw new Error('Update failed');
-
-        // Reflect updated balance in UI
-        document.getElementById(`balance-${accountId}`).textContent = `₱${balance.toFixed(2)}`;
-        alert('Account updated successfully!');
-      } catch (err) {
-        console.error('Error updating account:', err);
-        alert('Failed to update account');
-      }
-
-      async function deleteAccount(accountId) {
-        if (!confirm('Are you sure you want to delete this account?')) return;
-
-        try {
-          const res = await fetch(`${accountsApiUrl}/${accountId}`, {
-            method: 'DELETE'
-          });
-
-          if (!res.ok) throw new Error('Failed to delete account');
-          alert('Account deleted successfully!');
-          loadAccounts();
-        } catch (err) {
-          console.error('Error deleting account:', err);
-          alert('Failed to delete account.');
-        }
-      }
-
-    }
-
-    // Call after loading students
-    loadAccounts();
-
-  </script>
+        loadAccounts();
+    </script>
 </body>
-
 </html>

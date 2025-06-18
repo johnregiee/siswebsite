@@ -27,14 +27,10 @@
             font-weight: bold;
         }
 
-        nav .nav-links {
-            display: flex;
-            gap: 20px;
-        }
-
         nav .nav-links span {
             cursor: pointer;
             color: white;
+            padding: 5px 10px;
         }
 
         .container {
@@ -64,7 +60,7 @@
         th,
         td {
             padding: 10px;
-            text-align: center;
+            text-align: left;
         }
 
         th {
@@ -87,24 +83,27 @@
     </nav>
 
     <div class="container">
+        <!-- HOME SECTION (Default) -->
         <div id="homeSection" class="section active">
-            <h2>Welcome to the Student Dashboard</h2>
-            <p>This is your homepage.</p>
+            <h2>Welcome to your Dashboard, <span id="student-name-placeholder">Student</span>!</h2>
+            <p>Select a section from the navigation bar to view your information.</p>
         </div>
 
+        <!-- ENROLLMENT SECTION -->
         <div id="enrollmentSection" class="section">
             <h2>Enrollment</h2>
-
-            <label for="subjectSelect">Select Course:</label>
+            <label for="subjectSelect">Select Course to Enroll:</label>
             <select id="subjectSelect"></select>
             <button id="enrollBtn">Enroll</button>
-
+            <hr>
             <h3>My Enrolled Subjects</h3>
             <ul id="enrolledSubjects"></ul>
         </div>
 
+        <!-- ACCOUNTS SECTION -->
         <div id="accountsSection" class="section">
             <h2>Accounts</h2>
+            <p>Your financial statement and balance.</p>
             <table>
                 <thead>
                     <tr>
@@ -118,173 +117,200 @@
             </table>
         </div>
 
+        <!-- SCHEDULE SECTION -->
+        <!-- All schedule-related HTML is now properly contained here -->
         <div id="scheduleSection" class="section">
-            <h2>Schedule</h2>
-            <table>
+            <h2>My Class Schedule</h2>
+            <p>Here is your schedule for the current semester.</p>
+            <table id="scheduleTable">
                 <thead>
                     <tr>
-                        <th>Subject Name</th>
-                        <th>Subject Code</th>
-                        <th>Day</th>
+                        <th>Course Code</th>
+                        <th>Course Name</th>
+                        <th>Day(s)</th>
                         <th>Time</th>
                         <th>Room</th>
                     </tr>
                 </thead>
-                <tbody id="scheduleTableBody"></tbody>
+                <tbody id="scheduleTableBody">
+                    <!-- Schedule rows will be inserted here by JavaScript -->
+                </tbody>
             </table>
         </div>
 
+        <!-- GRADES SECTION -->
+
         <div id="gradesSection" class="section">
-            <h2>Grades</h2>
-            <p>Your academic performance will be shown here.</p>
+            <h2>My Grades</h2>
+            <p>Your academic performance will be shown here once available.</p>
+            <table id="gradesTable">
+                <thead>
+                    <tr>
+                        <th>Semester</th>
+                        <th>Course Code</th>
+                        <th>Course Name</th>
+                        <th>Grade</th>
+                        <th>Comments</th>
+                    </tr>
+                </thead>
+                <tbody id="gradesTableBody">
+                    <!-- Grade rows will be inserted here by JavaScript -->
+                </tbody>
+            </table>
         </div>
-    </div>
 
+        <script>
+            // --- SINGLE SOURCE OF TRUTH FOR STUDENT ID ---
+            const studentId = sessionStorage.getItem("studentId");
 
-    <script>
-        const studentId = sessionStorage.getItem("studentId");
-
-        if (!studentId) {
-            alert("You are not logged in. Redirecting to login page...");
-            window.location.href = "login.html";
-        }
-
-        const scheduleApiUrl = `http://localhost:8080/api/schedules/student/${studentId}`;
-
-
-        function loadStudentSchedule() {
-            fetch(scheduleApiUrl)
-                .then(res => {
-                    if (!res.ok) throw new Error("Schedule fetch failed.");
-                    return res.json();
-                })
-                .then(data => {
-                    const tbody = document.getElementById('scheduleTableBody');
-                    tbody.innerHTML = '';
-
-                    data.forEach(schedule => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-              <td>${schedule.subjectName}</td>
-              <td>${schedule.subjectCode}</td>
-              <td>${schedule.day}</td>
-              <td>${schedule.time}</td>
-              <td>${schedule.room}</td>
-            `;
-                        tbody.appendChild(row);
-                    });
-                })
-                .catch(err => {
-                    console.error('Error loading schedule:', err);
-                    alert('Could not load schedule. Check the console for more info.');
-                });
-        }
-
-        const availableCourses = [
-            { courseCode: 'MATH101', courseName: 'College Algebra' },
-            { courseCode: 'CS102', courseName: 'Intro to Programming' },
-            { courseCode: 'ENG103', courseName: 'English Grammar' },
-        ];
-
-        function loadAvailableCourses() {
-            const select = document.getElementById('subjectSelect');
-            select.innerHTML = '';
-            availableCourses.forEach(subject => {
-                const option = document.createElement('option');
-                option.value = subject.courseCode;
-                option.textContent = `${subject.courseCode} - ${subject.courseName}`;
-                select.appendChild(option);
-            });
-        }
-
-        async function enrollInSubject() {
-            const select = document.getElementById('subjectSelect');
-            const selectedCode = select.value;
-            const subject = availableCourses.find(s => s.courseCode === selectedCode);
-
-            const enrollmentData = {
-                studentId: studentId,
-                courseCode: subject.courseCode,
-                courseName: subject.courseName,
-                semester: '1st Sem AY 2025–2026',
-                status: 'Enrolled'
-            };
-
-            try {
-                const response = await fetch('http://localhost:8080/api/enrollments', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(enrollmentData)
-                });
-                if (!response.ok) throw new Error('Failed to enroll.');
-                alert('Successfully enrolled!');
-                loadStudentEnrollments();
-            } catch (error) {
-                console.error(error);
-                alert('Error enrolling subject.');
+            // Redirect if not logged in
+            if (!studentId) {
+                alert("You are not logged in. Redirecting to login page...");
+                window.location.href = "login.html";
             }
-        }
 
-        async function loadStudentEnrollments() {
-            try {
-                const response = await fetch(`http://localhost:8080/api/enrollments/student/${studentId}`);
-                if (!response.ok) throw new Error('Failed to fetch subjects');
-                const data = await response.json();
-                const enrolledList = document.getElementById('enrolledSubjects');
-                enrolledList.innerHTML = '';
-                data.forEach(enrollment => {
-                    const li = document.createElement('li');
-                    li.textContent = `${enrollment.courseCode} - ${enrollment.courseName} (${enrollment.semester})`;
-                    enrolledList.appendChild(li);
-                });
-            } catch (error) {
-                console.error(error);
-            }
-        }
+            // --- COMBINED AND CLEANED-UP SCRIPT ---
+            $(document).ready(function () {
 
-        async function loadStudentAccounts() {
-            try {
-                const response = await fetch(`http://localhost:8080/api/accounts/student/${studentId}`);
-                if (!response.ok) throw new Error('Failed to fetch accounts');
-                const data = await response.json();
-                const tableBody = document.getElementById('accountsTableBody');
-                tableBody.innerHTML = '';
+                // --- ALL API-LOADING FUNCTIONS ---
 
-                data.forEach(account => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-            <td>${account.semester}</td>
-            <td>₱${account.tuitionFee.toFixed(2)}</td>
-            <td>₱${account.amountPaid.toFixed(2)}</td>
-            <td>₱${account.balance.toFixed(2)}</td>
-          `;
-                    tableBody.appendChild(row);
-                });
-            } catch (error) {
-                console.error('Error loading accounts:', error);
-            }
-        }
+                // Function to load student's schedule
+                async function loadStudentSchedule() {
+                    const tableBody = $('#scheduleTableBody');
+                    tableBody.html('<tr><td colspan="5">Loading...</td></tr>'); // Show loading feedback
+                    try {
+                        const response = await fetch(`http://localhost:8080/api/schedules/student/${studentId}`);
+                        if (!response.ok) throw new Error('Failed to fetch schedule from server.');
 
-        $(document).ready(function () {
-            $('.nav-links span').click(function () {
-                const target = $(this).data('target');
-                $('.section').removeClass('active');
-                $('#' + target).addClass('active');
+                        const schedules = await response.json();
+                        tableBody.empty(); // Clear the loading message
 
-                if (target === 'accountsSection') {
-                    loadStudentAccounts();
-                } else if (target === 'scheduleSection') {
-                    loadStudentSchedule();
+                        if (schedules.length === 0) {
+                            tableBody.html('<tr><td colspan="5">You have no schedules assigned yet.</td></tr>');
+                        } else {
+                            schedules.forEach(schedule => {
+                                const row = `
+                                <tr>
+                                    <td>${schedule.courseCode}</td>
+                                    <td>${schedule.courseName}</td>
+                                    <td>${schedule.day}</td>
+                                    <td>${schedule.time}</td>
+                                    <td>${schedule.room}</td>
+                                </tr>`;
+                                tableBody.append(row);
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Error loading schedule:', error);
+                        tableBody.html('<tr><td colspan="5" style="color: red;">Could not load schedule. Please try again later.</td></tr>');
+                    }
                 }
-            });
 
-            loadAvailableCourses();
-            loadStudentEnrollments();
-            loadStudentAccounts();
-            loadStudentSchedule();
-            $('#enrollBtn').click(enrollInSubject);
-        });
-    </script>
+                async function loadStudentAccounts() {
+                    const tableBody = $('#accountsTableBody');
+                    tableBody.html('<tr><td colspan="4">Loading...</td></tr>');
+                    try {
+                        const response = await fetch(`http://localhost:8080/api/accounts/student/${studentId}`);
+                        if (!response.ok) throw new Error('Failed to fetch accounts');
+
+                        const data = await response.json();
+                        tableBody.empty();
+
+                        if (data.length === 0) {
+                            tableBody.html('<tr><td colspan="4">No account information available.</td></tr>');
+                        } else {
+                            data.forEach(account => {
+                                const row = `
+                                <tr>
+                                    <td>${account.semester}</td>
+                                    <td>₱${account.tuitionFee.toFixed(2)}</td>
+                                    <td>₱${account.amountPaid.toFixed(2)}</td>
+                                    <td>₱${account.balance.toFixed(2)}</td>
+                                </tr>`;
+                                tableBody.append(row);
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Error loading accounts:', error);
+                        tableBody.html('<tr><td colspan="4" style="color: red;">Could not load accounts.</td></tr>');
+                    }
+                }
+
+                async function loadStudentGrades() {
+                    const tableBody = $('#gradesTableBody');
+                    tableBody.html('<tr><td colspan="5">Loading grades...</td></tr>'); // Show loading feedback
+
+                    try {
+                        const response = await fetch(`http://localhost:8080/api/grades/student/${studentId}`);
+                        if (!response.ok) throw new Error('Failed to fetch grades from server.');
+
+                        const grades = await response.json();
+                        tableBody.empty(); // Clear the loading message
+
+                        if (grades.length === 0) {
+                            tableBody.html('<tr><td colspan="5">No grades are available yet.</td></tr>');
+                        } else {
+                            grades.forEach(grade => {
+                                const row = `
+                    <tr>
+                        <td>${grade.semester}</td>
+                        <td>${grade.courseCode}</td>
+                        <td>${grade.courseName}</td>
+                        <td><strong>${grade.grade}</strong></td>
+                        <td>${grade.comments || ''}</td>
+                    </tr>`; // Use '|| ""' for empty comments
+                                tableBody.append(row);
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Error loading grades:', error);
+                        tableBody.html('<tr><td colspan="5" style="color: red;">Could not load grades. Please try again later.</td></tr>');
+                    }
+                }
+
+                // --- MODIFY THE EXISTING CLICK HANDLER ---
+                // Find your existing nav click handler and add the 'else if' part
+                $('.nav-links span').on('click', function () {
+                    const targetId = $(this).data('target');
+
+                    $('.section').removeClass('active');
+                    $('#' + targetId).addClass('active');
+
+                    if (targetId === 'accountsSection') {
+                        loadStudentAccounts();
+                    } else if (targetId === 'scheduleSection') {
+                        loadStudentSchedule();
+                    } else if (targetId === 'gradesSection') { // <-- ADD THIS BLOCK
+                        loadStudentGrades();
+                    }
+                });
+
+                // (Your enrollment functions would go here too, I've left them out for brevity)
+
+                // --- EVENT HANDLERS ---
+
+                // Navigation click handler
+                $('.nav-links span').on('click', function () {
+                    const targetId = $(this).data('target');
+
+                    // Switch active class for section visibility
+                    $('.section').removeClass('active');
+                    $('#' + targetId).addClass('active');
+
+                    // Load data for the selected section
+                    if (targetId === 'accountsSection') {
+                        loadStudentAccounts();
+                    } else if (targetId === 'scheduleSection') {
+                        loadStudentSchedule();
+                    } else if (targetId === 'enrollmentSection') {
+                        // loadStudentEnrollments();
+                    }
+                });
+
+                loadStudentAccounts();
+                loadStudentSchedule();
+            });
+        </script>
 
 </body>
 

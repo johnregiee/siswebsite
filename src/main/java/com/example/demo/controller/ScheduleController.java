@@ -1,12 +1,20 @@
 package com.example.demo.controller;
 
-import com.example.demo.entity.Schedule;
-import com.example.demo.service.ScheduleService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.demo.entity.Schedule;
+import com.example.demo.service.ScheduleService;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -44,5 +52,10 @@ public class ScheduleController {
     @DeleteMapping("/{id}")
     public void deleteSchedule(@PathVariable Long id) {
         scheduleService.deleteSchedule(id);
+    }
+
+     @GetMapping("/faculty/{facultyId}")
+    public List<Schedule> getSchedulesForFaculty(@PathVariable Long facultyId) {
+        return scheduleService.getSchedulesByFacultyId(facultyId);
     }
 }

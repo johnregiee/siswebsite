@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8" />
-    <title>Login - Student & Faculty</title>
+    <title>Login - SIS Portal</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
         body {
@@ -12,46 +11,57 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background: #f4f4f4;
+            margin: 0;
+            background-color: #f0f2f5;
         }
-
         .login-container {
             background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-            width: 300px;
-        }
-
-        .login-container h2 {
-            margin-bottom: 20px;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 320px;
             text-align: center;
         }
-
-        input,
-        select,
-        button {
-            width: 100%;
-            margin-bottom: 15px;
-            padding: 10px;
-            font-size: 1em;
+        .login-container h2 {
+            margin-bottom: 25px;
+            color: #333;
         }
-
+        /* Style for all input fields, including the select dropdown */
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box; /* Important for consistent sizing */
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
         .error {
             color: red;
             text-align: center;
             margin-bottom: 10px;
+            height: 20px; /* Reserve space to prevent layout shift */
         }
     </style>
 </head>
-
 <body>
     <div class="login-container">
-        <h2>Login</h2>
+        <h2>SIS Portal Login</h2>
         <div id="error" class="error"></div>
         <form id="loginForm">
+            <!-- THE ROLE SELECTOR DROPDOWN IS BACK -->
             <select id="userType" required>
-                <option value="">Select user type</option>
+                <option value="">-- Select your role --</option>
                 <option value="student">Student</option>
                 <option value="faculty">Faculty</option>
             </select>
@@ -69,12 +79,16 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const errorDiv = document.getElementById('error');
+            errorDiv.textContent = ''; // Clear previous errors
 
+            // Determine the API endpoint based on the selected role
             let endpoint = '';
             if (userType === 'student') {
-                endpoint = 'http://localhost:8080/api/admin/student/login';
+                // This must match an endpoint in your backend
+                endpoint = 'http://localhost:8080/api/auth/student/login';
             } else if (userType === 'faculty') {
-                endpoint = 'http://localhost:8080/api/admin/faculty/login';
+                // This must also match an endpoint in your backend
+                endpoint = 'http://localhost:8080/api/auth/faculty/login';
             } else {
                 errorDiv.textContent = 'Please select a user type.';
                 return;
@@ -89,35 +103,27 @@
 
                 if (!response.ok) {
                     const errorText = await response.text();
-                    errorDiv.textContent = errorText || 'Login failed.';
+                    errorDiv.textContent = errorText || 'Login failed. Please check your credentials.';
                     return;
                 }
 
                 const userData = await response.json();
-                errorDiv.textContent = '';
 
-                // Store user data
-                // Store student ID in sessionStorage for use in dashboard
+                // Store the correct ID and redirect to the correct dashboard
                 if (userType === 'student') {
                     sessionStorage.setItem("studentId", userData.id);
-                } else if (userType === 'faculty') {
-                    sessionStorage.setItem("facultyId", userData.id); // if needed later
-                }
-
-
-                // Redirect to dashboard
-                if (userType === 'student') {
                     window.location.href = 'student-dashboard.html';
-                } else {
+                } else if (userType === 'faculty') {
+                    sessionStorage.setItem("facultyId", userData.id);
+
                     window.location.href = 'faculty-dashboard.html';
                 }
 
             } catch (err) {
                 console.error('Login error:', err);
-                errorDiv.textContent = 'Network error or server not running.';
+                errorDiv.textContent = 'Server is not running or network error.';
             }
         });
     </script>
 </body>
-
 </html>

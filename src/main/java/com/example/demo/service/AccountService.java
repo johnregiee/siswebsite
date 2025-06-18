@@ -1,11 +1,12 @@
 package com.example.demo.service;
 
-import com.example.demo.entity.Account;
-import com.example.demo.repository.AccountRepository;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.example.demo.entity.Account;
+import com.example.demo.repository.AccountRepository;
 
 @Service
 public class AccountService {
@@ -19,5 +20,9 @@ public class AccountService {
 
     public Account saveAccount(Account account) {
         return accountRepository.save(account);
+    }
+
+    public List<Account> getAllAccounts() {
+        return accountRepository.findAll();
     }
 }

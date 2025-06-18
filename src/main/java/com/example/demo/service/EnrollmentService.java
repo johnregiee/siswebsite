@@ -42,4 +42,8 @@ public class EnrollmentService {
             return true;
         }).orElse(false);
     }
+
+    public List<Enrollment> getEnrollmentsByCourse(String courseCode) {
+        return enrollmentRepository.findByCourseCode(courseCode);
+    }
 }
