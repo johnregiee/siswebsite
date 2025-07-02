@@ -347,7 +347,11 @@
                 btn.classList.toggle('active', btn.getAttribute('data-tab') === sectionId);
             });
             // Refresh schedules table when Schedules tab is shown
-            if (sectionId === 'schedules') fetchAndRenderSchedules();
+            if (sectionId === 'schedules') {
+                const selector = document.getElementById('scheduleCurriculumSelect');
+                const selectedId = selector ? selector.value : '';
+                fetchAndRenderSchedules(selectedId);
+            }
         }
         // Show the first tab by default
         showTab('faculty');
@@ -386,7 +390,7 @@
                     select.appendChild(option);
                 });
             });
-        // Fetch curriculums and populate scheduleCurriculumSelect
+        // Populate schedule curriculum dropdown and do NOT auto-select the first curriculum
         fetch('/api/curriculums')
             .then(res => res.json())
             .then(curriculums => {
@@ -399,6 +403,13 @@
                     opt.textContent = c.name;
                     selector.appendChild(opt);
                 });
+                // Do NOT auto-select the first curriculum
+                // selector.value = curriculums.length > 0 ? curriculums[0].id : '';
+                // if (selector.value && selector.value !== 'undefined') {
+                //     fetchAndRenderSchedules(selector.value);
+                // }
+                // Instead, show the default message until user selects
+                fetchAndRenderSchedules();
             });
         // When curriculumSelector changes, update csCurriculumId in the form
         const curriculumSelector = document.getElementById('curriculumSelector');
@@ -547,6 +558,57 @@
                     alert('Network or server error: ' + err);
                 });
             });
+        }
+        const sectionForm = document.getElementById('sectionForm');
+        if (sectionForm) {
+            sectionForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const name = document.getElementById('sectionName').value.trim();
+                const saveBtn = document.querySelector('#sectionForm button[type="submit"]');
+                if (!name) {
+                    alert('Please enter a section name.');
+                    return;
+                }
+                if (saveBtn) saveBtn.disabled = true;
+                fetch('/api/sections', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name })
+                })
+                .then(async res => {
+                    if (saveBtn) saveBtn.disabled = false;
+                    if (res.ok) {
+                        alert('Section saved!');
+                        this.reset();
+                        fetchAndRenderSections();
+                    } else {
+                        const errorText = await res.text();
+                        if (errorText && errorText.toLowerCase().includes('unique')) {
+                            alert('A section with this name already exists.');
+                        } else {
+                            alert('Failed to save section: ' + errorText);
+                        }
+                    }
+                })
+                .catch(err => {
+                    if (saveBtn) saveBtn.disabled = false;
+                    alert('Network or server error: ' + err);
+                });
+            });
+        }
+        const scheduleCurriculumSelect = document.getElementById('scheduleCurriculumSelect');
+        if (scheduleCurriculumSelect) {
+            scheduleCurriculumSelect.addEventListener('change', function() {
+                const curriculumId = String(this.value);
+                console.log('[DEBUG] Dropdown changed, curriculumId:', curriculumId);
+                if (curriculumId && curriculumId !== 'undefined' && curriculumId !== '') {
+                    fetchAndRenderSchedules(curriculumId);
+                } else {
+                    fetchAndRenderSchedules();
+                }
+            });
+            // On page load, show empty or message
+            fetchAndRenderSchedules();
         }
     });
     // --- Faculty Add/Render Logic ---
@@ -1224,18 +1286,6 @@
             });
     }
 
-    // After the curriculum dropdown in the Schedules section, add:
-    const scheduleCurriculumSelect = document.getElementById('scheduleCurriculumSelect');
-    if (scheduleCurriculumSelect) {
-        scheduleCurriculumSelect.addEventListener('change', function() {
-            const curriculumId = this.value;
-            fetchAndRenderSchedules(curriculumId);
-            // ... existing code for curriculum subject table ...
-        });
-        // On page load, show empty or message
-        fetchAndRenderSchedules();
-    }
-
     function populateScheduleFacultyDropdown() {
         fetch('/api/faculty')
             .then(res => res.json())
@@ -1295,6 +1345,78 @@
             alert('Failed to update subject.');
         }
     };
+
+    function fetchAndRenderSections() {
+        fetch('/api/sections')
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('sectionTableBody');
+                tbody.innerHTML = '';
+                data.forEach(section => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${section.name ?? ''}</td>
+                        <td>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <button type="button" style="margin-right:8px;" onclick="editSection(${section.id}, '${section.name?.replace(/'/g, "&#39;")}')">Edit</button>
+                                <button type="button" onclick="deleteSection(${section.id})">Delete</button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+    }
+
+    function fetchAndRenderSchedules(curriculumId) {
+        const tbody = document.getElementById('schedulesTableBody');
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#888;">Loading...</td></tr>';
+
+        if (!curriculumId) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#888;">Please select a curriculum.</td></tr>';
+            return;
+        }
+
+        console.log('[DEBUG] fetchAndRenderSchedules called with curriculumId:', curriculumId);
+        Promise.all([
+            fetch(`/api/curriculums/${curriculumId}/subjects`).then(res => res.json()),
+            fetch(`/api/schedules/curriculum/${curriculumId}`).then(res => res.json())
+        ]).then(([subjects, schedules]) => {
+            console.log('[DEBUG] Subjects API response for curriculumId', curriculumId, ':', subjects);
+            tbody.innerHTML = '';
+            if (!subjects.length) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#e85743;">No subjects found for this curriculum (ID: ${curriculumId}).<br>Check if subjects are assigned to this curriculum and not soft-deleted.</td></tr>`;
+                return;
+            }
+            const scheduleMap = {};
+            schedules.forEach(sch => {
+                if (sch.subjectId) scheduleMap[sch.subjectId] = sch;
+            });
+            subjects.forEach(subject => {
+                // Use subject properties directly
+                const sch = scheduleMap[subject.id] || {};
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${sch.courseCode || subject.subjectCode || ''}</td>
+                    <td>${sch.courseName || subject.subjectName || ''}</td>
+                    <td>${sch.day || subject.days || ''}</td>
+                    <td>${sch.time || subject.time || ''}</td>
+                    <td>${sch.room || subject.roomNumber || ''}</td>
+                    <td>${sch.facultyName || subject.facultyName || ''}</td>
+                    <td>
+                        ${sch.id ? `
+                            <button class="schedule-edit-btn" data-id="${sch.id}">Edit</button>
+                            <button class="schedule-delete-btn" data-id="${sch.id}">Delete</button>
+                        ` : `<button class="schedule-add-btn" data-subject-id="${subject.id}">Add</button>`}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            // Attach event listeners for add/edit/delete as needed
+        }).catch((err) => {
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#e85743;">Failed to load schedule. Error: ${err}</td></tr>`;
+        });
+    }
     </script>
 </body>
 

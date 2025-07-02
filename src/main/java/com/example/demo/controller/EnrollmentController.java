@@ -25,7 +25,6 @@ import com.example.demo.repository.CurriculumSubjectRepository;
 import com.example.demo.repository.FacultyRepository;
 import com.example.demo.repository.ScheduleRepository;
 import com.example.demo.service.EnrollmentService;
-import com.example.demo.controller.EnrollmentWithDetailsDto;
 
 @RestController
 @RequestMapping("/api/enrollments")
