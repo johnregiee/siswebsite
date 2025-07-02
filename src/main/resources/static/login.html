@@ -2,95 +2,62 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Login - SIS Portal</title>
+    <title>SIS Portal Login</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f2f5;
-        }
-        .login-container {
-            background: white;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            width: 320px;
-            text-align: center;
-        }
-        .login-container h2 {
-            margin-bottom: 25px;
-            color: #333;
-        }
-        /* Style for all input fields, including the select dropdown */
-        input, select, button {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box; /* Important for consistent sizing */
-            font-size: 16px;
-        }
-        button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .error {
-            color: red;
-            text-align: center;
-            margin-bottom: 10px;
-            height: 20px; /* Reserve space to prevent layout shift */
-        }
-    </style>
+    <link rel="stylesheet" href="login.css" />
 </head>
 <body>
     <div class="login-container">
+        <span class="logo" style="font-size:1.5em; font-weight:bold; color:#e74c3c; letter-spacing:1px; margin-bottom:8px;">PRISM</span>
         <h2>SIS Portal Login</h2>
-        <div id="error" class="error"></div>
+        <div style="color:#888; font-size:1em; margin-bottom:18px; text-align:center;">Portal for Records, Information, and Student Management</div>
+        <div id="error" class="error" style="display:none;"></div>
         <form id="loginForm">
-            <!-- THE ROLE SELECTOR DROPDOWN IS BACK -->
             <select id="userType" required>
                 <option value="">-- Select your role --</option>
                 <option value="student">Student</option>
                 <option value="faculty">Faculty</option>
             </select>
+            <input type="text" id="studentNumber" placeholder="Student Number" style="display:none;" />
             <input type="email" id="email" placeholder="Email" required />
             <input type="password" id="password" placeholder="Password" required />
             <button type="submit">Login</button>
         </form>
     </div>
-
     <script>
+        const userTypeSelect = document.getElementById('userType');
+        const studentNumberInput = document.getElementById('studentNumber');
+        userTypeSelect.addEventListener('change', function() {
+            if (this.value === 'student') {
+                studentNumberInput.style.display = '';
+                studentNumberInput.required = true;
+            } else {
+                studentNumberInput.style.display = 'none';
+                studentNumberInput.required = false;
+            }
+        });
+
         document.getElementById('loginForm').addEventListener('submit', async function (e) {
             e.preventDefault();
 
             const userType = document.getElementById('userType').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const studentNumber = studentNumberInput.value;
             const errorDiv = document.getElementById('error');
-            errorDiv.textContent = ''; // Clear previous errors
+            errorDiv.style.display = 'none';
+            errorDiv.textContent = '';
 
-            // Determine the API endpoint based on the selected role
             let endpoint = '';
+            let body = { email, password };
             if (userType === 'student') {
-                // This must match an endpoint in your backend
-                endpoint = 'http://localhost:8080/api/auth/student/login';
+                endpoint = 'http://localhost:8080/api/admin/student/login';
+                body.studentNumber = studentNumber;
             } else if (userType === 'faculty') {
-                // This must also match an endpoint in your backend
                 endpoint = 'http://localhost:8080/api/auth/faculty/login';
             } else {
                 errorDiv.textContent = 'Please select a user type.';
+                errorDiv.style.display = 'block';
                 return;
             }
 
@@ -98,30 +65,31 @@
                 const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
+                    body: JSON.stringify(body)
                 });
 
                 if (!response.ok) {
                     const errorText = await response.text();
                     errorDiv.textContent = errorText || 'Login failed. Please check your credentials.';
+                    errorDiv.style.display = 'block';
                     return;
                 }
 
                 const userData = await response.json();
 
-                // Store the correct ID and redirect to the correct dashboard
                 if (userType === 'student') {
                     sessionStorage.setItem("studentId", userData.id);
+                    sessionStorage.setItem("studentNumber", userData.studentNumber);
                     window.location.href = 'student-dashboard.html';
                 } else if (userType === 'faculty') {
                     sessionStorage.setItem("facultyId", userData.id);
-
                     window.location.href = 'faculty-dashboard.html';
                 }
 
             } catch (err) {
                 console.error('Login error:', err);
                 errorDiv.textContent = 'Server is not running or network error.';
+                errorDiv.style.display = 'block';
             }
         });
     </script>

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Enrollment | PRISM Student Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f6f7fb;
+            color: #222;
+        }
+        header {
+            background: #e74c3c;
+            color: #fff;
+            padding: 18px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        nav {
+            display: flex;
+            gap: 18px;
+        }
+        nav .nav-link {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 18px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        nav .nav-link.active, nav .nav-link:hover {
+            background: #fff;
+            color: #e74c3c;
+        }
+        .container {
+            display: flex;
+            gap: 32px;
+            max-width: 1300px;
+            margin: 32px auto 0 auto;
+            padding: 0 16px 32px 16px;
+        }
+        .sidebar {
+            width: 260px;
+            min-width: 200px;
+        }
+        .sidebar .card {
+            padding: 18px 20px 18px 20px;
+            margin-bottom: 24px;
+        }
+        .sidebar h4 {
+            margin: 0 0 12px 0;
+            font-size: 1.1em;
+            color: #e74c3c;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 18px 0;
+        }
+        .sidebar ul li {
+            margin-bottom: 10px;
+        }
+        .sidebar ul li a {
+            color: #e74c3c;
+            text-decoration: none;
+            font-weight: 500;
+            transition: text-decoration 0.2s;
+        }
+        .sidebar ul li a:hover {
+            text-decoration: underline;
+        }
+        .inbox-list {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+            padding: 16px 0 0 0;
+            margin-bottom: 18px;
+        }
+        .inbox-list .inbox-item {
+            padding: 12px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.98em;
+        }
+        .inbox-list .inbox-item:last-child {
+            border-bottom: none;
+        }
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            padding: 28px 32px 24px 32px;
+            margin-bottom: 32px;
+        }
+        h1 {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 0 0 18px 0;
+        }
+        h2, h3 {
+            color: #e74c3c;
+            margin-top: 0;
+        }
+        @media (max-width: 1000px) {
+            .container { flex-direction: column; gap: 0; }
+            .sidebar { width: 100%; min-width: 0; margin-bottom: 24px; }
+        }
+        @media (max-width: 700px) {
+            .card { padding: 10px 2px 10px 2px; }
+        }
+        .enroll-btn {
+            background: linear-gradient(90deg, #e85743 0%, #ff7e5f 100%);
+            color: #fff;
+            border: none;
+            padding: 0.9rem 2.2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            box-shadow: 0 2px 8px rgba(231,76,60,0.08);
+            transition: background 0.2s, transform 0.1s;
+        }
+        .enroll-btn:hover {
+            background: linear-gradient(90deg, #ff7e5f 0%, #e85743 100%);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <span class="logo">PRISM</span>
+        <nav>
+            <a class="nav-link" href="student-dashboard.html">Home</a>
+            <a class="nav-link active" href="enrollment.html">Enrollment</a>
+            <a class="nav-link" href="accounts.html">Accounts</a>
+            <a class="nav-link" href="schedule.html">Schedule</a>
+            <a class="nav-link" href="grades.html">Grades</a>
+        </nav>
+        <div style="display: flex; align-items: center; gap: 16px; position: relative;">
+            <span id="profileIcon" style="font-size: 1.2em; cursor: pointer;">👤</span>
+            <div id="logoutDropdown" style="display:none; position:absolute; top:36px; right:0; background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.12); min-width:120px; z-index:10;">
+                <button id="logoutBtn" style="width:100%; background:#e74c3c; color:#fff; border:none; border-radius:8px; padding:10px 0; font-size:1em; cursor:pointer;">Logout</button>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="card">
+                <h4>Inbox</h4>
+                <div class="inbox-list">
+                    <div class="inbox-item"><b>March 08, 2025</b><br>2025 Career Fest (PI)</div>
+                    <div class="inbox-item"><b>November 11, 2024</b><br>A Comprehensive Online Labor Laws and Standards Orientation and Review</div>
+                    <div class="inbox-item"><b>May 14, 2024</b><br>Career Development Talk 2024</div>
+                </div>
+                <ul>
+                    <li><a href="#">Graduation Clearance</a></li>
+                    <li><a href="#">Submit Feedback</a></li>
+                </ul>
+            </div>
+        </aside>
+        <section class="main-content">
+            <div class="card">
+                <h1>Enrollment</h1>
+                <p>Welcome to the enrollment section. Here you can enroll in courses for the upcoming semester.</p>
+                <div id="enrolledSubjectsContainer" style="margin-top:2.5rem;">
+                  <h3 style="color:#e85743;">Enrolled Subjects</h3>
+                  <table id="enrolledSubjectsTable" style="width:100%; border-collapse:collapse; background:#fff; border-radius:10px; box-shadow:0 1px 6px rgba(0,0,0,0.04);">
+                    <thead>
+                      <tr style="background:#ffeaea; color:#e85743;">
+                        <th style="text-align:left; padding:10px 8px;">Subject Code</th>
+                        <th style="text-align:left; padding:10px 8px;">Subject Name</th>
+                        <th style="text-align:left; padding:10px 8px;">Units</th>
+                        <th style="text-align:left; padding:10px 8px;">Faculty</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+                <button class="enroll-btn" onclick="document.getElementById('enrollModal').style.display='flex'">Enroll Now</button>
+                <!-- Enrollment Modal -->
+                <div id="enrollModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.18); z-index:2000; align-items:center; justify-content:center;">
+                  <div style="background:#fff; border-radius:12px; padding:2rem 2.5rem; min-width:320px; max-width:90vw; box-shadow:0 4px 24px rgba(0,0,0,0.15); position:relative;">
+                    <button onclick="document.getElementById('enrollModal').style.display='none'" style="position:absolute; top:10px; right:10px; background:none; border:none; font-size:1.5rem; color:#e85743; cursor:pointer;">&times;</button>
+                    <h2 style="color:#e85743; margin-top:0;">Enroll Student</h2>
+                    <form id="enrollForm">
+                      <div style="margin-bottom:1.3rem;">
+                        <label for="studentId" style="font-weight:600;">Student ID:</label>
+                        <input type="text" id="studentId" name="studentId" style="width:100%; padding:0.6rem; border-radius:7px; border:1.5px solid #e0e0e0; font-size:1.1rem; margin-top:0.3rem;" required />
+                      </div>
+                      <div style="margin-bottom:1.3rem;">
+                        <label for="curriculumSelect" style="font-weight:600;">Curriculum:</label>
+                        <select id="curriculumSelect" name="curriculumSelect" style="width:100%; padding:0.6rem; border-radius:7px; border:1.5px solid #e0e0e0; font-size:1.1rem; margin-top:0.3rem;" required>
+                          <option value="">Loading curriculums...</option>
+                        </select>
+                      </div>
+                      <button type="submit" class="enroll-btn" style="width:100%;">Submit Enrollment</button>
+                    </form>
+                  </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <footer style="background:#fff; color:#888; font-size:0.98em; text-align:center; padding:18px 0 8px 0; border-top:1px solid #eee; margin-top:32px;">
+        <div style="max-width:1200px; margin:auto; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px;">
+            <div>For questions and comments, email us at <a href="mailto:prismconcerns@university.edu.ph" style="color:#e74c3c;">prismconcerns@university.edu.ph</a></div>
+            <div>PRISM – Portal for Records, Information, and Student Management</div>
+            <div>
+                <a href="#" style="color:#e74c3c; margin-right:8px;">Terms of Use</a>
+                <a href="#" style="color:#e74c3c; margin-right:8px;">Privacy Statement</a>
+                Version 06.2025.A
+            </div>
+        </div>
+    </footer>
+    <script>
+    // Profile icon dropdown logic
+    const profileIcon = document.getElementById('profileIcon');
+    const logoutDropdown = document.getElementById('logoutDropdown');
+    profileIcon.addEventListener('click', function(e) {
+        logoutDropdown.style.display = logoutDropdown.style.display === 'block' ? 'none' : 'block';
+        e.stopPropagation();
+    });
+    document.addEventListener('click', function() {
+        logoutDropdown.style.display = 'none';
+    });
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+        sessionStorage.clear();
+        window.location.href = 'login.html';
+    });
+    // Highlight the active nav link based on current URL
+    document.addEventListener('DOMContentLoaded', function() {
+        const navLinks = document.querySelectorAll('nav .nav-link');
+        navLinks.forEach(link => {
+            if (window.location.pathname.endsWith(link.getAttribute('href'))) {
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            }
+        });
+    });
+    // Populate curriculum dropdown on modal open
+    async function populateCurriculums() {
+      const select = document.getElementById('curriculumSelect');
+      select.innerHTML = '<option value="">Loading curriculums...</option>';
+      try {
+        const res = await fetch('/api/curriculums');
+        const curriculums = await res.json();
+        select.innerHTML = '<option value="">Select a curriculum</option>';
+        curriculums.forEach(c => {
+          select.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+        });
+      } catch {
+        select.innerHTML = '<option value="">Failed to load curriculums</option>';
+      }
+    }
+    document.querySelector('.enroll-btn').addEventListener('click', populateCurriculums);
+    // Helper: Show enrolled subjects for a student
+    async function showEnrolledSubjects(studentId) {
+      const container = document.getElementById('enrolledSubjectsContainer');
+      const tbody = document.querySelector('#enrolledSubjectsTable tbody');
+      // Set loading message only once, right before fetch
+      tbody.innerHTML = '<tr><td colspan="2" style="text-align:center; color:#888;">Loading enrolled subjects...</td></tr>';
+      if (!studentId) {
+        container.style.display = 'none';
+        return;
+      }
+      try {
+        const res = await fetch(`/api/enrollments/student/${studentId}`);
+        const enrollments = await res.json();
+        // Always clear loading message before adding new rows
+        tbody.innerHTML = '';
+        // Filter to unique subjects by code+name and only show active ones
+        const unique = {};
+        enrollments.forEach(e => {
+          if (e.status && (e.status.toLowerCase() === 'dropped' || e.status.toLowerCase() === 'deleted')) return;
+          const key = (e.courseCode || e.subjectCode || '') + '|' + (e.courseName || e.subjectName || '');
+          if (!unique[key]) unique[key] = e;
+        });
+        const uniqueEnrollments = Object.values(unique);
+        if (uniqueEnrollments.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="2" style="text-align:center; color:#888;">No enrolled subjects.</td></tr>';
+        } else {
+          tbody.innerHTML = uniqueEnrollments.map(e =>
+            `<tr>
+              <td style='padding:10px 8px; text-align:left;'>${e.subjectCode || e.courseCode || ''}</td>
+              <td style='padding:10px 8px; text-align:left;'>${e.subjectName || e.courseName || ''}</td>
+              <td style='padding:10px 8px; text-align:left;'>${e.units ?? ''}</td>
+              <td style='padding:10px 8px; text-align:left;'>${e.facultyName ?? ''}</td>
+            </tr>`
+          ).join('');
+        }
+      } catch {
+        tbody.innerHTML = '<tr><td colspan="2" style="text-align:center; color:#e85743;">Failed to load enrolled subjects.</td></tr>';
+      }
+    }
+    // On student ID input blur, show enrolled subjects
+    document.getElementById('studentId').addEventListener('blur', function() {
+      const studentId = this.value.trim();
+      showEnrolledSubjects(studentId);
+    });
+    // Helper: Get student ID by student number
+    async function getStudentIdByStudentNumber(studentNumber) {
+      const res = await fetch('/api/admin/student');
+      const students = await res.json();
+      const student = students.find(s => s.studentNumber === studentNumber);
+      return student ? student.id : null;
+    }
+    // After successful enrollment, refresh enrolled subjects
+    document.getElementById('enrollForm').onsubmit = async function(e) {
+      e.preventDefault();
+      const studentNumber = document.getElementById('studentId').value.trim();
+      const curriculumSelect = document.getElementById('curriculumSelect');
+      if (!studentNumber || !curriculumSelect.value) {
+        alert('Please fill in all fields.');
+        return;
+      }
+      const studentId = await getStudentIdByStudentNumber(studentNumber);
+      if (!studentId) {
+        alert('Student not found. Please check the student number.');
+        return;
+      }
+      const curriculumId = Number(curriculumSelect.value);
+      try {
+        const response = await fetch('/api/enrollments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ studentId, curriculumId })
+        });
+        if (response.ok) {
+          alert('Enrollment submitted for Student Number: ' + studentNumber);
+          showEnrolledSubjectsForLoggedInStudent();
+          this.reset();
+        } else {
+          const errorText = await response.text();
+          alert(errorText || 'Failed to enroll in subject.');
+        }
+      } catch (err) {
+        alert('Error connecting to server.');
+      }
+    };
+    // Show enrolled subjects for the logged-in student on page load
+    async function showEnrolledSubjectsForLoggedInStudent() {
+      const studentNumber = sessionStorage.getItem('studentNumber');
+      if (!studentNumber) {
+        const tbody = document.querySelector('#enrolledSubjectsTable tbody');
+        tbody.innerHTML = '<tr><td colspan="2" style="text-align:center; color:#e85743;">Not logged in.</td></tr>';
+        return;
+      }
+      const studentId = await getStudentIdByStudentNumber(studentNumber);
+      showEnrolledSubjects(studentId);
+    }
+    showEnrolledSubjectsForLoggedInStudent();
+    </script>
+</body>
+</html> 

@@ -4,6 +4,7 @@ import com.example.demo.entity.Enrollment;
 import com.example.demo.repository.EnrollmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,7 +20,7 @@ public class EnrollmentService {
     }
 
     public List<Enrollment> getEnrollmentsByStudentId(Long studentId) {
-        return enrollmentRepository.findByStudentId(studentId);
+        return enrollmentRepository.findExistingSubjectEnrollmentsByStudentId(studentId);
     }
 
     public Enrollment saveEnrollment(Enrollment enrollment) {
@@ -45,5 +46,21 @@ public class EnrollmentService {
 
     public List<Enrollment> getEnrollmentsByCourse(String courseCode) {
         return enrollmentRepository.findByCourseCode(courseCode);
+    }
+
+    public boolean softDeleteEnrollment(Long id) {
+        return enrollmentRepository.findById(id).map(enrollment -> {
+            enrollment.setStatus("Deleted");
+            enrollmentRepository.save(enrollment);
+            return true;
+        }).orElse(false);
+    }
+
+    public Enrollment createEnrollment(Enrollment enrollment) {
+        java.util.List<Enrollment> existing = enrollmentRepository.findActiveEnrollment(enrollment.getStudentId(), enrollment.getCourseCode());
+        if (!existing.isEmpty()) {
+            throw new ResponseStatusException(org.springframework.http.HttpStatus.CONFLICT, "Student is already enrolled in this subject.");
+        }
+        return enrollmentRepository.save(enrollment);
     }
 }

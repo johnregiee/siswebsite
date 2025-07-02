@@ -12,4 +12,10 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
 
     List<Enrollment> findByCourseCode(String courseCode);
     List<Schedule> findByFacultyId(Long facultyId);
+
+    void deleteByCurriculumIdAndSubjectId(Long curriculumId, Long subjectId);
+
+    Schedule findByCurriculumIdAndSubjectId(Long curriculumId, Long subjectId);
+
+    List<Schedule> findByCurriculumId(Long curriculumId);
 }

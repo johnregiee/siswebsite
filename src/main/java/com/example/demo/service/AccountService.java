@@ -25,4 +25,32 @@ public class AccountService {
     public List<Account> getAllAccounts() {
         return accountRepository.findAll();
     }
+
+    public boolean deleteAccountById(Long id) {
+        if (accountRepository.existsById(id)) {
+            accountRepository.deleteById(id);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public Account updateAccount(Long id, Account updatedAccount) {
+        return accountRepository.findById(id).map(account -> {
+            if (updatedAccount.getStudentId() != null) {
+                account.setStudentId(updatedAccount.getStudentId());
+            }
+            if (updatedAccount.getSemester() != null) {
+                account.setSemester(updatedAccount.getSemester());
+            }
+            if (updatedAccount.getTuitionFee() != null) {
+                account.setTuitionFee(updatedAccount.getTuitionFee());
+            }
+            if (updatedAccount.getAmountPaid() != null) {
+                account.setAmountPaid(updatedAccount.getAmountPaid());
+            }
+            // Add other fields as needed
+            return accountRepository.save(account);
+        }).orElse(null);
+    }
 }

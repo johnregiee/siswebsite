@@ -1,35 +1,39 @@
 package com.example.demo.entity;
 
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Student {
+public class Curriculum {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String studentNumber;
+    private String academicYear;
     private String name;
-    private String email;
-    private String password;
+    private String description;
 
-    @ManyToOne(optional = true)
-    @JoinColumn(name = "course_id", nullable = true)
+    @ManyToOne
+    @JoinColumn(name = "course_id")
     private Course course;
 
-    @ManyToOne(optional = true)
-    @JoinColumn(name = "section_id", nullable = true)
-    private Section section;
+    @OneToMany(mappedBy = "curriculum", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<CurriculumSubject> curriculumSubjects;
 }

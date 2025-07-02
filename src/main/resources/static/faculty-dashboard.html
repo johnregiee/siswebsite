@@ -1,114 +1,439 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Faculty Dashboard</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Add your CSS file -->
+  <meta charset="UTF-8" />
+  <title>Faculty Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="admin.css" />
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,600,700&display=swap" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-    <h1>Faculty Dashboard</h1>
-    <p>Welcome, Faculty Member!</p>
-    <hr>
-
-    <h3>My Courses</h3>
-    <label for="courseSelect">Select a Course to View Roster:</label>
-    <select id="courseSelect">
-        <option value="">-- Please select a course --</option>
-    </select>
-
-    <h3 style="margin-top: 30px;">Student Roster</h3>
-    <p id="roster-feedback"></p>
-    <table border="1" style="width:100%;">
-        <thead>
-            <tr>
-                <th>Student ID</th>
-                <th>Course Code</th>
-                <!-- We will add more student details later -->
-                <th>Action</th>
-            </tr>
+  <header class="header">
+    <div class="logo">
+      <span>PRISM</span>
+      <span class="admin-label">Faculty</span>
+    </div>
+    <nav class="nav-tabs">
+      <button class="tab-btn active" data-tab="overview">Overview</button>
+      <button class="tab-btn" data-tab="subjects">Subjects</button>
+      <button class="tab-btn" data-tab="students">Students</button>
+      <button class="tab-btn" data-tab="grading">Grading</button>
+      <button class="tab-btn" data-tab="schedule">Schedule</button>
+      <button class="tab-btn" data-tab="profile">Profile</button>
+    </nav>
+    <div class="profile-icon" style="margin-right: 1.5rem;">
+      <svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-left: 8px;"><circle cx="12" cy="12" r="12" fill="#fff"/><path d="M12 13.5c1.86 0 3.5-1.64 3.5-3.5S13.86 6.5 12 6.5 8.5 8.14 8.5 10s1.64 3.5 3.5 3.5Zm0 1.5c-2.25 0-6.5 1.13-6.5 3.5V20h13v-1.5c0-2.37-4.25-3.5-6.5-3.5Z" fill="#e85743"/></svg>
+    </div>
+  </header>
+  <main class="main-content-wrapper">
+    <section id="overview" class="card" style="display:block;">
+      <h2>Welcome, <span id="facultyName">Faculty Name</span>!</h2>
+      <div class="faculty-email" id="facultyEmail">faculty@email.com</div>
+      <div class="dashboard-date" id="dashboardDate">Date & Time</div>
+      <!-- Quick stats and schedule summary go here -->
+    </section>
+    <section id="subjects" class="card" style="display:none;">
+      <h2>Subjects / Classes Management</h2>
+      <table id="facultySubjectsTable" style="width:100%; margin-top:1.5em; border-collapse:collapse;">
+      <thead>
+          <tr style="background:#ffeaea; color:#e85743;">
+          <th>Course Code</th>
+            <th>Course Name</th>
+            <th>Day(s)</th>
+            <th>Time</th>
+            <th>Room</th>
+          </tr>
         </thead>
-        <tbody id="rosterTableBody">
-            <!-- Student roster will be loaded here -->
+        <tbody>
+          <tr><td colspan="5" style="text-align:center; color:#888;">Loading...</td></tr>
         </tbody>
+      </table>
+      <!-- Student List Modal -->
+      <div id="studentListModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.18); z-index:2000; align-items:center; justify-content:center;">
+        <div style="background:#fff; border-radius:12px; padding:2rem 2.5rem; min-width:320px; max-width:90vw; box-shadow:0 4px 24px rgba(0,0,0,0.15); position:relative;">
+          <button onclick="document.getElementById('studentListModal').style.display='none'" style="position:absolute; top:10px; right:10px; background:none; border:none; font-size:1.5rem; color:#e85743; cursor:pointer;">&times;</button>
+          <h3 style="color:#e85743; margin-top:0;">Enrolled Students</h3>
+          <table id="studentListTable" style="width:100%; border-collapse:collapse; background:#fff; border-radius:10px; box-shadow:0 1px 6px rgba(0,0,0,0.04);">
+            <thead>
+              <tr style="background:#ffeaea; color:#e85743;">
+                <th style="padding:10px 8px;">Student Number</th>
+                <th style="padding:10px 8px;">Name</th>
+                <th style="padding:10px 8px;">Email</th>
+                <th style="padding:10px 8px;">Grade</th>
+                <th style="padding:10px 8px;">Action</th>
+        </tr>
+      </thead>
+            <tbody></tbody>
     </table>
-
-    <script>
-        $(document).ready(function() {
-            const facultyId = sessionStorage.getItem("facultyId");
-            if (!facultyId) {
-                alert("Not logged in!");
-                window.location.href = "login.html";
-            }
-
-            // --- 1. Load the faculty's assigned courses into the dropdown ---
-            async function loadFacultyCourses() {
-                const courseSelect = $('#courseSelect');
-                try {
-                    const response = await fetch(`http://localhost:8080/api/schedules/faculty/${facultyId}`);
-                    const courses = await response.json();
-
-                    courses.forEach(course => {
-                        const option = `<option value="${course.courseCode}" data-coursename="${course.courseName}">${course.courseCode} - ${course.courseName}</option>`;
-                        courseSelect.append(option);
-                    });
-                } catch (error) {
-                    console.error("Failed to load courses:", error);
-                }
-            }
-
-            // --- 2. Load the student roster when a course is selected ---
-            $('#courseSelect').on('change', async function() {
-                const courseCode = $(this).val();
-                const tableBody = $('#rosterTableBody');
-                const feedback = $('#roster-feedback');
-
-                tableBody.empty(); // Clear previous roster
-                
-                if (!courseCode) {
-                    feedback.text('');
-                    return;
-                }
-                
-                feedback.text('Loading roster...');
-
-                try {
-                    const response = await fetch(`http://localhost:8080/api/enrollments/course/${courseCode}`);
-                    const enrollments = await response.json();
-                    
-                    if (enrollments.length === 0) {
-                        feedback.text('No students are enrolled in this course.');
-                        return;
-                    }
-                    
-                    feedback.text(''); // Clear "loading" message
-                    
-                    enrollments.forEach(enrollment => {
-                        const row = `
-                            <tr>
-                                <td>${enrollment.studentId}</td>
-                                <td>${enrollment.courseCode}</td>
-                                <td>
-                                    <button class="add-grade-btn" 
-                                            data-studentid="${enrollment.studentId}" 
-                                            data-coursecode="${enrollment.courseCode}">
-                                        Add/Edit Grade
-                                    </button>
-                                </td>
-                            </tr>
-                        `;
-                        tableBody.append(row);
-                    });
-
-                } catch (error) {
-                    feedback.text('Failed to load roster.');
-                    console.error("Roster error:", error);
-                }
-            });
-
-            // Initial load of the courses
-            loadFacultyCourses();
+          <div id="gradeMessage" style="margin-top:1em; color:#27ae60; display:none;"></div>
+        </div>
+      </div>
+    </section>
+    <section id="students" class="card" style="display:none;">
+      <h2>Student List / Class Roster</h2>
+      <table id="facultyStudentTable" style="width:100%; margin-top:16px;">
+        <thead>
+          <tr>
+            <th>Student Number</th>
+            <th>Name</th>
+            <th>Email</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Students will be rendered here -->
+        </tbody>
+      </table>
+    </section>
+    <section id="grading" class="card" style="display:none;">
+      <h2>Grading & Assessment</h2>
+      <div style="margin-bottom:1em;">
+        <label for="gradingSubjectSelect" style="font-weight:600;">Select Subject:</label>
+        <select id="gradingSubjectSelect" style="margin-left:1em; padding:0.4em 1em; border-radius:6px; border:1.5px solid #e0e0e0;"></select>
+  </div>
+      <table id="gradingStudentTable" style="width:100%; border-collapse:collapse; background:#fff; border-radius:10px; box-shadow:0 1px 6px rgba(0,0,0,0.04); display:none;">
+        <thead>
+          <tr style="background:#ffeaea; color:#e85743;">
+            <th style="padding:10px 8px;">Student Number</th>
+            <th style="padding:10px 8px;">Name</th>
+            <th style="padding:10px 8px;">Email</th>
+            <th style="padding:10px 8px;">Grade</th>
+            <th style="padding:10px 8px;">Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div id="gradingMessage" style="margin-top:1em; color:#27ae60; display:none;"></div>
+    </section>
+    <section id="schedule" class="card" style="display:none;">
+      <h2>Class Schedule</h2>
+      <table id="facultyScheduleTable" style="width:100%; margin-top:1.5em; border-collapse:collapse;">
+        <thead>
+          <tr style="background:#ffeaea; color:#e85743;">
+            <th>Course Code</th>
+            <th>Course Name</th>
+            <th>Day(s)</th>
+            <th>Time</th>
+            <th>Room</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="5" style="text-align:center; color:#888;">Loading...</td></tr>
+        </tbody>
+      </table>
+    </section>
+    <section id="profile" class="card" style="display:none;">
+      <h2>Profile Settings</h2>
+      <!-- Profile update form goes here -->
+    </section>
+  </main>
+  <script>
+    // Tab switching logic
+    document.querySelectorAll('.tab-btn').forEach(tab => {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('main > section').forEach(s => s.style.display = 'none');
+        this.classList.add('active');
+        document.getElementById(this.dataset.tab).style.display = 'block';
+      });
+    });
+    // Date/time update
+    function updateDateTime() {
+      const now = new Date();
+      document.getElementById('dashboardDate').textContent = now.toLocaleString();
+    }
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+    // Load faculty info dynamically
+    const facultyId = sessionStorage.getItem('facultyId');
+    if (facultyId) {
+      fetch(`http://localhost:8080/api/faculty/${facultyId}`)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('facultyName').textContent = data.fullName;
+          document.getElementById('facultyEmail').textContent = data.email;
         });
-    </script>
+      // Fetch and render faculty schedule
+      fetch(`http://localhost:8080/api/schedules/faculty/${facultyId}`)
+        .then(res => res.json())
+        .then(schedules => {
+          const tbody = document.querySelector('#facultyScheduleTable tbody');
+          if (!schedules.length) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#888;">No schedule found.</td></tr>';
+            return;
+          }
+          tbody.innerHTML = '';
+          schedules.forEach(sch => {
+            tbody.innerHTML += `
+              <tr>
+                <td>${sch.courseCode || ''}</td>
+                <td>${sch.courseName || ''}</td>
+                <td>${sch.day || ''}</td>
+                <td>${sch.time || ''}</td>
+                <td>${sch.room || ''}</td>
+              </tr>
+            `;
+          });
+        });
+      // Fetch and render faculty subjects/classes
+      fetch(`http://localhost:8080/api/schedules/faculty/${facultyId}`)
+        .then(res => res.json())
+        .then(schedules => {
+          const tbody = document.querySelector('#facultySubjectsTable tbody');
+          if (!schedules.length) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#888;">No subjects found.</td></tr>';
+            return;
+          }
+          tbody.innerHTML = '';
+          schedules.forEach(sch => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${sch.courseCode || ''}</td>
+              <td>${sch.courseName || ''}</td>
+              <td>${sch.day || ''}</td>
+              <td>${sch.time || ''}</td>
+              <td>${sch.room || ''}</td>
+            `;
+            tr.style.cursor = 'pointer';
+            tr.addEventListener('click', function() {
+              showStudentListModal(sch.courseCode);
+            });
+            tbody.appendChild(tr);
+          });
+        });
+      // Populate grading subject dropdown
+      fetch(`http://localhost:8080/api/schedules/faculty/${facultyId}`)
+        .then(res => res.json())
+        .then(schedules => {
+          const select = document.getElementById('gradingSubjectSelect');
+          if (!select) return;
+          select.innerHTML = '<option value="">-- Select a subject --</option>';
+          // Use a Set to avoid duplicate course codes
+          const seen = new Set();
+          schedules.forEach(sch => {
+            if (!seen.has(sch.courseCode)) {
+              seen.add(sch.courseCode);
+              const opt = document.createElement('option');
+              opt.value = sch.courseCode;
+              opt.text = `${sch.courseCode} - ${sch.courseName}`;
+              if (sch.semester) opt.setAttribute('data-semester', sch.semester);
+              select.appendChild(opt);
+            }
+          });
+        });
+      // On subject select, fetch students and grades
+      document.getElementById('gradingSubjectSelect').addEventListener('change', async function() {
+        const courseCode = this.value;
+        const table = document.getElementById('gradingStudentTable');
+        const tbody = table.querySelector('tbody');
+        const gradingMessage = document.getElementById('gradingMessage');
+        gradingMessage.style.display = 'none';
+        if (!courseCode) {
+          table.style.display = 'none';
+          tbody.innerHTML = '';
+          return;
+        }
+        table.style.display = '';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#888;">Loading...</td></tr>';
+        const enrollments = await fetch(`/api/enrollments/course/${courseCode}`).then(res => res.json());
+        if (!enrollments.length) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#888;">No students enrolled.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = '';
+        // Filter enrollments to unique students by studentId
+        const unique = {};
+        for (const e of enrollments) {
+          const studentId = e.studentId || e.id;
+          if (!unique[studentId]) unique[studentId] = e;
+        }
+        const uniqueEnrollments = Object.values(unique);
+        for (const e of uniqueEnrollments) {
+          const studentId = e.studentId || e.id;
+          // Fetch student details
+          let studentNumber = '', name = '', email = '';
+          try {
+            const studentRes = await fetch(`/api/admin/student/${studentId}`);
+            if (studentRes.ok) {
+              const studentObj = await studentRes.json();
+              studentNumber = studentObj.studentNumber || '';
+              name = studentObj.name || '';
+              email = studentObj.email || '';
+            }
+          } catch {}
+          // Fetch grade for this student and course
+          let grade = '';
+          try {
+            const gradeRes = await fetch(`/api/grades/student/${studentId}/course/${courseCode}`);
+            if (gradeRes.ok) {
+              const gradeObj = await gradeRes.json();
+              grade = gradeObj && gradeObj.grade ? gradeObj.grade : '';
+            }
+          } catch {}
+          tbody.innerHTML += `<tr>
+            <td>${studentNumber}</td>
+            <td>${name}</td>
+            <td>${email}</td>
+            <td><input type='text' style='width:60px;' id='gradingGradeInput-${studentId}' value='${grade}' /></td>
+            <td><button onclick='saveGradingGrade(${studentId}, "${courseCode}")'>Save</button></td>
+          </tr>`;
+        }
+      });
+    }
+    // Save grade from grading tab
+    function saveGradingGrade(studentId, courseCode) {
+      const input = document.getElementById(`gradingGradeInput-${studentId}`);
+      const grade = input.value.trim();
+      if (!grade) {
+        alert('Please enter a grade.');
+        return;
+      }
+      // Get courseName and semester from the dropdown
+      const select = document.getElementById('gradingSubjectSelect');
+      let courseName = '', semester = '';
+      if (select) {
+        const selectedOption = select.options[select.selectedIndex];
+        courseName = selectedOption.text.split(' - ').slice(1).join(' - ').trim();
+        semester = selectedOption.getAttribute('data-semester') || '';
+      }
+      fetch('/api/grades', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ studentId, courseCode, courseName, grade, semester })
+      })
+      .then(res => {
+        const msg = document.getElementById('gradingMessage');
+        if (res.ok) {
+          msg.textContent = 'Grade saved!';
+          msg.style.color = '#27ae60';
+          msg.style.display = 'block';
+          setTimeout(() => { msg.style.display = 'none'; }, 2000);
+        } else {
+          msg.textContent = 'Failed to save grade.';
+          msg.style.color = '#e85743';
+          msg.style.display = 'block';
+          setTimeout(() => { msg.style.display = 'none'; }, 2000);
+        }
+      });
+    }
+    // Show student list modal for a course
+    function showStudentListModal(courseCode) {
+      const modal = document.getElementById('studentListModal');
+      const tbody = document.querySelector('#studentListTable tbody');
+      const gradeMessage = document.getElementById('gradeMessage');
+      gradeMessage.style.display = 'none';
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#888;">Loading...</td></tr>';
+      modal.style.display = 'flex';
+      fetch(`/api/enrollments/course/${courseCode}`)
+        .then(res => res.json())
+        .then(async enrollments => {
+          if (!enrollments.length) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#888;">No students enrolled.</td></tr>';
+            return;
+          }
+          tbody.innerHTML = '';
+          for (const e of enrollments) {
+            const studentId = e.studentId || e.id;
+            // Fetch grade for this student and course
+            let grade = '';
+            try {
+              const gradeRes = await fetch(`/api/grades/student/${studentId}/course/${courseCode}`);
+              if (gradeRes.ok) {
+                const gradeObj = await gradeRes.json();
+                grade = gradeObj && gradeObj.grade ? gradeObj.grade : '';
+              }
+            } catch {}
+            tbody.innerHTML += `<tr>
+              <td>${e.studentNumber || ''}</td>
+              <td>${e.name || ''}</td>
+              <td>${e.email || ''}</td>
+              <td><input type='text' style='width:60px;' id='gradeInput-${studentId}' value='${grade}' /></td>
+              <td><button onclick='saveGrade(${studentId}, "${courseCode}")'>Save</button></td>
+            </tr>`;
+          }
+        });
+    }
+    // Save grade for a student
+    function saveGrade(studentId, courseCode) {
+      const input = document.getElementById(`gradeInput-${studentId}`);
+      const grade = input.value.trim();
+      if (!grade) {
+        alert('Please enter a grade.');
+        return;
+      }
+      // Get courseName and semester from the subjects table row (if available)
+      let courseName = '', semester = '';
+      const select = document.getElementById('gradingSubjectSelect');
+      if (select) {
+        const selectedOption = select.options[select.selectedIndex];
+        courseName = selectedOption.text.split(' - ').slice(1).join(' - ').trim();
+        semester = selectedOption.getAttribute('data-semester') || '';
+      }
+      fetch('/api/grades', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ studentId, courseCode, courseName, grade, semester })
+      })
+      .then(res => {
+        document.getElementById('gradeMessage').textContent = res.ok ? 'Grade saved!' : 'Failed to save grade.';
+        document.getElementById('gradeMessage').style.color = res.ok ? '#27ae60' : '#e85743';
+        document.getElementById('gradeMessage').style.display = 'block';
+        setTimeout(() => { document.getElementById('gradeMessage').style.display = 'none'; }, 2000);
+      });
+    }
+    // Add logic to load students for the first subject/class when Students tab is selected
+    function loadFacultyStudentList(courseCode) {
+      const tbody = document.querySelector('#facultyStudentTable tbody');
+      tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#888;">Loading...</td></tr>';
+      fetch(`/api/enrollments/course/${courseCode}`)
+        .then(res => res.json())
+        .then(async enrollments => {
+          if (!enrollments.length) {
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#888;">No students enrolled.</td></tr>';
+            return;
+          }
+          const seenNames = new Set();
+          tbody.innerHTML = '';
+          for (const e of enrollments) {
+            const studentId = e.studentId || e.id;
+            let studentNumber = '', name = '', email = '';
+            try {
+              const studentRes = await fetch(`/api/admin/student/${studentId}`);
+              if (studentRes.ok) {
+                const studentObj = await studentRes.json();
+                studentNumber = studentObj.studentNumber || '';
+                name = studentObj.name || '';
+                email = studentObj.email || '';
+              }
+            } catch {}
+            // Only add row if name is unique
+            if (!seenNames.has(name) && name) {
+              seenNames.add(name);
+              tbody.innerHTML += `<tr>
+                <td>${studentNumber}</td>
+                <td>${name}</td>
+                <td>${email}</td>
+              </tr>`;
+            }
+          }
+        });
+    }
+    // When Students tab is clicked, load students for the first subject/class
+    const studentsTab = document.querySelector('.tab-btn[data-tab="students"]');
+    studentsTab.addEventListener('click', function() {
+      // Fetch faculty's subjects/classes
+      fetch(`http://localhost:8080/api/schedules/faculty/${facultyId}`)
+        .then(res => res.json())
+        .then(schedules => {
+          if (schedules.length > 0) {
+            // Use the first subject/class's courseCode
+            loadFacultyStudentList(schedules[0].courseCode);
+          } else {
+            const tbody = document.querySelector('#facultyStudentTable tbody');
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#888;">No classes found.</td></tr>';
+          }
+        });
+    });
+  </script>
 </body>
 </html>

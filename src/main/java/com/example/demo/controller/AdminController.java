@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.DTO.CreateFacultyRequestDto;
+import com.example.demo.DTO.FacultyLoginRequest;
 import com.example.demo.entity.Admin;
 import com.example.demo.entity.Faculty;
 import com.example.demo.repository.AdminRepository;
@@ -38,8 +38,7 @@ public class AdminController {
     // THIS IS THE NEW METHOD FOR ADDING A FACULTY MEMBER
     // =========================================================
     @PostMapping("/faculty") // Endpoint will be POST /api/admins/faculty
-    public ResponseEntity<?> createFaculty(@RequestBody CreateFacultyRequestDto facultyDto) {
-        
+    public ResponseEntity<?> createFaculty(@RequestBody FacultyLoginRequest facultyDto) {
         // 1. Check if a faculty member with this email already exists
         if (facultyRepository.findByEmail(facultyDto.getEmail()).isPresent()) {
             return ResponseEntity
@@ -51,15 +50,13 @@ public class AdminController {
         Faculty newFaculty = new Faculty();
         newFaculty.setFullName(facultyDto.getFullName());
         newFaculty.setEmail(facultyDto.getEmail());
-        
         // 3. Set the password directly (as requested)
         newFaculty.setPassword(facultyDto.getPassword());
-        
         // 4. Save the new faculty member using its repository
         Faculty savedFaculty = facultyRepository.save(newFaculty);
 
-        // 5. Return a success message
-        return ResponseEntity.status(HttpStatus.CREATED).body("Faculty user created successfully with ID: " + savedFaculty.getId());
+        // 5. Return the saved faculty as JSON
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedFaculty);
     }
 
 
@@ -104,7 +101,32 @@ public class AdminController {
     }
 
     @GetMapping("/faculty")
-public List<Faculty> getAllFaculty() {
-    return facultyRepository.findAll();
-}
+    public List<Faculty> getAllFaculty() {
+        return facultyRepository.findAll();
+    }
+
+    @DeleteMapping("/faculty/{id}")
+    public ResponseEntity<?> deleteFaculty(@PathVariable Long id) {
+        if (facultyRepository.existsById(id)) {
+            facultyRepository.deleteById(id);
+            return ResponseEntity.ok("Faculty deleted successfully.");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Faculty not found.");
+        }
+    }
+
+    @PutMapping("/faculty/{id}")
+    public ResponseEntity<?> updateFaculty(@PathVariable Long id, @RequestBody Faculty facultyUpdate) {
+        return facultyRepository.findById(id)
+            .map(faculty -> {
+                faculty.setFullName(facultyUpdate.getFullName());
+                faculty.setEmail(facultyUpdate.getEmail());
+                if (facultyUpdate.getPassword() != null && !facultyUpdate.getPassword().isEmpty()) {
+                    faculty.setPassword(facultyUpdate.getPassword());
+                }
+                facultyRepository.save(faculty);
+                return ResponseEntity.ok("Faculty updated successfully.");
+            })
+            .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Faculty not found."));
+    }
 }

@@ -9,99 +9,291 @@
     <style>
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f0f0f0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f6f7fb;
+            color: #222;
         }
-
-        nav {
-            background-color: #005792;
-            color: white;
-            padding: 15px 20px;
+        header {
+            background: #e74c3c;
+            color: #fff;
+            padding: 18px 32px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-
-        nav .brand {
-            font-size: 1.2em;
+        .logo {
+            font-size: 1.5em;
             font-weight: bold;
+            letter-spacing: 1px;
         }
-
-        nav .nav-links span {
-            cursor: pointer;
-            color: white;
-            padding: 5px 10px;
+        nav {
+            display: flex;
+            gap: 18px;
         }
-
+        nav .nav-link {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 18px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        nav .nav-link.active, nav .nav-link:hover {
+            background: #fff;
+            color: #e74c3c;
+        }
         .container {
-            padding: 20px;
+            display: flex;
+            gap: 32px;
+            max-width: 1300px;
+            margin: 32px auto 0 auto;
+            padding: 0 16px 32px 16px;
         }
-
-        .section {
-            display: none;
+        .sidebar {
+            width: 260px;
+            min-width: 200px;
         }
-
-        .section.active {
-            display: block;
+        .sidebar .card {
+            padding: 18px 20px 18px 20px;
+            margin-bottom: 24px;
         }
-
+        .sidebar h4 {
+            margin: 0 0 12px 0;
+            font-size: 1.1em;
+            color: #e74c3c;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 18px 0;
+        }
+        .sidebar ul li {
+            margin-bottom: 10px;
+        }
+        .sidebar ul li a {
+            color: #e74c3c;
+            text-decoration: none;
+            font-weight: 500;
+            transition: text-decoration 0.2s;
+        }
+        .sidebar ul li a:hover {
+            text-decoration: underline;
+        }
+        .inbox-list {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+            padding: 16px 0 0 0;
+            margin-bottom: 18px;
+        }
+        .inbox-list .inbox-item {
+            padding: 12px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.98em;
+        }
+        .inbox-list .inbox-item:last-child {
+            border-bottom: none;
+        }
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            padding: 28px 32px 24px 32px;
+            margin-bottom: 32px;
+        }
+        .alert {
+            background: #fdeaea;
+            color: #c0392b;
+            border: 1px solid #f5b7b1;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .alert .icon {
+            font-size: 1.5em;
+        }
+        h1 {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 0 0 18px 0;
+        }
+        h2, h3 {
+            color: #e74c3c;
+            margin-top: 0;
+        }
         table {
             width: 100%;
-            border-collapse: collapse;
-            background: white;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+            margin-bottom: 24px;
         }
-
-        table,
-        th,
-        td {
-            border: 1px solid #ccc;
-        }
-
-        th,
-        td {
-            padding: 10px;
+        th, td {
+            padding: 14px 12px;
             text-align: left;
         }
-
         th {
-            background-color: #e0e0e0;
+            background: #f6f7fb;
+            color: #e74c3c;
+            font-weight: 600;
+            border-bottom: 2px solid #e74c3c22;
+        }
+        tr:nth-child(even) td {
+            background: #fafbfc;
+        }
+        tr:last-child td {
+            border-bottom: none;
+        }
+        .note {
+            background: #fffbe6;
+            color: #b8860b;
+            border: 1px solid #ffe58f;
+            border-radius: 8px;
+            padding: 12px 18px;
+            margin: 18px 0 0 0;
+            font-size: 0.98em;
+        }
+        @media (max-width: 1000px) {
+            .container { flex-direction: column; gap: 0; }
+            .sidebar { width: 100%; min-width: 0; margin-bottom: 24px; }
+        }
+        @media (max-width: 700px) {
+            .card { padding: 10px 2px 10px 2px; }
+            th, td { padding: 8px 4px; }
         }
     </style>
 </head>
 
 <body>
-
+    <header>
+        <span class="logo">PRISM</span>
     <nav>
-        <div class="brand">Student Dashboard</div>
-        <div class="nav-links">
-            <span data-target="homeSection">Home</span>
-            <span data-target="enrollmentSection">Enrollment</span>
-            <span data-target="accountsSection">Accounts</span>
-            <span data-target="scheduleSection">Schedule</span>
-            <span data-target="gradesSection">Grades</span>
+            <a class="nav-link active" href="student-dashboard.html">Home</a>
+            <a class="nav-link" href="enrollment.html">Enrollment</a>
+            <a class="nav-link" href="accounts.html">Accounts</a>
+            <a class="nav-link" href="schedule.html">Schedule</a>
+            <a class="nav-link" href="grades.html">Grades</a>
+        </nav>
+        <div style="display: flex; align-items: center; gap: 16px; position: relative;">
+            <span id="profileIcon" style="font-size: 1.2em; cursor: pointer;">👤</span>
+            <div id="logoutDropdown" style="display:none; position:absolute; top:36px; right:0; background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.12); min-width:120px; z-index:10;">
+                <button id="logoutBtn" style="width:100%; background:#e74c3c; color:#fff; border:none; border-radius:8px; padding:10px 0; font-size:1em; cursor:pointer;">Logout</button>
+            </div>
         </div>
-    </nav>
-
+    </header>
     <div class="container">
-        <!-- HOME SECTION (Default) -->
-        <div id="homeSection" class="section active">
-            <h2>Welcome to your Dashboard, <span id="student-name-placeholder">Student</span>!</h2>
-            <p>Select a section from the navigation bar to view your information.</p>
+        <aside class="sidebar">
+            <div class="card">
+                <h4>Inbox</h4>
+                <div class="inbox-list">
+                    <div class="inbox-item"><b>March 08, 2025</b><br>2025 Career Fest (PI)</div>
+                    <div class="inbox-item"><b>November 11, 2024</b><br>A Comprehensive Online Labor Laws and Standards Orientation and Review</div>
+                    <div class="inbox-item"><b>May 14, 2024</b><br>Career Development Talk 2024</div>
+                </div>
+                <ul>
+                    <li><a href="#">Graduation Clearance</a></li>
+                    <li><a href="#">Submit Feedback</a></li>
+                </ul>
+            </div>
+        </aside>
+        <section class="main-content">
+            <div class="card">
+                <h1>Home</h1>
+                <div style="margin-bottom: 18px;">
+                    <span id="student-info" style="color:#e74c3c; font-weight:600;"></span>
+                </div>
+                <div class="alert">
+                    <span class="icon">📄</span>
+                    <div>
+                        <b>PRISM Internship Memorandum of Agreement</b><br>
+                        Please review and download the required document
+                    </div>
+                </div>
+                <div class="card" style="background:#f9f9f9; box-shadow:none;">
+                    <h3 style="color:#222;">GENERAL GUIDELINES FOR IMPLEMENTATION OF RA 10931 - UNIVERSAL ACCESS TO QUALITY TERTIARY EDUCATION IN PRISM</h3>
+                    <ol style="margin-left: 18px;">
+                        <li>As stated in the Act, a student who has satisfied the admission requirements shall be eligible in availing Free Education provided that the student does not fall in the identified "ineligible" stated in Rule II Section 6 'Exceptions for Free HE'.</li>
+                        <li>For a student to enjoy continued Free Education benefits, he/she must have good scholastic standing. However, the matrix below shows the action to be taken when students have scholastic delinquency.</li>
+                    </ol>
+                    <div style="overflow-x:auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th colspan="3">For 21 units and above load in previous semester</th>
+                                </tr>
+                                <tr>
+                                    <th>NUMBER OF SUBJECT FAILED/WITHDRAWN/DROPPED</th>
+                                    <th>ACTION TO BE TAKEN</th>
+                                    <th>REMARKS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>1 subject</td><td>Warning</td><td>Warning*</td></tr>
+                                <tr><td>2 subjects</td><td>Warning with reduced load by 3 units</td><td>Warning*</td></tr>
+                                <tr><td>3 subjects</td><td>Reduced load by 6 units</td><td>Scholarship will be forfeited for the following semester (Paying)</td></tr>
+                                <tr><td>4 subjects</td><td>Dismissal-Dropped from the University</td><td></td></tr>
+                            </tbody>
+                        </table>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th colspan="3">For 20 units and below load in previous semester</th>
+                                </tr>
+                                <tr>
+                                    <th>NUMBER OF SUBJECT FAILED/WITHDRAWN/DROPPED</th>
+                                    <th>ACTION TO BE TAKEN</th>
+                                    <th>REMARKS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>1-2 subjects</td><td>Warning</td><td>Warning*</td></tr>
+                                <tr><td>3 subjects</td><td>Warning with reduced load by 3 units</td><td>Scholarship will be forfeited for the following semester (Paying)</td></tr>
+                                <tr><td>4 subjects</td><td>Dismissal-Dropped from the University</td><td></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="note">
+                        <b>Note:</b> Student who acquired a "Warning" for two consecutive semesters, the scholarship grant will be forfeited the following semester.
+                    </div>
+                    <ol style="margin-left: 18px; margin-top: 18px;">
+                        <li>If a student stays beyond the allowed number of years according to the curriculum, the remaining years of stay, provided that this is still within the residency period.</li>
+                        <li>In case a student intends to file a leave of absence, the same procedure shall be followed as stated in the PRISM Student Handbook. With permission from the University, the leave of absence will enable the student to still enjoy the scholarship on his/her return to the university.</li>
+                        <li>Existing admission, retention, and graduation rules and policy of the University shall be upheld. They shall be used as a basis to complement the implementation of the Act.</li>
+                        <li>For provisions inconsistent with the PRISM Student Handbook, the proposed guidelines shall prevail.</li>
+                    </ol>
+                </div>
         </div>
-
-        <!-- ENROLLMENT SECTION -->
-        <div id="enrollmentSection" class="section">
+            <div class="card">
             <h2>Enrollment</h2>
-            <label for="subjectSelect">Select Course to Enroll:</label>
-            <select id="subjectSelect"></select>
-            <button id="enrollBtn">Enroll</button>
+                <p>Your enrolled subjects.</p>
             <hr>
-            <h3>My Enrolled Subjects</h3>
-            <ul id="enrolledSubjects"></ul>
+            <div id="enrolledSubjectsContainer" style="margin-top:1.5rem;">
+              <table id="enrolledSubjectsTable" style="width:100%; border-collapse:collapse; background:#fff; border-radius:10px; box-shadow:0 1px 6px rgba(0,0,0,0.04);">
+                <thead>
+                  <tr style="background:#ffeaea; color:#e85743;">
+                    <th style="padding:10px 8px;">Subject Code</th>
+                    <th style="padding:10px 8px;">Subject Name</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
         </div>
-
-        <!-- ACCOUNTS SECTION -->
-        <div id="accountsSection" class="section">
+            <div class="card">
             <h2>Accounts</h2>
             <p>Your financial statement and balance.</p>
             <table>
@@ -116,13 +308,10 @@
                 <tbody id="accountsTableBody"></tbody>
             </table>
         </div>
-
-        <!-- SCHEDULE SECTION -->
-        <!-- All schedule-related HTML is now properly contained here -->
-        <div id="scheduleSection" class="section">
+            <div class="card">
             <h2>My Class Schedule</h2>
             <p>Here is your schedule for the current semester.</p>
-            <table id="scheduleTable">
+                <table>
                 <thead>
                     <tr>
                         <th>Course Code</th>
@@ -132,33 +321,38 @@
                         <th>Room</th>
                     </tr>
                 </thead>
-                <tbody id="scheduleTableBody">
-                    <!-- Schedule rows will be inserted here by JavaScript -->
-                </tbody>
+                    <tbody id="scheduleTableBody"></tbody>
             </table>
         </div>
-
-        <!-- GRADES SECTION -->
-
-        <div id="gradesSection" class="section">
+            <div class="card">
             <h2>My Grades</h2>
             <p>Your academic performance will be shown here once available.</p>
-            <table id="gradesTable">
+                <table>
                 <thead>
                     <tr>
-                        <th>Semester</th>
+                        <th>Faculty</th>
                         <th>Course Code</th>
                         <th>Course Name</th>
                         <th>Grade</th>
                         <th>Comments</th>
                     </tr>
                 </thead>
-                <tbody id="gradesTableBody">
-                    <!-- Grade rows will be inserted here by JavaScript -->
-                </tbody>
+                    <tbody id="gradesTableBody"></tbody>
             </table>
+            </div>
+        </section>
+    </div>
+    <footer style="background:#fff; color:#888; font-size:0.98em; text-align:center; padding:18px 0 8px 0; border-top:1px solid #eee; margin-top:32px;">
+        <div style="max-width:1200px; margin:auto; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px;">
+            <div>For questions and comments, email us at <a href="mailto:prismconcerns@university.edu.ph" style="color:#e74c3c;">prismconcerns@university.edu.ph</a></div>
+            <div>PRISM – Portal for Records, Information, and Student Management</div>
+            <div>
+                <a href="#" style="color:#e74c3c; margin-right:8px;">Terms of Use</a>
+                <a href="#" style="color:#e74c3c; margin-right:8px;">Privacy Statement</a>
+                Version 06.2025.A
+            </div>
         </div>
-
+    </footer>
         <script>
             // --- SINGLE SOURCE OF TRUTH FOR STUDENT ID ---
             const studentId = sessionStorage.getItem("studentId");
@@ -177,7 +371,16 @@
                 // Function to load student's schedule
                 async function loadStudentSchedule() {
                     const tableBody = $('#scheduleTableBody');
-                    tableBody.html('<tr><td colspan="5">Loading...</td></tr>'); // Show loading feedback
+                    tableBody.html('<tr><td colspan="4">Loading schedule...</td></tr>');
+                    
+                    // Get studentId and validate it
+                    const studentId = sessionStorage.getItem("studentId");
+                    if (!studentId) {
+                        tableBody.html('<tr><td colspan="4" style="color:red;">Error: Student ID not found. Please log in again.</td></tr>');
+                        console.error('Student ID not found in sessionStorage');
+                        return;
+                    }
+                    
                     try {
                         const response = await fetch(`http://localhost:8080/api/schedules/student/${studentId}`);
                         if (!response.ok) throw new Error('Failed to fetch schedule from server.');
@@ -208,7 +411,16 @@
 
                 async function loadStudentAccounts() {
                     const tableBody = $('#accountsTableBody');
-                    tableBody.html('<tr><td colspan="4">Loading...</td></tr>');
+                    tableBody.html('<tr><td colspan="4">Loading accounts...</td></tr>');
+                    
+                    // Get studentId and validate it
+                    const studentId = sessionStorage.getItem("studentId");
+                    if (!studentId) {
+                        tableBody.html('<tr><td colspan="4" style="color:red;">Error: Student ID not found. Please log in again.</td></tr>');
+                        console.error('Student ID not found in sessionStorage');
+                        return;
+                    }
+                    
                     try {
                         const response = await fetch(`http://localhost:8080/api/accounts/student/${studentId}`);
                         if (!response.ok) throw new Error('Failed to fetch accounts');
@@ -238,27 +450,95 @@
 
                 async function loadStudentGrades() {
                     const tableBody = $('#gradesTableBody');
-                    tableBody.html('<tr><td colspan="5">Loading grades...</td></tr>'); // Show loading feedback
-
+                    tableBody.html('<tr><td colspan="5">Loading grades...</td></tr>');
+                    
+                    // Get studentId and validate it
+                    const studentId = sessionStorage.getItem("studentId");
+                    if (!studentId) {
+                        tableBody.html('<tr><td colspan="5" style="color:red;">Error: Student ID not found. Please log in again.</td></tr>');
+                        console.error('Student ID not found in sessionStorage');
+                        return;
+                    }
+                    
+                    console.log('Using studentId:', studentId); // Debug log
+                    
                     try {
-                        const response = await fetch(`http://localhost:8080/api/grades/student/${studentId}`);
-                        if (!response.ok) throw new Error('Failed to fetch grades from server.');
-
-                        const grades = await response.json();
-                        tableBody.empty(); // Clear the loading message
-
-                        if (grades.length === 0) {
-                            tableBody.html('<tr><td colspan="5">No grades are available yet.</td></tr>');
+                        // Fetch student info to get courseId
+                        const studentRes = await fetch(`http://localhost:8080/api/admin/student/${studentId}`);
+                        if (!studentRes.ok) throw new Error('Failed to fetch student info');
+                        const student = await studentRes.json();
+                        const courseId = student.course ? student.course.id : null;
+                        
+                        // Fetch enrollments, grades, and curriculum subjects in parallel
+                        const [enrollmentsRes, gradesRes, curriculumRes, schedulesRes] = await Promise.all([
+                            fetch(`http://localhost:8080/api/enrollments/student/${studentId}`),
+                            fetch(`http://localhost:8080/api/grades/student/${studentId}`),
+                            courseId ? fetch(`http://localhost:8080/api/curriculum-subjects/course/${courseId}`) : Promise.resolve({ ok: false }),
+                            fetch(`http://localhost:8080/api/schedules/student/${studentId}`)
+                        ]);
+                        if (!enrollmentsRes.ok) throw new Error('Failed to fetch enrollments');
+                        if (!gradesRes.ok) throw new Error('Failed to fetch grades');
+                        if (!curriculumRes.ok) throw new Error('Failed to fetch curriculum subjects');
+                        if (!schedulesRes.ok) throw new Error('Failed to fetch schedules');
+                        const enrollments = await enrollmentsRes.json();
+                        const grades = await gradesRes.json();
+                        console.log('Enrollments:', enrollments);
+                        console.log('Grades:', grades);
+                        const curriculumSubjects = courseId && curriculumRes.ok ? await curriculumRes.json() : [];
+                        const schedules = await schedulesRes.json();
+                        console.log('Schedules:', schedules);
+                        console.log('Schedule objects details:', schedules.map(s => ({
+                            courseCode: s.courseCode,
+                            subjectCode: s.subjectCode,
+                            facultyName: s.facultyName,
+                            faculty: s.faculty
+                        })));
+                        
+                        // Build a map for faculty lookup by courseCode and subjectCode
+                        const facultyMap = {};
+                        schedules.forEach(s => {
+                            const facultyName = s.facultyName || (s.faculty ? s.faculty.fullName : '') || '';
+                            if (s.courseCode) {
+                                facultyMap[s.courseCode] = facultyName;
+                            }
+                            if (s.subjectCode) {
+                                facultyMap[s.subjectCode] = facultyName;
+                            }
+                        });
+                        console.log('Faculty map:', facultyMap);
+                        tableBody.empty();
+                        // Build a map for quick grade lookup by courseCode+courseName
+                        const gradeMap = {};
+                        grades.forEach(g => {
+                            const key = (g.courseCode || g.subjectCode || '') + '|' + (g.courseName || g.subjectName || '');
+                            gradeMap[key] = g;
+                        });
+                        // Filter to unique subjects by code+name and only show active ones
+                        const unique = {};
+                        enrollments.forEach(e => {
+                            if (e.status && (e.status.toLowerCase() === 'dropped' || e.status.toLowerCase() === 'deleted')) return;
+                            const key = (e.courseCode || e.subjectCode || '') + '|' + (e.courseName || e.subjectName || '');
+                            if (!unique[key]) unique[key] = e;
+                        });
+                        const uniqueEnrollments = Object.values(unique);
+                        if (uniqueEnrollments.length === 0) {
+                            tableBody.html('<tr><td colspan="5">No enrolled subjects.</td></tr>');
                         } else {
-                            grades.forEach(grade => {
+                            uniqueEnrollments.forEach(e => {
+                                const key = (e.courseCode || e.subjectCode || '') + '|' + (e.courseName || e.subjectName || '');
+                                const grade = gradeMap[key];
+                                const facultyName = facultyMap[e.courseCode] || facultyMap[e.subjectCode] || '';
+                                console.log(`Enrollment: ${e.courseCode || e.subjectCode}, Faculty lookup: ${facultyName}`);
+                                const gradeValue = grade ? `<strong>${grade.grade}</strong>` : '<span style="color:#e74c3c;">Not graded yet</span>';
+                                const comments = grade ? (grade.comments || '') : '';
                                 const row = `
-                    <tr>
-                        <td>${grade.semester}</td>
-                        <td>${grade.courseCode}</td>
-                        <td>${grade.courseName}</td>
-                        <td><strong>${grade.grade}</strong></td>
-                        <td>${grade.comments || ''}</td>
-                    </tr>`; // Use '|| ""' for empty comments
+                                    <tr>
+                                        <td>${facultyName}</td>
+                                        <td>${e.courseCode || e.subjectCode || ''}</td>
+                                        <td>${e.courseName || e.subjectName || ''}</td>
+                                        <td>${gradeValue}</td>
+                                        <td>${comments}</td>
+                                    </tr>`;
                                 tableBody.append(row);
                             });
                         }
@@ -309,9 +589,87 @@
 
                 loadStudentAccounts();
                 loadStudentSchedule();
+                loadStudentGrades();
+
+                // Dynamically load student name and number
+                if (studentId) {
+                    fetch(`http://localhost:8080/api/admin/student/${studentId}`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.name && data.studentNumber) {
+                                let info = `${data.name} (${data.studentNumber})`;
+                                if (data.course) {
+                                    info += ` - ${data.course.code} (${data.course.name})`;
+                                }
+                                document.getElementById('student-info').textContent = info;
+                            } else {
+                                document.getElementById('student-info').textContent = 'Student';
+                            }
+                        })
+                        .catch(() => {
+                            document.getElementById('student-info').textContent = 'Student';
+                        });
+                }
+
+                // Profile icon dropdown logic
+                const profileIcon = document.getElementById('profileIcon');
+                const logoutDropdown = document.getElementById('logoutDropdown');
+                profileIcon.addEventListener('click', function(e) {
+                    logoutDropdown.style.display = logoutDropdown.style.display === 'block' ? 'none' : 'block';
+                    e.stopPropagation();
+                });
+                document.addEventListener('click', function() {
+                    logoutDropdown.style.display = 'none';
+                });
+                document.getElementById('logoutBtn').addEventListener('click', function() {
+                    sessionStorage.clear();
+                    window.location.href = 'login.html';
+                });
+
+                // --- ENROLLED SUBJECTS LOGIC ---
+                async function showEnrolledSubjectsForLoggedInStudent() {
+                    const tableBody = $('#enrolledSubjectsTable tbody');
+                    tableBody.html('<tr><td colspan="2" style="text-align:center; color:#888;">Loading enrolled subjects...</td></tr>');
+                    // Get studentId and validate it
+                    const studentId = sessionStorage.getItem("studentId");
+                    if (!studentId) {
+                        tableBody.html('<tr><td colspan="2" style="color:red;">Error: Student ID not found. Please log in again.</td></tr>');
+                        console.error('Student ID not found in sessionStorage');
+                        return;
+                    }
+                    try {
+                        const res = await fetch(`/api/enrollments/student/${studentId}`);
+                        const enrollments = await res.json();
+                        console.log('Raw enrollments:', enrollments);
+                        // Filter to unique subjects by code+name and only show active ones
+                        const unique = {};
+                        enrollments.forEach(e => {
+                            if (e.status && (e.status.toLowerCase() === 'dropped' || e.status.toLowerCase() === 'deleted')) {
+                                console.log('Filtered out (deleted/dropped):', e);
+                                return;
+                            }
+                            const key = (e.courseCode || e.subjectCode || '') + '|' + (e.courseName || e.subjectName || '');
+                            if (!unique[key]) unique[key] = e;
+                        });
+                        const uniqueEnrollments = Object.values(unique);
+                        console.log('Unique enrollments to display:', uniqueEnrollments);
+                        if (uniqueEnrollments.length === 0) {
+                            tableBody.html('<tr><td colspan="2" style="text-align:center; color:#888;">No enrolled subjects.</td></tr>');
+                        } else {
+                            tableBody.html(
+                                uniqueEnrollments.map(e =>
+                                    `<tr><td style='padding:10px 8px; text-align:left;'>${e.courseCode || e.subjectCode || ''}</td><td style='padding:10px 8px; text-align:left;'>${e.courseName || e.subjectName || ''}</td></tr>`
+                                ).join('')
+                            );
+                        }
+                    } catch {
+                        tableBody.html('<tr><td colspan="2" style="text-align:center; color:#e85743;">Failed to load enrolled subjects.</td></tr>');
+                    }
+                }
+                // Call on page load
+                showEnrolledSubjectsForLoggedInStudent();
             });
         </script>
-
 </body>
 
 </html>

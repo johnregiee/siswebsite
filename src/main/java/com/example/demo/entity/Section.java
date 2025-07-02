@@ -7,23 +7,18 @@ import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Subject {
+public class Section {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String subjectCode;
-    private String subjectName;
+    private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "course_id")
-    private Course course;
+    // You can later add relationships to Course, Faculty, etc. if needed
 }

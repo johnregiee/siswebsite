@@ -9,27 +9,31 @@ import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Student {
+public class CurriculumSubject {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String studentNumber;
-    private String name;
-    private String email;
-    private String password;
+    private int yearLevel;
+    private int semester;
+    private int units;
+    private String roomNumber;
+    private String time;
+    private String days;
 
-    @ManyToOne(optional = true)
-    @JoinColumn(name = "course_id", nullable = true)
-    private Course course;
+    @ManyToOne
+    @JoinColumn(name = "curriculum_id")
+    @JsonBackReference
+    private Curriculum curriculum;
 
-    @ManyToOne(optional = true)
-    @JoinColumn(name = "section_id", nullable = true)
-    private Section section;
+    @ManyToOne
+    @JoinColumn(name = "subject_id")
+    private Subject subject;
 }

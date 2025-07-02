@@ -1,7 +1,13 @@
 package com.example.demo.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Data
@@ -16,7 +22,7 @@ public class Account {
 
     private Long studentId;
     private String semester;
-    private double tuitionFee;
-    private double amountPaid;
-    private double balance;
+    private Double tuitionFee;
+    private Double amountPaid;
+    private Double balance;
 }

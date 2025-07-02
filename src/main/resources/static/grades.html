@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Grades | PRISM Student Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f6f7fb;
+            color: #222;
+        }
+        header {
+            background: #e74c3c;
+            color: #fff;
+            padding: 18px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        nav {
+            display: flex;
+            gap: 18px;
+        }
+        nav .nav-link {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 18px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        nav .nav-link.active, nav .nav-link:hover {
+            background: #fff;
+            color: #e74c3c;
+        }
+        .container {
+            display: flex;
+            gap: 32px;
+            max-width: 1300px;
+            margin: 32px auto 0 auto;
+            padding: 0 16px 32px 16px;
+        }
+        .sidebar {
+            width: 260px;
+            min-width: 200px;
+        }
+        .sidebar .card {
+            padding: 18px 20px 18px 20px;
+            margin-bottom: 24px;
+        }
+        .sidebar h4 {
+            margin: 0 0 12px 0;
+            font-size: 1.1em;
+            color: #e74c3c;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 18px 0;
+        }
+        .sidebar ul li {
+            margin-bottom: 10px;
+        }
+        .sidebar ul li a {
+            color: #e74c3c;
+            text-decoration: none;
+            font-weight: 500;
+            transition: text-decoration 0.2s;
+        }
+        .sidebar ul li a:hover {
+            text-decoration: underline;
+        }
+        .inbox-list {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+            padding: 16px 0 0 0;
+            margin-bottom: 18px;
+        }
+        .inbox-list .inbox-item {
+            padding: 12px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.98em;
+        }
+        .inbox-list .inbox-item:last-child {
+            border-bottom: none;
+        }
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            padding: 28px 32px 24px 32px;
+            margin-bottom: 32px;
+        }
+        h1 {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 0 0 18px 0;
+        }
+        h2, h3 {
+            color: #e74c3c;
+            margin-top: 0;
+        }
+        @media (max-width: 1000px) {
+            .container { flex-direction: column; gap: 0; }
+            .sidebar { width: 100%; min-width: 0; margin-bottom: 24px; }
+        }
+        @media (max-width: 700px) {
+            .card { padding: 10px 2px 10px 2px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <span class="logo">PRISM</span>
+        <nav>
+            <a class="nav-link" href="student-dashboard.html">Home</a>
+            <a class="nav-link" href="enrollment.html">Enrollment</a>
+            <a class="nav-link" href="accounts.html">Accounts</a>
+            <a class="nav-link" href="schedule.html">Schedule</a>
+            <a class="nav-link active" href="grades.html">Grades</a>
+        </nav>
+        <div style="display: flex; align-items: center; gap: 16px; position: relative;">
+            <span id="profileIcon" style="font-size: 1.2em; cursor: pointer;">👤</span>
+            <div id="logoutDropdown" style="display:none; position:absolute; top:36px; right:0; background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.12); min-width:120px; z-index:10;">
+                <button id="logoutBtn" style="width:100%; background:#e74c3c; color:#fff; border:none; border-radius:8px; padding:10px 0; font-size:1em; cursor:pointer;">Logout</button>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="card">
+                <h4>Inbox</h4>
+                <div class="inbox-list">
+                    <div class="inbox-item"><b>March 08, 2025</b><br>2025 Career Fest (PI)</div>
+                    <div class="inbox-item"><b>November 11, 2024</b><br>A Comprehensive Online Labor Laws and Standards Orientation and Review</div>
+                    <div class="inbox-item"><b>May 14, 2024</b><br>Career Development Talk 2024</div>
+                </div>
+                <ul>
+                    <li><a href="#">Graduation Clearance</a></li>
+                    <li><a href="#">Submit Feedback</a></li>
+                </ul>
+            </div>
+        </aside>
+        <section class="main-content">
+            <div class="card">
+                <h1>Grades</h1>
+                <p>View your academic performance, grades, and GPA for current and previous semesters.</p>
+                <table id="gradesTable" style="width:100%; margin-top:2em; border-collapse:collapse;">
+                    <thead>
+                        <tr style="background:#ffeaea; color:#e85743;">
+                            <th style="text-align:left; padding:10px 8px;">Course Code</th>
+                            <th style="text-align:left; padding:10px 8px;">Course Name</th>
+                            <th style="text-align:left; padding:10px 8px;">Faculty</th>
+                            <th style="text-align:left; padding:10px 8px;">Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td colspan="4" style="text-align:center; color:#888;">Loading...</td></tr>
+                    </tbody>
+                </table>
+                <div style="margin-top:1em;">
+                    <label for="semesterFilter" style="font-weight:600;">Filter by Curriculum:</label>
+                    <select id="semesterFilter" style="margin-left:1em; padding:0.4em 1em; border-radius:6px; border:1.5px solid #e0e0e0;"></select>
+                </div>
+                <div id="gpaSummary" style="margin-top:1.5em; font-weight:bold; color:#e85743;"></div>
+            </div>
+        </section>
+    </div>
+    <footer style="background:#fff; color:#888; font-size:0.98em; text-align:center; padding:18px 0 8px 0; border-top:1px solid #eee; margin-top:32px;">
+        <div style="max-width:1200px; margin:auto; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px;">
+            <div>For questions and comments, email us at <a href="mailto:prismconcerns@university.edu.ph" style="color:#e74c3c;">prismconcerns@university.edu.ph</a></div>
+            <div>PRISM – Portal for Records, Information, and Student Management</div>
+            <div>
+                <a href="#" style="color:#e74c3c; margin-right:8px;">Terms of Use</a>
+                <a href="#" style="color:#e74c3c; margin-right:8px;">Privacy Statement</a>
+                Version 06.2025.A
+            </div>
+        </div>
+    </footer>
+    <script>
+    // Profile icon dropdown logic
+    const profileIcon = document.getElementById('profileIcon');
+    const logoutDropdown = document.getElementById('logoutDropdown');
+    profileIcon.addEventListener('click', function(e) {
+        logoutDropdown.style.display = logoutDropdown.style.display === 'block' ? 'none' : 'block';
+        e.stopPropagation();
+    });
+    document.addEventListener('click', function() {
+        logoutDropdown.style.display = 'none';
+    });
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+        sessionStorage.clear();
+        window.location.href = 'login.html';
+    });
+    // Fetch and render grades for the logged-in student
+    const studentId = sessionStorage.getItem('studentId');
+    let allGrades = [];
+    function renderGradesTable(grades, facultyMap) {
+        const tbody = document.querySelector('#gradesTable tbody');
+        if (!grades.length) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#888;">No grades found.</td></tr>';
+            document.getElementById('gpaSummary').textContent = '';
+            return;
+        }
+        tbody.innerHTML = '';
+        let total = 0, count = 0;
+        grades.forEach(g => {
+            const faculty = facultyMap[g.courseCode] || facultyMap[g.subjectCode] || '';
+            tbody.innerHTML += `
+                <tr>
+                    <td style='padding:10px 8px; text-align:left;'>${g.courseCode || ''}</td>
+                    <td style='padding:10px 8px; text-align:left;'>${g.courseName || ''}</td>
+                    <td style='padding:10px 8px; text-align:left;'>${faculty}</td>
+                    <td style='padding:10px 8px; text-align:left;'>${g.grade || ''}</td>
+                </tr>
+            `;
+            // GPA calculation: assume numeric grades, skip non-numeric
+            const num = parseFloat(g.grade);
+            if (!isNaN(num)) { total += num; count++; }
+        });
+        // GPA calculation (simple average)
+        const gpa = count ? (total / count).toFixed(2) : 'N/A';
+        document.getElementById('gpaSummary').textContent = `GPA: ${gpa}`;
+    }
+    function populateCurriculumFilter(curriculums) {
+        const select = document.getElementById('semesterFilter');
+        select.innerHTML = '<option value="">All Curriculums</option>';
+        curriculums.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.id;
+            opt.text = c.name;
+            select.appendChild(opt);
+        });
+    }
+    if (studentId) {
+        Promise.all([
+            fetch(`/api/grades/student/${studentId}`).then(res => res.json()),
+            fetch(`/api/schedules/student/${studentId}`).then(res => res.json()),
+            fetch('/api/curriculums').then(res => res.json()),
+            fetch('/api/curriculum-subjects').then(res => res.json())
+        ]).then(([grades, schedules, curriculums, curriculumSubjects]) => {
+            allGrades = grades;
+            // After fetching schedules, build a subjectCode-to-facultyName map
+            const subjectFacultyMap = {};
+            schedules.forEach(s => {
+                if (s.courseCode && s.facultyName) {
+                    subjectFacultyMap[s.courseCode] = s.facultyName;
+                }
+            });
+            // On curriculum filter change:
+            document.getElementById('semesterFilter').onchange = function() {
+                const selectedCurriculumId = this.value;
+                if (!selectedCurriculumId) {
+                    renderGradesTable([], subjectFacultyMap);
+                    return;
+                }
+                // Fetch all subjects for the selected curriculum
+                fetch(`/api/curriculum-subjects/curriculum/${selectedCurriculumId}`)
+                    .then(res => res.json())
+                    .then(csList => {
+                        // For each subject, find grade if exists
+                        const rows = csList.map(cs => {
+                            const gradeObj = allGrades.find(g => g.subjectId == cs.subject.id);
+                            return {
+                                courseCode: cs.subject.subjectCode,
+                                courseName: cs.subject.subjectName,
+                                faculty: subjectFacultyMap[cs.subject.subjectCode] || '',
+                                grade: gradeObj ? gradeObj.grade : '',
+                            };
+                        });
+                        renderGradesTable(rows, subjectFacultyMap);
+                    });
+            };
+            // Initial render: show all subjects for the first curriculum if selected
+            const initialCurriculumSelect = document.getElementById('semesterFilter');
+            if (initialCurriculumSelect && initialCurriculumSelect.value) {
+                initialCurriculumSelect.onchange();
+            }
+            populateCurriculumFilter(curriculums);
+            // Optionally, trigger the onchange handler to show subjects for the first curriculum
+            if (curriculums.length > 0) {
+                document.getElementById('semesterFilter').value = curriculums[0].id;
+                document.getElementById('semesterFilter').onchange();
+            }
+        });
+    }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Schedule | PRISM Student Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f6f7fb;
+            color: #222;
+        }
+        header {
+            background: #e74c3c;
+            color: #fff;
+            padding: 18px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        nav {
+            display: flex;
+            gap: 18px;
+        }
+        nav .nav-link {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 18px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        nav .nav-link.active, nav .nav-link:hover {
+            background: #fff;
+            color: #e74c3c;
+        }
+        .container {
+            display: flex;
+            gap: 32px;
+            max-width: 1300px;
+            margin: 32px auto 0 auto;
+            padding: 0 16px 32px 16px;
+        }
+        .sidebar {
+            width: 260px;
+            min-width: 200px;
+        }
+        .sidebar .card {
+            padding: 18px 20px 18px 20px;
+            margin-bottom: 24px;
+        }
+        .sidebar h4 {
+            margin: 0 0 12px 0;
+            font-size: 1.1em;
+            color: #e74c3c;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 18px 0;
+        }
+        .sidebar ul li {
+            margin-bottom: 10px;
+        }
+        .sidebar ul li a {
+            color: #e74c3c;
+            text-decoration: none;
+            font-weight: 500;
+            transition: text-decoration 0.2s;
+        }
+        .sidebar ul li a:hover {
+            text-decoration: underline;
+        }
+        .inbox-list {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+            padding: 16px 0 0 0;
+            margin-bottom: 18px;
+        }
+        .inbox-list .inbox-item {
+            padding: 12px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.98em;
+        }
+        .inbox-list .inbox-item:last-child {
+            border-bottom: none;
+        }
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            padding: 28px 32px 24px 32px;
+            margin-bottom: 32px;
+        }
+        h1 {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 0 0 18px 0;
+        }
+        h2, h3 {
+            color: #e74c3c;
+            margin-top: 0;
+        }
+        @media (max-width: 1000px) {
+            .container { flex-direction: column; gap: 0; }
+            .sidebar { width: 100%; min-width: 0; margin-bottom: 24px; }
+        }
+        @media (max-width: 700px) {
+            .card { padding: 10px 2px 10px 2px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <span class="logo">PRISM</span>
+        <nav>
+            <a class="nav-link" href="student-dashboard.html">Home</a>
+            <a class="nav-link" href="enrollment.html">Enrollment</a>
+            <a class="nav-link" href="accounts.html">Accounts</a>
+            <a class="nav-link active" href="schedule.html">Schedule</a>
+            <a class="nav-link" href="grades.html">Grades</a>
+        </nav>
+        <div style="display: flex; align-items: center; gap: 16px; position: relative;">
+            <span id="profileIcon" style="font-size: 1.2em; cursor: pointer;">👤</span>
+            <div id="logoutDropdown" style="display:none; position:absolute; top:36px; right:0; background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.12); min-width:120px; z-index:10;">
+                <button id="logoutBtn" style="width:100%; background:#e74c3c; color:#fff; border:none; border-radius:8px; padding:10px 0; font-size:1em; cursor:pointer;">Logout</button>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="card">
+                <h4>Inbox</h4>
+                <div class="inbox-list">
+                    <div class="inbox-item"><b>March 08, 2025</b><br>2025 Career Fest (PI)</div>
+                    <div class="inbox-item"><b>November 11, 2024</b><br>A Comprehensive Online Labor Laws and Standards Orientation and Review</div>
+                    <div class="inbox-item"><b>May 14, 2024</b><br>Career Development Talk 2024</div>
+                </div>
+                <ul>
+                    <li><a href="#">Graduation Clearance</a></li>
+                    <li><a href="#">Submit Feedback</a></li>
+                </ul>
+            </div>
+        </aside>
+        <section class="main-content">
+            <div class="card">
+                <h1>Schedule</h1>
+                <p>View your class schedule, exam dates, and important academic events.</p>
+                <table style="margin-top:2em; width:100%; border-collapse:collapse; background:#fff; border-radius:10px; box-shadow:0 1px 6px rgba(0,0,0,0.04);">
+                    <thead>
+                        <tr style="background:#ffeaea; color:#e85743;">
+                            <th style="text-align:left; padding:10px 8px;">Subject Code</th>
+                            <th style="text-align:left; padding:10px 8px;">Subject Name</th>
+                            <th style="text-align:left; padding:10px 8px;">Units</th>
+                            <th style="text-align:left; padding:10px 8px;">Room Number</th>
+                            <th style="text-align:left; padding:10px 8px;">Time</th>
+                            <th style="text-align:left; padding:10px 8px;">Day(s)</th>
+                            <th style="text-align:left; padding:10px 8px;">Faculty</th>
+                            <th style="text-align:left; padding:10px 8px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="scheduleTableBody">
+                        <tr><td colspan="6" style="text-align:center; color:#888;">Loading schedule...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+    <footer style="background:#fff; color:#888; font-size:0.98em; text-align:center; padding:18px 0 8px 0; border-top:1px solid #eee; margin-top:32px;">
+        <div style="max-width:1200px; margin:auto; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px;">
+            <div>For questions and comments, email us at <a href="mailto:prismconcerns@university.edu.ph" style="color:#e74c3c;">prismconcerns@university.edu.ph</a></div>
+            <div>PRISM – Portal for Records, Information, and Student Management</div>
+            <div>
+                <a href="#" style="color:#e74c3c; margin-right:8px;">Terms of Use</a>
+                <a href="#" style="color:#e74c3c; margin-right:8px;">Privacy Statement</a>
+                Version 06.2025.A
+            </div>
+        </div>
+    </footer>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const studentId = sessionStorage.getItem("studentId");
+        if (!studentId) {
+            alert("You are not logged in. Redirecting to login page...");
+            window.location.href = "login.html";
+            return;
+        }
+
+        const tableBody = document.getElementById('scheduleTableBody');
+        tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#888;">Loading schedule...</td></tr>';
+
+        fetch(`http://localhost:8080/api/schedules/student/${studentId}`)
+            .then(res => res.json())
+            .then(schedules => {
+                tableBody.innerHTML = '';
+                if (!schedules.length) {
+                    tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#888;">No schedule found.</td></tr>';
+                } else {
+                    // Build a set of enrolled subject codes, only for active enrollments
+                    const enrolledCodes = new Set(
+                        enrollments
+                            .filter(e => !e.status || (e.status.toLowerCase() !== 'dropped' && e.status.toLowerCase() !== 'deleted'))
+                            .map(e => e.courseCode || e.subjectCode)
+                    );
+                    // Filter schedules to only those for enrolled subjects
+                    const filteredSchedules = schedules.filter(s => enrolledCodes.has(s.courseCode));
+                    filteredSchedules.forEach(schedule => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td style='padding:10px 8px; text-align:left;'>${schedule.subjectCode || ''}</td>
+                            <td style='padding:10px 8px; text-align:left;'>${schedule.subjectName || ''}</td>
+                            <td style='padding:10px 8px; text-align:left;'>${schedule.units || ''}</td>
+                            <td style='padding:10px 8px; text-align:left;'>${schedule.room || ''}</td>
+                            <td style='padding:10px 8px; text-align:left;'>${schedule.time || ''}</td>
+                            <td style='padding:10px 8px; text-align:left;'>${schedule.days || ''}</td>
+                            <td style='padding:10px 8px; text-align:left;'>${schedule.facultyName || schedule.faculty || 'N/A'}</td>
+                            <td style='padding:10px 8px; text-align:left;'>
+                                <button type='button' class='schedule-edit-btn'>Edit</button>
+                                <button type='button' class='schedule-delete-btn'>Delete</button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                }
+                setTimeout(() => {
+                    document.querySelectorAll('.schedule-edit-btn').forEach((btn, idx) => {
+                        btn.onclick = function() {
+                            alert('Edit functionality coming soon! Row: ' + (idx + 1));
+                        };
+                    });
+                    document.querySelectorAll('.schedule-delete-btn').forEach((btn, idx) => {
+                        btn.onclick = function() {
+                            if (confirm('Are you sure you want to delete this schedule?')) {
+                                alert('Delete functionality coming soon! Row: ' + (idx + 1));
+                            }
+                        };
+                    });
+                }, 100);
+            })
+            .catch(() => {
+                tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#888;">Failed to load schedule.</td></tr>';
+            });
+    });
+
+    // Profile icon dropdown logic
+    const profileIcon = document.getElementById('profileIcon');
+    const logoutDropdown = document.getElementById('logoutDropdown');
+    profileIcon.addEventListener('click', function(e) {
+        logoutDropdown.style.display = logoutDropdown.style.display === 'block' ? 'none' : 'block';
+        e.stopPropagation();
+    });
+    document.addEventListener('click', function() {
+        logoutDropdown.style.display = 'none';
+    });
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+        sessionStorage.clear();
+        window.location.href = 'login.html';
+    });
+
+    async function getStudentIdByStudentNumber(studentNumber) {
+        const res = await fetch('/api/admin/student');
+        const students = await res.json();
+        const student = students.find(s => s.studentNumber === studentNumber);
+        return student ? student.id : null;
+    }
+
+    async function showStudentSchedule(studentNumber) {
+        const studentId = await getStudentIdByStudentNumber(studentNumber);
+        const tbody = document.getElementById('scheduleTableBody');
+        if (!studentId) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#888;">Student not found.</td></tr>';
+            return;
+        }
+        const res = await fetch(`/api/schedules/student/${studentId}`);
+        const schedules = await res.json();
+        if (!schedules.length) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#888;">No schedule found.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = '';
+        schedules.forEach(sch => {
+            tbody.innerHTML += `<tr>
+                <td style='padding:10px 8px; text-align:left;'>${sch.subjectCode || ''}</td>
+                <td style='padding:10px 8px; text-align:left;'>${sch.subjectName || ''}</td>
+                <td style='padding:10px 8px; text-align:left;'>${sch.units || ''}</td>
+                <td style='padding:10px 8px; text-align:left;'>${sch.room || ''}</td>
+                <td style='padding:10px 8px; text-align:left;'>${sch.time || ''}</td>
+                <td style='padding:10px 8px; text-align:left;'>${sch.days || ''}</td>
+                <td style='padding:10px 8px; text-align:left;'>${sch.facultyName || sch.faculty || 'N/A'}</td>
+                <td style='padding:10px 8px; text-align:left;'>
+                    <button type='button' class='schedule-edit-btn'>Edit</button>
+                    <button type='button' class='schedule-delete-btn'>Delete</button>
+                </td>
+            </tr>`;
+        });
+        setTimeout(() => {
+            document.querySelectorAll('.schedule-edit-btn').forEach((btn, idx) => {
+                btn.onclick = function() {
+                    alert('Edit functionality coming soon! Row: ' + (idx + 1));
+                };
+            });
+            document.querySelectorAll('.schedule-delete-btn').forEach((btn, idx) => {
+                btn.onclick = function() {
+                    if (confirm('Are you sure you want to delete this schedule?')) {
+                        alert('Delete functionality coming soon! Row: ' + (idx + 1));
+                    }
+                };
+            });
+        }, 100);
+    }
+    // TODO: Replace 'SIS-00001' with the logged-in student's number dynamically
+    showStudentSchedule('SIS-00001');
+    </script>
+</body>
+</html> 

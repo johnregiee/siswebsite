@@ -38,10 +38,12 @@ public class StudentService {
     // Update student info
     public Optional<Student> updateStudent(Long id, Student studentDetails) {
         return studentRepository.findById(id).map(student -> {
+            student.setStudentNumber(studentDetails.getStudentNumber());
             student.setName(studentDetails.getName());
             student.setEmail(studentDetails.getEmail());
             student.setPassword(studentDetails.getPassword());
-            // update other fields if any
+            student.setCourse(studentDetails.getCourse());
+            student.setSection(studentDetails.getSection());
             return studentRepository.save(student);
         });
     }
@@ -52,5 +54,10 @@ public class StudentService {
             studentRepository.delete(student);
             return true;
         }).orElse(false);
+    }
+
+    // Find student by email
+    public Optional<Student> getStudentByEmail(String email) {
+        return studentRepository.findByEmail(email);
     }
 }

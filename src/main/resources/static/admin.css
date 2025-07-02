@@ -1,0 +1,289 @@
+body {
+    font-family: 'Montserrat', Arial, sans-serif;
+    background: #f7f8fa;
+    color: #222;
+    min-height: 100vh;
+}
+.header {
+    background: #e85743;
+    color: #fff;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    padding: 0 2.5rem 0 1.5rem;
+    display: flex;
+    align-items: center;
+    height: 48px;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(231,76,60,0.08);
+    border-bottom: none;
+}
+.logo {
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    padding-left: 0.2rem;
+}
+.admin-label {
+    font-weight: 400;
+    font-size: 1rem;
+    margin-left: 0.2rem;
+    color: #fff;
+    opacity: 0.85;
+}
+.nav-tabs {
+    display: flex;
+    gap: 1.5rem;
+    flex: 1 1 0;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Montserrat', Arial, sans-serif;
+}
+.tab-btn {
+    background: transparent;
+    border: none;
+    padding: 0.4rem 1.2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #fff;
+    font-size: 1.05rem;
+    transition: background 0.2s, color 0.2s;
+    outline: none;
+    margin: 0 0.05rem;
+    box-shadow: none;
+}
+.tab-btn.active {
+    background: #fff;
+    color: #e85743;
+    font-weight: 600;
+    box-shadow: none;
+    border-radius: 8px;
+}
+.tab-btn:hover:not(.active) {
+    background: rgba(255,255,255,0.10);
+    color: #fff;
+}
+.profile-icon {
+    margin-left: 1.2rem;
+    margin-right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 32px;
+}
+.profile-icon svg {
+    display: block;
+    width: 24px;
+    height: 24px;
+    margin-left: 8px;
+}
+.main-content-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+    margin-top: 7rem;
+    padding: 2.5rem 2rem;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+.card {
+    background: #fafbfc;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    padding: 1.5rem 1rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #f0f0f0;
+}
+.card-form {
+    margin-bottom: 2rem;
+}
+.card-table {
+    margin-bottom: 2rem;
+}
+h2, h3 {
+    color: #e85743;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-weight: 700;
+}
+h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+}
+h3 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    align-items: end;
+}
+input, select {
+    padding: 0.7rem 1rem;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: #fff;
+    color: #222;
+    transition: border 0.2s;
+    font-family: 'Montserrat', Arial, sans-serif;
+}
+input:focus, select:focus {
+    outline: none;
+    border-color: #e85743;
+    box-shadow: 0 0 0 2px #ffeaea;
+}
+input::placeholder {
+    color: #bbb;
+}
+button, .action-btn {
+    background: linear-gradient(90deg, #e85743 0%, #ff7e5f 100%);
+    color: #fff;
+    border: none;
+    padding: 0.7rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    box-shadow: 0 2px 8px rgba(231,76,60,0.08);
+    transition: background 0.2s, transform 0.1s;
+    font-family: 'Montserrat', Arial, sans-serif;
+}
+button:hover, .action-btn:hover {
+    background: linear-gradient(90deg, #ff7e5f 0%, #e85743 100%);
+    transform: translateY(-2px);
+}
+button:active, .action-btn:active {
+    transform: translateY(0);
+}
+.action-btn {
+    padding: 0.4rem 1rem;
+    margin: 0 0.2rem;
+    font-size: 0.95rem;
+    border-radius: 6px;
+    font-weight: 500;
+}
+.edit-btn {
+    background: #fff3e0;
+    color: #e67e22;
+    border: 1px solid #ffe0b2;
+}
+.edit-btn:hover {
+    background: #ffe0b2;
+    color: #b35400;
+}
+.delete-btn {
+    background: #ffeaea;
+    color: #e85743;
+    border: 1px solid #ffd6d6;
+}
+.delete-btn:hover {
+    background: #ffd6d6;
+    color: #b71c1c;
+}
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    margin-bottom: 1rem;
+    font-family: 'Montserrat', Arial, sans-serif;
+}
+thead {
+    background: #ffeaea;
+    color: #e85743;
+}
+th {
+    padding: 1rem 0.7rem;
+    text-align: left;
+    font-weight: 700;
+    font-size: 1rem;
+    border-bottom: 1.5px solid #f0f0f0;
+}
+td {
+    padding: 0.9rem 0.7rem;
+    border-bottom: 1px solid #f5f5f5;
+    font-size: 1rem;
+}
+tbody tr:nth-child(even) {
+    background: #fafbfc;
+}
+tbody tr:hover {
+    background: #fff3e0;
+    transition: background 0.2s;
+}
+tbody tr:last-child td {
+    border-bottom: none;
+}
+.feedback {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    display: none;
+    font-size: 1rem;
+}
+.feedback.success {
+    background: #eafaf1;
+    color: #27ae60;
+    border: 1px solid #b2f2d7;
+    display: block;
+}
+.feedback.error {
+    background: #ffeaea;
+    color: #e85743;
+    border: 1px solid #ffd6d6;
+    display: block;
+}
+@media (max-width: 1100px) {
+    .main-content-wrapper {
+        padding: 1.5rem 0.5rem;
+    }
+}
+@media (max-width: 700px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem 0.5rem;
+        height: auto;
+    }
+    .logo {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    .nav-tabs {
+        gap: 0.7rem;
+    }
+    .main-content-wrapper {
+        padding: 1rem 0.2rem;
+    }
+    th, td {
+        font-size: 0.95rem;
+        padding: 0.7rem 0.3rem;
+    }
+}
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-thumb {
+    background: #ffeaea;
+    border-radius: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #f7f8fa;
+    border-radius: 8px;
+} 

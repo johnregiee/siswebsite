@@ -1,342 +1,1448 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin - Management</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        table, th, td {
-            border: 1px solid black;
-            border-collapse: collapse;
-        }
-        table { width: 100%; margin-bottom: 30px; }
-        th, td { padding: 8px; text-align: left; }
-        form { border: 1px solid #ccc; padding: 15px; margin-bottom: 20px; }
-        h1, h3 { margin-top: 30px; }
-        .feedback { font-weight: bold; margin-bottom: 15px; }
-        .success { color: green; }
-        .error { color: red; }
-    </style>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="admin.css" />
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,600,700&display=swap" rel="stylesheet">
 </head>
+
 <body>
-    <h1>Admin Panel</h1>
-
-    <!-- ============================================== -->
-    <!--          FACULTY MANAGEMENT SECTION            -->
-    <!-- ============================================== -->
-    <h3>Add New Faculty Member</h3>
-    <div id="faculty-feedback" class="feedback"></div>
-    <form id="facultyForm">
-        <input type="text" id="facultyName" placeholder="Full Name" required />
-        <input type="email" id="facultyEmail" placeholder="Email" required />
-        <input type="password" id="facultyPassword" placeholder="Password" required />
-        <button type="submit">Create Faculty Account</button>
-    </form>
-    
-    <!-- NEW: Table to display all faculty members -->
-    <h3>All Faculty Members</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Full Name</th>
-                <th>Email</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody id="facultyTableBody"></tbody>
-    </table>
-
-    <hr>
-
-    <!-- ============================================== -->
-    <!--          STUDENT MANAGEMENT SECTION            -->
-    <!-- ============================================== -->
-    <h3>Add New Student</h3>
-    <form id="studentForm">
-        <input type="hidden" id="studentId" />
-        <input type="text" id="studentNumber" placeholder="Student Number" required />
-        <input type="text" id="name" placeholder="Name" required />
-        <input type="email" id="email" placeholder="Email" required />
-        <input type="password" id="password" placeholder="Password" required />
-        <button type="submit">Save Student</button>
-    </form>
-
-    <h3>All Students</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Student Number</th>
-                <th>Name</th>
-                <th>Email</th>
-                <!-- UPDATED: Password column is removed for security -->
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody id="studentTableBody"></tbody>
-    </table>
-    
-    <hr>
-
-    <!-- ============================================== -->
-    <!--       STUDENT ACCOUNT MANAGEMENT SECTION       -->
-    <!-- ============================================== -->
-    <h3>Add Student Account</h3>
-    <form id="accountForm">
-        <input type="number" id="accountStudentId" placeholder="Student ID" required />
-        <input type="text" id="accountSemester" placeholder="Semester" required />
-        <input type="number" step="0.01" id="accountTuitionFee" placeholder="Tuition Fee" required />
-        <input type="number" step="0.01" id="accountAmountPaid" placeholder="Amount Paid" required />
-        <button type="submit">Add Account</button>
-    </form>
-    
-    <h3>All Student Accounts</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Account ID</th>
-                <th>Student ID</th>
-                <th>Semester</th>
-                <th>Tuition Fee</th>
-                <th>Amount Paid</th>
-                <th>Balance</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody id="accountTableBody"></tbody>
-    </table>
-
+    <header class="header">
+        <div class="logo">
+            <span>PRISM</span>
+            <span class="admin-label">Admin</span>
+        </div>
+        <nav class="nav-tabs">
+            <button class="tab-btn" data-tab="faculty">Faculty</button>
+            <button class="tab-btn" data-tab="students">Students</button>
+            <button class="tab-btn" data-tab="subjects">Subjects</button>
+            <button class="tab-btn" data-tab="curriculum">Curriculum</button>
+            <button class="tab-btn" data-tab="accounts">Accounts</button>
+            <button class="tab-btn" data-tab="courses">Courses</button>
+            <button class="tab-btn" data-tab="sections">Sections</button>
+            <button class="tab-btn" data-tab="schedules">Schedules</button>
+        </nav>
+        <div class="profile-icon" style="margin-right: 1.5rem;">
+            <svg width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-left: 8px;"><circle cx="12" cy="12" r="12" fill="#fff"/><path d="M12 13.5c1.86 0 3.5-1.64 3.5-3.5S13.86 6.5 12 6.5 8.5 8.14 8.5 10s1.64 3.5 3.5 3.5Zm0 1.5c-2.25 0-6.5 1.13-6.5 3.5V20h13v-1.5c0-2.37-4.25-3.5-6.5-3.5Z" fill="#e85743"/></svg>
+        </div>
+    </header>
+    <main class="main-content-wrapper">
+        <!-- Faculty Section -->
+        <section id="faculty" class="card" style="display:none;">
+            <h2>Faculty Management</h2>
+            <div id="faculty-feedback" class="feedback"></div>
+            <form id="facultyForm" class="card-form">
+                <h3>Add New Faculty Member</h3>
+                <fieldset>
+                    <input type="text" id="facultyName" placeholder="Full Name" required />
+                    <input type="email" id="facultyEmail" placeholder="Email" required />
+                    <input type="password" id="facultyPassword" placeholder="Password" required />
+                    <button type="submit">Create Faculty Account</button>
+                </fieldset>
+            </form>
+            <h3>All Faculty Members</h3>
+            <div class="card-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="facultyTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+        <!-- Student Section -->
+        <section id="students" class="card" style="display:none;">
+            <h2>Student Management</h2>
+            <form id="studentForm" class="card-form">
+                <h3>Add / Edit Student</h3>
+                <fieldset style="display:flex; flex-wrap:wrap; gap: 16px 12px; align-items:center; border:none; padding:0;">
+                    <input type="hidden" id="studentId" />
+                    <input type="text" id="studentNumber" placeholder="Student Number" required style="flex:1 1 180px; min-width:150px;" />
+                    <input type="text" id="name" placeholder="Name" required style="flex:1 1 180px; min-width:150px;" />
+                    <input type="email" id="email" placeholder="Email" required style="flex:1 1 180px; min-width:150px;" />
+                    <input type="password" id="password" placeholder="Password" required style="flex:1 1 180px; min-width:150px;" />
+                    <select id="studentCourseSelect" style="flex:1 1 180px; min-width:150px;"><option value="">None</option></select>
+                    <select id="studentSectionSelect" style="flex:1 1 180px; min-width:150px;"><option value="">None</option></select>
+                    <div style="flex-basis:100%; height:0;"></div>
+                    <button type="submit" style="width:250px; min-width:150px; margin-top:8px;">Save Student</button>
+                </fieldset>
+            </form>
+            <h3>All Students</h3>
+            <div class="card-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Student Number</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Course</th>
+                            <th>Section</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+        <!-- Subject Section -->
+        <section id="subjects" class="card" style="display:none;">
+            <h2>Subject Management</h2>
+            <form id="subjectForm" class="card-form">
+                <h3>Add New Subject</h3>
+                <fieldset>
+                    <input type="hidden" id="subjectId" />
+                    <select id="subjectCourseSelect" required>
+                        <option value="">Select Course</option>
+                    </select>
+                    <input type="text" id="subjectCode" placeholder="Subject Code" required />
+                    <input type="text" id="subjectName" placeholder="Subject Name" required />
+                    <button type="submit">Save Subject</button>
+                </fieldset>
+            </form>
+            <h3>All Subjects</h3>
+            <div class="card-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Subject Code</th>
+                            <th>Subject Name</th>
+                            <th>Course</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subjectTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+        <!-- Curriculum Section -->
+        <section id="curriculum" class="card" style="display:none;">
+            <h2 style="color:#F45B48; font-size:2.5rem; font-weight:700; margin-bottom:1.5rem;">Curriculum Management</h2>
+            <form id="curriculumForm" class="card-form">
+                <h3>Add / Edit Curriculum</h3>
+                <input type="text" id="curriculumName" placeholder="Curriculum Name" required />
+                <button type="submit" id="saveCurriculumBtn">Save Curriculum</button>
+            </form>
+            <h3>All Curriculums</h3>
+            <div class="card-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Curriculum Name</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="curriculumTableBody"></tbody>
+                </table>
+            </div>
+            <!-- Place Select Curriculum dropdown here -->
+            <div id="curriculumPageCurriculumSelectWrapper" style="margin-bottom:1em;">
+                <label for="curriculumPageCurriculumSelect" style="font-weight:600; margin-bottom:0.5em; display:block;">Select Curriculum:</label>
+                <select id="curriculumPageCurriculumSelect" style="margin-bottom:1em;"><option value="">Select Curriculum</option></select>
+            </div>
+            <h3 id="curriculumSubjectsHeading">Subjects Under Curriculum</h3>
+            <div class="card-table">
+                <table id="curriculumSubjectsTable">
+                    <thead>
+                        <tr style="background:#ffeaea; color:#e85743;">
+                            <th style="padding:10px 12px; text-align:left;">Course Code</th>
+                            <th style="padding:10px 12px; text-align:left;">Course Name</th>
+                            <th style="padding:10px 12px; text-align:left;">Units</th>
+                            <th style="padding:10px 12px; text-align:left;">Room Number</th>
+                            <th style="padding:10px 12px; text-align:left;">Time</th>
+                            <th style="padding:10px 12px; text-align:left;">Day(s)</th>
+                            <th style="padding:10px 12px; text-align:left;">Faculty</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <h4>Add / Edit Subject to Curriculum</h4>
+            <form id="curriculumSubjectForm" class="card-form">
+                <fieldset style="display:flex; flex-wrap:wrap; gap:16px 12px;">
+                    <select id="csCurriculumId" required style="margin-bottom:12px;"><option value="">Select Curriculum</option></select>
+                    <select id="csSubjectId" required style="margin-bottom:12px;"><option value="">Select Subject</option></select>
+                    <select id="csFacultySelect" style="margin-bottom:12px;"><option value="">Select Faculty</option></select>
+                    <input type="number" id="csUnits" placeholder="Units" required min="1" style="margin-bottom:12px;" />
+                    <input type="text" id="csRoomNumber" placeholder="Room Number" style="margin-bottom:12px;" />
+                    <input type="text" id="csTime" placeholder="Time (e.g., 9:00-10:30)" style="margin-bottom:12px;" />
+                    <input type="text" id="csDays" placeholder="Day(s) (e.g., Mon/Wed)" style="margin-bottom:12px;" />
+                    <button type="submit" style="margin-bottom:12px;">Save Subject to Curriculum</button>
+                </fieldset>
+            </form>
+        </section>
+        <!-- Accounts Section -->
+        <section id="accounts" class="card" style="display:none;">
+            <h2>Student Accounts</h2>
+            <form id="accountForm" class="card-form">
+                <h3>Add Student Account</h3>
+                <fieldset>
+                    <input type="number" id="accountStudentId" placeholder="Student ID" required />
+                    <input type="text" id="accountSemester" placeholder="Semester" required />
+                    <input type="number" step="0.01" id="accountTuitionFee" placeholder="Tuition Fee" required />
+                    <input type="number" step="0.01" id="accountAmountPaid" placeholder="Amount Paid" required />
+                    <button type="submit">Add Account</button>
+                </fieldset>
+            </form>
+            <h3>All Student Accounts</h3>
+            <div class="card-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Account ID</th>
+                            <th>Student ID</th>
+                            <th>Semester</th>
+                            <th>Tuition Fee</th>
+                            <th>Amount Paid</th>
+                            <th>Balance</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="accountTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+        <!-- Courses Section -->
+        <section id="courses" class="card" style="display:none;">
+            <h2>Course Management</h2>
+            <form id="courseForm" class="card-form">
+                <h3>Add / Edit Course</h3>
+                <fieldset>
+                    <input type="hidden" id="courseId">
+                    <input type="text" id="courseCode" placeholder="Course Code (e.g., BSIT)" required />
+                    <input type="text" id="courseName" placeholder="Course Name (e.g., Information Technology)" required />
+                    <button type="submit">Save Course</button>
+                </fieldset>
+            </form>
+            <h3>All Courses</h3>
+            <div class="card-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Course Code</th>
+                            <th>Course Name</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="courseTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+        <!-- Sections Section -->
+        <section id="sections" class="card" style="display:none;">
+            <h2>Section Management</h2>
+            <form id="sectionForm" class="card-form">
+                <h3>Add New Section</h3>
+                <fieldset>
+                    <input type="hidden" id="sectionId" />
+                    <input type="text" id="sectionName" placeholder="Section Name" required />
+                    <button type="submit">Save Section</button>
+                </fieldset>
+            </form>
+            <h3>All Sections</h3>
+            <div class="card-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Section Name</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sectionTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+        <!-- Schedules Section -->
+        <section id="schedules" class="card" style="display:none;">
+            <h2>Schedule Management</h2>
+            <label for="scheduleCurriculumSelect" style="font-weight:600; margin-bottom:0.5em; display:block;">Select Curriculum:</label>
+            <select id="scheduleCurriculumSelect" style="margin-bottom:1em;"><option value="">Select Curriculum</option></select>
+            <div class="card-table">
+                <table>
+                    <thead>
+                        <tr style="background:#ffeaea; color:#e85743;">
+                            <th>Course Code</th>
+                            <th>Course Name</th>
+                            <th>Day(s)</th>
+                            <th>Time</th>
+                            <th>Room</th>
+                            <th>Faculty</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="schedulesTableBody"></tbody>
+                </table>
+            </div>
+            <form id="scheduleForm" class="card-form">
+                <h3>Add / Edit Schedule</h3>
+                <fieldset>
+                    <input type="hidden" id="scheduleId" />
+                    <input type="hidden" id="scheduleSubjectId" />
+                    <input type="hidden" id="scheduleCurriculumId" />
+                    <input type="number" id="scheduleStudentId" placeholder="Student ID" required />
+                    <input type="text" id="scheduleCourseCode" placeholder="Course Code" required />
+                    <input type="text" id="scheduleCourseName" placeholder="Course Name" required />
+                    <input type="text" id="scheduleDay" placeholder="Day(s) (e.g., Mon/Wed)" required />
+                    <input type="text" id="scheduleTime" placeholder="Time (e.g., 9:00-10:30)" required />
+                    <input type="text" id="scheduleRoom" placeholder="Room Number" required />
+                    <select id="scheduleFacultySelect" required>
+                      <option value="">Select Faculty</option>
+                    </select>
+                    <button type="submit">Save Schedule</button>
+                </fieldset>
+            </form>
+        </section>
+    </main>
+    <footer style="text-align:center; color:#aaa; font-size:0.95rem; margin-top:2rem; padding:1.5rem 0 0.5rem 0;">
+        <div>For questions and comments, email us at <a href="mailto:prismconcerns@university.edu.ph" style="color:#e85743; text-decoration:none;">prismconcerns@university.edu.ph</a></div>
+        <div style="margin-top:0.5rem;">PRISM – Portal for Records, Information, and Student Management | <a href="#" style="color:#e85743; text-decoration:none;">Terms of Use</a> | <a href="#" style="color:#e85743; text-decoration:none;">Privacy Statement</a></div>
+        <div style="margin-top:0.5rem; font-size:0.85rem;">Version 06.20.25A</div>
+    </footer>
     <script>
-        const studentApiUrl = 'http://localhost:8080/api/admin/student';
-        const accountsApiUrl = 'http://localhost:8080/api/accounts';
-        const adminApiUrl = 'http://localhost:8080/api/admins'; 
-
-        // --- Faculty Management ---
-        document.getElementById('facultyForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const feedbackEl = document.getElementById('faculty-feedback');
-            feedbackEl.textContent = '';
-            feedbackEl.className = 'feedback';
-
-            const facultyData = {
-                fullName: document.getElementById('facultyName').value,
-                email: document.getElementById('facultyEmail').value,
-                password: document.getElementById('facultyPassword').value
-            };
-
-            try {
-                const response = await fetch(`${adminApiUrl}/faculty`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(facultyData)
-                });
-                const responseText = await response.text();
-                if (!response.ok) throw new Error(responseText);
-                
-                feedbackEl.textContent = responseText;
-                feedbackEl.classList.add('success');
-                document.getElementById('facultyForm').reset();
-                loadFaculty(); // UPDATED: Reload the faculty list after adding a new one
-            } catch (err) {
-                feedbackEl.textContent = 'Error: ' + err.message;
-                feedbackEl.classList.add('error');
-            }
+    document.addEventListener('DOMContentLoaded', function() {
+        function showTab(sectionId) {
+            document.querySelectorAll('main > section').forEach(function(sec) {
+                sec.style.display = 'none';
+            });
+            var section = document.getElementById(sectionId);
+            if (section) section.style.display = 'block';
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-tab') === sectionId);
+            });
+            // Refresh schedules table when Schedules tab is shown
+            if (sectionId === 'schedules') fetchAndRenderSchedules();
+        }
+        // Show the first tab by default
+        showTab('faculty');
+        // Add click handlers to nav buttons
+        document.querySelectorAll('.tab-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var id = btn.getAttribute('data-tab');
+                showTab(id);
+            });
         });
+        // Populate the course dropdown for students
+        fetch('/api/courses')
+            .then(res => res.json())
+            .then(courses => {
+                const select = document.getElementById('studentCourseSelect');
+                if (!select) return;
+                select.innerHTML = '<option value="">None</option>';
+                courses.forEach(course => {
+                    const option = document.createElement('option');
+                    option.value = course.id;
+                    option.textContent = `${course.code} - ${course.name}`;
+                    select.appendChild(option);
+                });
+            });
+        // Populate the course dropdown for subjects
+        fetch('/api/courses')
+            .then(res => res.json())
+            .then(courses => {
+                const select = document.getElementById('subjectCourseSelect');
+                if (!select) return;
+                select.innerHTML = '<option value="">Select Course</option>';
+                courses.forEach(course => {
+                    const option = document.createElement('option');
+                    option.value = course.id;
+                    option.textContent = `${course.code} - ${course.name}`;
+                    select.appendChild(option);
+                });
+            });
+        // Fetch curriculums and populate scheduleCurriculumSelect
+        fetch('/api/curriculums')
+            .then(res => res.json())
+            .then(curriculums => {
+                const selector = document.getElementById('scheduleCurriculumSelect');
+                if (!selector) return;
+                selector.innerHTML = '<option value="">Select Curriculum</option>';
+                curriculums.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id;
+                    opt.textContent = c.name;
+                    selector.appendChild(opt);
+                });
+            });
+        // When curriculumSelector changes, update csCurriculumId in the form
+        const curriculumSelector = document.getElementById('curriculumSelector');
+        if (curriculumSelector) {
+            curriculumSelector.addEventListener('change', function() {
+                const csCurriculumId = document.getElementById('csCurriculumId');
+                if (csCurriculumId) csCurriculumId.value = this.value;
+            });
+        }
+        // Populate section dropdown for students
+        fetch('/api/sections')
+            .then(res => res.json())
+            .then(sections => {
+                const select = document.getElementById('studentSectionSelect');
+                if (!select) return;
+                select.innerHTML = '<option value="">None</option>';
+                sections.forEach(section => {
+                    const option = document.createElement('option');
+                    option.value = section.id;
+                    option.textContent = section.name;
+                    select.appendChild(option);
+                });
+            });
+        populateFacultyDropdown();
+        // Populate curriculum dropdown for curriculum page
+        fetch('/api/curriculums')
+            .then(res => res.json())
+            .then(curriculums => {
+                const selector = document.getElementById('curriculumPageCurriculumSelect');
+                if (!selector) return;
+                selector.innerHTML = '<option value="">Select Curriculum</option>';
+                curriculums.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id;
+                    opt.textContent = c.name;
+                    selector.appendChild(opt);
+                });
+            });
+        // Ensure curriculum dropdown event listener is set up correctly
+        const curriculumDropdown = document.getElementById('curriculumPageCurriculumSelect');
+        if (curriculumDropdown) {
+            curriculumDropdown.addEventListener('change', function() {
+                const curriculumId = this.value;
+                // Sync the form dropdown
+                const csCurriculumId = document.getElementById('csCurriculumId');
+                if (csCurriculumId) csCurriculumId.value = curriculumId;
+                if (curriculumId) fetchAndRenderSubjectsUnderCurriculum(curriculumId);
+            });
+        } else {
+            console.warn('curriculumPageCurriculumSelect dropdown not found');
+        }
+    });
+    // --- Faculty Add/Render Logic ---
+    const FACULTY_API_URL = '/api/faculty';
+    const FACULTY_ADMIN_API_URL = '/api/admins/faculty';
+    let editingFacultyId = null;
 
-        // NEW: Function to load and display all faculty members
-        async function loadFaculty() {
-            try {
-                const res = await fetch(`${adminApiUrl}/faculty`);
-                const data = await res.json();
-                const tableBody = document.getElementById('facultyTableBody');
-                tableBody.innerHTML = '';
+    function fetchAndRenderFaculty() {
+        fetch(FACULTY_API_URL)
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('facultyTableBody');
+                tbody.innerHTML = '';
                 data.forEach(faculty => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${faculty.id}</td>
-                        <td>${faculty.fullName}</td>
-                        <td>${faculty.email}</td>
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${faculty.id ?? ''}</td>
+                        <td>${faculty.fullName ?? ''}</td>
+                        <td>${faculty.email ?? ''}</td>
                         <td>
-                            <button onclick="deleteFaculty(${faculty.id})">Delete</button>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <button type="button" style="margin-right:8px;" onclick="editFaculty(${faculty.id}, '${faculty.fullName?.replace(/'/g, "&#39;")}', '${faculty.email?.replace(/'/g, "&#39;")}')">Edit</button>
+                                <button type="button" onclick="deleteFaculty(${faculty.id})">Delete</button>
+                            </div>
                         </td>
                     `;
-                    tableBody.appendChild(row);
+                    tbody.appendChild(tr);
                 });
-            } catch (err) {
-                console.error("Error loading faculty:", err);
-            }
-        }
-        
-        // NEW: Function to delete a faculty member
-        async function deleteFaculty(id) {
-            if (confirm('Are you sure you want to delete this faculty member?')) {
-                // You will need to add a DELETE endpoint to your AdminController for this
-                // For now, this is a placeholder for the future.
-                alert('Delete functionality for faculty needs to be added to the backend!');
-            }
-        }
-        
-        // --- Student Management ---
-        async function loadStudents() {
-            try {
-                const res = await fetch(studentApiUrl);
-                const data = await res.json();
-                const tableBody = document.getElementById('studentTableBody');
-                tableBody.innerHTML = '';
-                data.forEach(student => {
-                    const row = document.createElement('tr');
-                    // UPDATED: Removed the password cell for security
-                    row.innerHTML = `
-                        <td>${student.id}</td>
-                        <td>${student.studentNumber}</td>
-                        <td>${student.name}</td>
-                        <td>${student.email}</td>
-                        <td>
-                            <button onclick="editStudent(${student.id}, '${student.studentNumber}', '${student.name}', '${student.email}', '')">Edit</button>
-                            <button onclick="deleteStudent(${student.id})">Delete</button>
-                        </td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-            } catch (err) {
-                console.error("Error loading students:", err);
-            }
-        }
-        
-        // ... (The rest of your Student and Account JavaScript is fine and remains here) ...
-        document.getElementById('studentForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('studentId').value;
-            const student = {
-                studentNumber: document.getElementById('studentNumber').value,
-                name: document.getElementById('name').value,
-                email: document.getElementById('email').value,
-                password: document.getElementById('password').value
-            };
-            const method = id ? 'PUT' : 'POST';
-            const endpoint = id ? `${studentApiUrl}/${id}` : studentApiUrl;
-            try {
-                await fetch(endpoint, {
-                    method,
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(student)
-                });
-                document.getElementById('studentForm').reset();
-                document.getElementById('studentId').value = '';
-                loadStudents();
-            } catch (err) {
-                console.error('Error saving student:', err);
+            });
+    }
+
+    window.editFaculty = function(id, fullName, email) {
+        editingFacultyId = id;
+        document.getElementById('facultyName').value = fullName;
+        document.getElementById('facultyEmail').value = email;
+        document.getElementById('facultyPassword').value = '';
+        document.querySelector('#facultyForm button[type="submit"]').textContent = 'Update Faculty Account';
+    };
+
+    window.deleteFaculty = function(id) {
+        if (!confirm('Are you sure you want to delete this faculty member?')) return;
+        fetch(`${FACULTY_ADMIN_API_URL}/${id}`, { method: 'DELETE' })
+            .then(res => {
+                if (res.ok) fetchAndRenderFaculty();
+                else alert('Failed to delete faculty');
+            });
+    };
+
+    document.getElementById('facultyForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const fullName = document.getElementById('facultyName').value;
+        const email = document.getElementById('facultyEmail').value;
+        const password = document.getElementById('facultyPassword').value;
+        const method = editingFacultyId ? 'PUT' : 'POST';
+        const url = editingFacultyId ? `${FACULTY_ADMIN_API_URL}/${editingFacultyId}` : FACULTY_API_URL;
+        fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fullName, email, password })
+        })
+        .then(res => {
+            if (res.ok) {
+                fetchAndRenderFaculty();
+                this.reset();
+                editingFacultyId = null;
+                document.querySelector('#facultyForm button[type="submit"]').textContent = 'Create Faculty Account';
+            } else {
+                alert('Failed to save faculty');
             }
         });
-        
-        function editStudent(id, studentNumber, name, email, password) {
-            document.getElementById('studentId').value = id;
-            document.getElementById('studentNumber').value = studentNumber;
-            document.getElementById('name').value = name;
-            document.getElementById('email').value = email;
-            // We don't load the old password into the form for security
-            document.getElementById('password').value = '';
-            document.getElementById('password').placeholder = 'Enter new password (optional)';
+    });
+
+    // Fetch faculty list on page load
+    fetchAndRenderFaculty();
+
+    // --- Student Add/Edit/Delete/Render Logic ---
+    const STUDENT_API_URL = '/api/admin/student'; // for all actions
+    let editingStudentId = null;
+
+    function fetchAndRenderStudents() {
+        fetch(STUDENT_API_URL)
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('studentTableBody');
+                tbody.innerHTML = '';
+                data.forEach(student => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${student.id ?? ''}</td>
+                        <td>${student.studentNumber ?? ''}</td>
+                        <td>${student.name ?? ''}</td>
+                        <td>${student.email ?? ''}</td>
+                        <td>${student.course ? (student.course.code + ' - ' + student.course.name) : ''}</td>
+                        <td>${student.section ? student.section.name : ''}</td>
+                        <td>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <button type="button" style="margin-right:8px;" onclick="editStudent(${student.id}, '${student.studentNumber?.replace(/'/g, "&#39;")}', '${student.name?.replace(/'/g, "&#39;")}', '${student.email?.replace(/'/g, "&#39;")}', ${student.course?.id ?? 'null'})">Edit</button>
+                                <button type="button" onclick="deleteStudent(${student.id})">Delete</button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+    }
+
+    window.editStudent = function(id, studentNumber, name, email, courseId) {
+        editingStudentId = id;
+        document.getElementById('studentId').value = id;
+        document.getElementById('studentNumber').value = studentNumber;
+        document.getElementById('name').value = name;
+        document.getElementById('email').value = email;
+        document.getElementById('password').value = '';
+        document.querySelector('#studentForm button[type="submit"]').textContent = 'Update Student';
+        // Set the course dropdown to the correct value
+        const courseSelect = document.getElementById('studentCourseSelect');
+        if (courseSelect) courseSelect.value = courseId || '';
+    };
+
+    window.deleteStudent = function(id) {
+        if (!confirm('Are you sure you want to delete this student?')) return;
+        fetch(`${STUDENT_API_URL}/${id}`, { method: 'DELETE' })
+            .then(async res => {
+                if (res.ok) fetchAndRenderStudents();
+                else {
+                    const errorText = await res.text();
+                    alert('Failed to delete student: ' + errorText);
+                }
+            });
+    };
+
+    document.getElementById('studentForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const studentNumber = document.getElementById('studentNumber').value;
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const courseId = document.getElementById('studentCourseSelect').value;
+        const sectionId = document.getElementById('studentSectionSelect').value;
+        const method = editingStudentId ? 'PUT' : 'POST';
+        const url = editingStudentId ? `${STUDENT_API_URL}/${editingStudentId}` : STUDENT_API_URL;
+        const studentData = {
+            studentNumber,
+            name,
+            email,
+            password,
+            course: courseId ? { id: courseId } : null,
+            section: sectionId ? { id: sectionId } : null
+        };
+        // Log request details
+        if (method === 'PUT') {
+            console.log('PUT request to:', url);
+            console.log('Request body:', studentData);
         }
-        
-        async function deleteStudent(id) {
-            if (confirm('Are you sure you want to delete this student?')) {
-                try {
-                    await fetch(`${studentApiUrl}/${id}`, { method: 'DELETE' });
-                    loadStudents();
-                } catch (err) {
-                    console.error('Error deleting student:', err);
+        fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(studentData)
+        })
+        .then(async res => {
+            // Log response details
+            if (method === 'PUT') {
+                console.log('Response status:', res.status);
+                let respText = await res.clone().text();
+                try { respText = JSON.parse(respText); } catch (e) {}
+                console.log('Response body:', respText);
+            }
+            if (res.ok) {
+                fetchAndRenderStudents();
+                this.reset();
+                editingStudentId = null;
+                document.querySelector('#studentForm button[type="submit"]').textContent = 'Save Student';
+            } else {
+                alert('Failed to save student');
+            }
+        });
+    });
+
+    // Fetch students on page load
+    fetchAndRenderStudents();
+
+    // --- Course Add/Edit/Delete/Render Logic ---
+    const COURSE_API_URL = '/api/courses'; // for all actions
+    let editingCourseId = null;
+
+    function fetchAndRenderCourses() {
+        fetch(COURSE_API_URL)
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('courseTableBody');
+                if (!tbody) return;
+                tbody.innerHTML = '';
+                data.forEach(course => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${course.code ?? ''}</td>
+                        <td>${course.name ?? ''}</td>
+                        <td>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <button type="button" style="margin-right:8px;" onclick="editCourse(${course.id}, '${course.code?.replace(/'/g, "&#39;")}', '${course.name?.replace(/'/g, "&#39;")}')">Edit</button>
+                                <button type="button" onclick="deleteCourse(${course.id})">Delete</button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+    }
+
+    window.editCourse = function(id, code, name) {
+        editingCourseId = id;
+        document.getElementById('courseId').value = id;
+        document.getElementById('courseCode').value = code;
+        document.getElementById('courseName').value = name;
+        document.querySelector('#courseForm button[type="submit"]').textContent = 'Update Course';
+    };
+
+    window.deleteCourse = async function(id) {
+        // Fetch dependencies
+        const [students, curriculums, enrollments] = await Promise.all([
+            fetch(`/api/courses/${id}/students`).then(r => r.json()),
+            fetch(`/api/courses/${id}/curriculums`).then(r => r.json()),
+            fetch(`/api/courses/${id}/enrollments`).then(r => r.json())
+        ]);
+        let message = '';
+        if (students.length > 0) {
+            message += `Students assigned to this course:\n` + students.map(s => `- ${s.name || s.studentNumber || s.id}`).join('\n') + '\n';
+        }
+        if (curriculums.length > 0) {
+            message += `Curriculums using this course:\n` + curriculums.map(c => `- ${c.name || c.id}`).join('\n') + '\n';
+        }
+        if (enrollments.length > 0) {
+            message += `Enrollments using this course:\n` + enrollments.map(e => `- Enrollment ID: ${e.id}`).join('\n') + '\n';
+        }
+        if (message) {
+            alert('Cannot delete course. It is still referenced by:\n\n' + message + '\nPlease unassign or remove these dependencies first.');
+            return;
+        }
+        if (!confirm('Are you sure you want to delete this course?')) return;
+        fetch(`${COURSE_API_URL}/${id}`, { method: 'DELETE' })
+            .then(async res => {
+                if (res.ok) fetchAndRenderCourses();
+                else {
+                    const errorText = await res.text();
+                    alert('Failed to delete course: ' + errorText);
+                }
+            });
+    };
+
+    document.getElementById('courseForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const code = document.getElementById('courseCode').value;
+        const name = document.getElementById('courseName').value;
+        const method = editingCourseId ? 'PUT' : 'POST';
+        const url = editingCourseId ? `${COURSE_API_URL}/${editingCourseId}` : COURSE_API_URL;
+        const body = { code, name };
+        fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        })
+        .then(async res => {
+            if (res.ok) {
+                fetchAndRenderCourses();
+                this.reset();
+                editingCourseId = null;
+                document.querySelector('#courseForm button[type="submit"]').textContent = 'Save Course';
+            } else {
+                const errorText = await res.text();
+                alert('Failed to save course: ' + errorText);
+            }
+        });
+    });
+
+    // Fetch courses on page load
+    fetchAndRenderCourses();
+
+    // --- Subject Add/Edit/Delete/Render Logic ---
+    const SUBJECT_API_URL = '/api/subjects'; // for all actions
+    let editingSubjectId = null;
+
+    function fetchAndRenderSubjects() {
+        fetch(SUBJECT_API_URL)
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('subjectTableBody');
+                if (!tbody) return;
+                tbody.innerHTML = '';
+                data.forEach(subject => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${subject.subjectCode ?? ''}</td>
+                        <td>${subject.subjectName ?? ''}</td>
+                        <td>${subject.course ? (subject.course.code + ' - ' + subject.course.name) : ''}</td>
+                        <td>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <button type="button" style="margin-right:8px;" onclick="editSubject(${subject.id}, '${subject.subjectCode?.replace(/'/g, "&#39;")}', '${subject.subjectName?.replace(/'/g, "&#39;")}', ${subject.course?.id ?? 'null'})">Edit</button>
+                                <button type="button" onclick="deleteSubject(${subject.id})">Delete</button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+    }
+
+    window.editSubject = function(id, subjectCode, subjectName, courseId) {
+        editingSubjectId = id;
+        document.getElementById('subjectId').value = id;
+        document.getElementById('subjectCode').value = subjectCode;
+        document.getElementById('subjectName').value = subjectName;
+        document.getElementById('subjectCourseSelect').value = courseId || '';
+        document.querySelector('#subjectForm button[type="submit"]').textContent = 'Update Subject';
+    };
+
+    window.deleteSubject = function(id) {
+        if (!confirm('Are you sure you want to delete this subject?')) return;
+        fetch(`${SUBJECT_API_URL}/${id}`, { method: 'DELETE' })
+            .then(async res => {
+                if (res.ok) fetchAndRenderSubjects();
+                else {
+                    const errorText = await res.text();
+                    alert('Failed to delete subject: ' + errorText);
+                }
+            });
+    };
+
+    document.getElementById('subjectForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const courseId = document.getElementById('subjectCourseSelect').value;
+        const subjectCode = document.getElementById('subjectCode').value;
+        const subjectName = document.getElementById('subjectName').value;
+        const method = editingSubjectId ? 'PUT' : 'POST';
+        const url = editingSubjectId ? `/api/subjects/${editingSubjectId}` : '/api/subjects';
+        const body = { subjectCode, subjectName, courseId };
+
+        fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        })
+        .then(res => {
+            if (res.ok) {
+                fetchAndRenderSubjects();
+                this.reset();
+                editingSubjectId = null;
+                document.querySelector('#subjectForm button[type="submit"]').textContent = 'Save Subject';
+            } else {
+                alert('Failed to save subject');
+            }
+        });
+    });
+
+    // Fetch subjects on page load
+    fetchAndRenderSubjects();
+
+    // --- Curriculum Add/Edit/Delete/Render Logic ---
+    const CURRICULUM_API_URL = '/api/curriculums'; // for all actions
+    let editingCurriculumId = null;
+
+    function fetchAndRenderCurriculums() {
+        fetch(CURRICULUM_API_URL)
+            .then(res => res.json())
+            .then(data => {
+                window.curriculumsList = data; // Store globally for form use
+                const tbody = document.getElementById('curriculumTableBody');
+                tbody.innerHTML = '';
+                data.forEach(curriculum => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${curriculum.name ?? ''}</td>
+                        <td>
+                            <button type="button" style="margin-right:8px;" onclick="editCurriculum(${curriculum.id}, '${curriculum.name?.replace(/'/g, "&#39;")}')">Edit</button>
+                            <button type="button" onclick="deleteCurriculum(${curriculum.id})">Delete</button>
+                        </td>`;
+                    tbody.appendChild(tr);
+                });
+
+                // Auto-select and load the first curriculum if available
+                if (data.length > 0) {
+                    // Highlight the first row
+                    const firstRow = tbody.querySelector('tr');
+                    if (firstRow) firstRow.style.background = '#ffeaea';
+                    // Fetch and render subjects for the first curriculum
+                    fetchAndRenderSubjectsUnderCurriculum(data[0].id);
+                } else {
+                    // If no curriculums, reset the heading and table
+                    document.getElementById('curriculumSubjectsHeading').textContent = 'Subjects Under Curriculum';
+                    document.querySelector('#curriculumSubjectsTable tbody').innerHTML = '';
+                }
+            });
+    }
+
+    window.editCurriculum = function(id, name) {
+        editingCurriculumId = id;
+        document.getElementById('curriculumId').value = id;
+        document.getElementById('curriculumName').value = name;
+        document.querySelector('#curriculumForm button[type="submit"]').textContent = 'Update Curriculum';
+    };
+
+    window.deleteCurriculum = function(id) {
+        if (!confirm('Are you sure you want to delete this curriculum?')) return;
+        fetch(`${CURRICULUM_API_URL}/${id}`, { method: 'DELETE' })
+            .then(async res => {
+                if (res.ok) fetchAndRenderCurriculums();
+                else {
+                    const errorText = await res.text();
+                    alert('Failed to delete curriculum: ' + errorText);
+                }
+            });
+    };
+
+    document.getElementById('curriculumForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const name = document.getElementById('curriculumName').value;
+        const method = editingCurriculumId ? 'PUT' : 'POST';
+        const url = editingCurriculumId ? `${CURRICULUM_API_URL}/${editingCurriculumId}` : CURRICULUM_API_URL;
+        const body = { name };
+        fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        })
+        .then(async res => {
+            if (res.ok) {
+                fetchAndRenderCurriculums();
+                this.reset();
+                editingCurriculumId = null;
+                document.querySelector('#curriculumForm button[type="submit"]').textContent = 'Save Curriculum';
+            } else {
+                const errorText = await res.text();
+                alert('Failed to save curriculum: ' + errorText);
+            }
+        });
+    });
+
+    // Fetch curriculums on page load
+    fetchAndRenderCurriculums();
+
+    // --- Subjects Under Curriculum Functionality ---
+    function fetchAndRenderSubjectsUnderCurriculum(curriculumId) {
+        console.log('fetchAndRenderSubjectsUnderCurriculum called with:', curriculumId);
+        // Fetch curriculum name
+        fetch(`/api/curriculums/${curriculumId}`)
+            .then(res => res.json())
+            .then(curriculum => {
+                document.getElementById('curriculumSubjectsHeading').textContent = `Subjects Under ${curriculum.name || ''}`;
+            });
+        // Fetch and render subjects under curriculum
+        fetch(`/api/curriculum-subjects/curriculum/${curriculumId}/faculty-details`)
+            .then(res => res.json())
+            .then(data => {
+                console.log('Raw data from API:', data);
+                // Force parse if needed
+                if (typeof data === 'string') {
+                    try {
+                        data = JSON.parse(data);
+                    } catch (e) {
+                        console.error('Failed to parse data:', data);
+                        data = [];
+                    }
+                }
+                let subjects = [];
+                if (Array.isArray(data)) {
+                    if (data.length > 0 && Array.isArray(data[0].curriculumSubjects)) {
+                        subjects = data[0].curriculumSubjects;
+                    }
+                } else if (data && Array.isArray(data.curriculumSubjects)) {
+                    subjects = data.curriculumSubjects;
+                }
+                console.log('Subjects to render:', subjects);
+                window.lastScheduleCSList = subjects;
+                const tbody = document.querySelector('#curriculumSubjectsTable tbody');
+                tbody.innerHTML = '';
+                // Prefer the row with a facultyName, otherwise keep the first seen
+                const uniqueSubjectsMap = new Map();
+                subjects.forEach(cs => {
+                    const key = cs.id;
+                    if (!uniqueSubjectsMap.has(key) || (cs.facultyName && cs.facultyName !== '')) {
+                        uniqueSubjectsMap.set(key, cs);
+                    }
+                });
+                const uniqueSubjects = Array.from(uniqueSubjectsMap.values());
+                uniqueSubjects.forEach(cs => {
+                    const tr = document.createElement('tr');
+                    tr.setAttribute('data-cs-id', cs.id);
+                    tr.innerHTML = `
+                        <td style="padding:10px 12px; text-align:left;">${cs.subjectCode ?? ''}</td>
+                        <td style="padding:10px 12px; text-align:left;">${cs.subjectName ?? ''}</td>
+                        <td style="padding:10px 12px; text-align:left;">${cs.units ?? ''}</td>
+                        <td style="padding:10px 12px; text-align:left;">${cs.roomNumber ?? ''}</td>
+                        <td style="padding:10px 12px; text-align:left;">${cs.time ?? ''}</td>
+                        <td style="padding:10px 12px; text-align:left;">${cs.days ?? ''}</td>
+                        <td style="padding:10px 12px; text-align:left;">${cs.facultyName || ''}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                console.log('Table rows after render:', tbody.innerHTML);
+            });
+    }
+
+    // Add click event to curriculum rows after rendering curriculums
+    function addCurriculumRowClickHandlers() {
+        const rows = document.querySelectorAll('#curriculumTableBody tr');
+        rows.forEach(row => {
+            row.onclick = function() {
+                // Remove highlight from all rows
+                rows.forEach(r => r.style.background = '');
+                // Highlight selected row
+                this.style.background = '#ffeaea';
+                const curriculumId = this.querySelector('td').textContent;
+                fetchAndRenderSubjectsUnderCurriculum(curriculumId);
+            };
+        });
+    }
+
+    // Patch fetchAndRenderCurriculums to add click handlers after rendering
+    const origFetchAndRenderCurriculums = fetchAndRenderCurriculums;
+    fetchAndRenderCurriculums = function() {
+        origFetchAndRenderCurriculums();
+        setTimeout(addCurriculumRowClickHandlers, 100); // Wait for DOM update
+    };
+
+    // --- CurriculumSubject Add/Edit/Delete/Render Logic ---
+    const CURRICULUM_SUBJECT_API_URL = '/api/curriculum-subjects';
+    let editingCSId = null;
+    let selectedCurriculumId = null;
+
+    // Populate curriculum dropdown
+    function populateCSCurriculumDropdown(selectedId) {
+        fetch('/api/curriculums')
+            .then(res => res.json())
+            .then(data => {
+                const select = document.getElementById('csCurriculumId');
+                select.innerHTML = '<option value="">Select Curriculum</option>';
+                data.forEach(curriculum => {
+                    const option = document.createElement('option');
+                    option.value = curriculum.id;
+                    option.textContent = curriculum.name;
+                    if (selectedId && String(curriculum.id) === String(selectedId)) option.selected = true;
+                    select.appendChild(option);
+                });
+            });
+    }
+
+    // Populate subject dropdown
+    function populateCSSubjectDropdown() {
+        fetch('/api/subjects')
+            .then(res => res.json())
+            .then(data => {
+                const select = document.getElementById('csSubjectId');
+                select.innerHTML = '<option value="">Select Subject</option>';
+                data.forEach(subject => {
+                    const option = document.createElement('option');
+                    option.value = subject.id;
+                    option.textContent = `${subject.subjectCode} - ${subject.subjectName}`;
+                    select.appendChild(option);
+                });
+            });
+    }
+    populateCSSubjectDropdown();
+    populateCSCurriculumDropdown(selectedCurriculumId);
+
+    // Patch fetchAndRenderSubjectsUnderCurriculum to add Edit/Delete buttons and update curriculum dropdown
+    const origFetchAndRenderSubjectsUnderCurriculum = fetchAndRenderSubjectsUnderCurriculum;
+    fetchAndRenderSubjectsUnderCurriculum = function(curriculumId) {
+        selectedCurriculumId = curriculumId;
+        populateCSCurriculumDropdown(curriculumId);
+        origFetchAndRenderSubjectsUnderCurriculum(curriculumId);
+        setTimeout(() => {
+            const rows = document.querySelectorAll('#curriculumSubjectsTable tbody tr');
+            rows.forEach((row, idx) => {
+                // Add Edit/Delete buttons if not present
+                if (!row.querySelector('.cs-edit-btn')) {
+                    const csId = row.getAttribute('data-cs-id') || (window.lastScheduleCSList && window.lastScheduleCSList[idx]?.id);
+                    const td = document.createElement('td');
+                    td.innerHTML = `
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <button type="button" class="cs-edit-btn">Edit</button>
+                            <button type="button" class="cs-delete-btn">Delete</button>
+                        </div>
+                    `;
+                    row.appendChild(td);
+                    td.querySelector('.cs-edit-btn').onclick = () => editCurriculumSubject(csId, idx);
+                    td.querySelector('.cs-delete-btn').onclick = () => deleteCurriculumSubject(csId);
+                }
+            });
+        }, 100);
+    };
+
+    // Edit CurriculumSubject
+    window.editCurriculumSubject = function(csId, idx) {
+        const cs = window.lastScheduleCSList && window.lastScheduleCSList[idx];
+        if (!cs) return;
+        editingCSId = csId;
+        populateFacultyDropdown();
+        document.getElementById('csCurriculumId').value = cs.curriculum?.id || '';
+        document.getElementById('csSubjectId').value = cs.subject?.id || '';
+        document.getElementById('csUnits').value = cs.units;
+        document.getElementById('csRoomNumber').value = cs.roomNumber || '';
+        document.getElementById('csTime').value = cs.time || '';
+        document.getElementById('csDays').value = cs.days || '';
+        document.querySelector('#curriculumSubjectForm button[type="submit"]').textContent = 'Update Subject in Curriculum';
+        if (cs.facultyName) {
+            const facultySelect = document.getElementById('csFacultySelect');
+            if (facultySelect) {
+                for (let i = 0; i < facultySelect.options.length; i++) {
+                    if (facultySelect.options[i].text === cs.facultyName) {
+                        facultySelect.selectedIndex = i;
+                        break;
+                    }
                 }
             }
+        } else {
+            const facultySelect = document.getElementById('csFacultySelect');
+            if (facultySelect) facultySelect.selectedIndex = 0;
         }
+    };
 
-        document.getElementById('accountForm').addEventListener('submit', async function (e) {
-            e.preventDefault();
-            const newAccount = {
-                studentId: parseInt(document.getElementById('accountStudentId').value),
-                semester: document.getElementById('accountSemester').value,
-                tuitionFee: parseFloat(document.getElementById('accountTuitionFee').value),
-                amountPaid: parseFloat(document.getElementById('accountAmountPaid').value),
-            };
-            try {
-                const response = await fetch(accountsApiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(newAccount)
-                });
-                if (!response.ok) throw new Error('Failed to create account');
-                alert('Account added successfully!');
-                document.getElementById('accountForm').reset();
-                loadAccounts();
-            } catch (err) {
-                console.error('Error adding account:', err);
-                alert('Failed to add account.');
+    // Delete CurriculumSubject
+    window.deleteCurriculumSubject = function(csId) {
+        if (!confirm('Are you sure you want to delete this subject from the curriculum?')) return;
+        fetch(`${CURRICULUM_SUBJECT_API_URL}/${csId}`, { method: 'DELETE' })
+            .then(async res => {
+                if (res.ok) {
+                    const selectedCurriculumId = document.getElementById('curriculumPageCurriculumSelect').value;
+                    if (selectedCurriculumId) {
+                        fetchAndRenderSubjectsUnderCurriculum(selectedCurriculumId);
+                    }
+                    this.reset();
+                    editingCSId = null;
+                    document.querySelector('#curriculumSubjectForm button[type="submit"]').textContent = 'Save Subject to Curriculum';
+                } else {
+                    const errorText = await res.text();
+                    alert('Failed to delete subject from curriculum: ' + errorText);
+                }
+            });
+    };
+
+    // Handle add/edit CurriculumSubject
+    document.getElementById('curriculumSubjectForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const curriculumId = document.getElementById('csCurriculumId').value;
+        const subjectId = document.getElementById('csSubjectId').value;
+        const units = document.getElementById('csUnits').value;
+        const roomNumber = document.getElementById('csRoomNumber').value;
+        const time = document.getElementById('csTime').value;
+        const days = document.getElementById('csDays').value;
+        const facultyId = document.getElementById('csFacultySelect').value;
+        const method = editingCSId ? 'PUT' : 'POST';
+        const url = editingCSId
+          ? `/api/curriculum-subjects/${editingCSId}?facultyId=${facultyId}`
+          : `/api/curriculum-subjects?facultyId=${facultyId}`;
+        // Find the selected curriculum and its course info
+        let selectedCurriculum = null;
+        let selectedCourse = null;
+        if (window.curriculumsList) {
+            selectedCurriculum = window.curriculumsList.find(c => String(c.id) === String(curriculumId));
+            if (selectedCurriculum && selectedCurriculum.course) {
+                selectedCourse = selectedCurriculum.course;
+            }
+        }
+        const body = {
+            curriculum: selectedCurriculum ? { id: curriculumId, course: selectedCourse ? { id: selectedCourse.id, code: selectedCourse.code, name: selectedCourse.name } : undefined } : { id: curriculumId },
+            subject: { id: subjectId },
+            units: parseInt(units),
+            roomNumber,
+            time,
+            days
+        };
+        fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        })
+        .then(async res => {
+            if (res.ok) {
+                const selectedCurriculumId = document.getElementById('curriculumPageCurriculumSelect').value;
+                if (selectedCurriculumId) {
+                    fetchAndRenderSubjectsUnderCurriculum(selectedCurriculumId);
+                }
+                this.reset();
+                editingCSId = null;
+                document.querySelector('#curriculumSubjectForm button[type="submit"]').textContent = 'Save Subject to Curriculum';
+            } else {
+                const errorText = await res.text();
+                alert('Failed to save subject to curriculum: ' + errorText);
             }
         });
-        
-        async function loadAccounts() {
-            try {
-                const res = await fetch(accountsApiUrl);
-                const data = await res.json();
-                const tableBody = document.getElementById('accountTableBody');
-                tableBody.innerHTML = '';
+    });
+
+    // --- Student Account Add/Edit/Delete/Render Logic ---
+    const ACCOUNT_API_URL = '/api/accounts';
+    let editingAccountId = null;
+
+    function fetchAndRenderAccounts() {
+        fetch(ACCOUNT_API_URL)
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('accountTableBody');
+                tbody.innerHTML = '';
                 data.forEach(account => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${account.id}</td>
-                        <td>${account.studentId}</td>
-                        <td>${account.semester}</td>
-                        <td>₱${account.tuitionFee.toFixed(2)}</td>
-                        <td><input type="number" value="${account.amountPaid}" min="0" id="paid-${account.id}" style="width: 80px;" /></td>
-                        <td id="balance-${account.id}">₱${account.balance.toFixed(2)}</td>
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${account.id ?? ''}</td>
+                        <td>${account.studentId ?? ''}</td>
+                        <td>${account.semester ?? ''}</td>
+                        <td>${account.tuitionFee ?? ''}</td>
+                        <td>${account.amountPaid ?? ''}</td>
+                        <td>${(account.tuitionFee && account.amountPaid) ? (account.tuitionFee - account.amountPaid).toFixed(2) : ''}</td>
                         <td>
-                            <button onclick="updateAccount(${account.id})">Save</button>
-                            <button onclick="deleteAccount(${account.id})">Delete</button>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <button type="button" style="margin-right:8px;" onclick="editAccount(${account.id}, ${account.studentId}, '${account.semester}', ${account.tuitionFee}, ${account.amountPaid})">Edit</button>
+                                <button type="button" onclick="deleteAccount(${account.id})">Delete</button>
+                            </div>
                         </td>
                     `;
-                    tableBody.appendChild(row);
+                    tbody.appendChild(tr);
                 });
-            } catch (err) {
-                console.error('Error loading accounts:', err);
-            }
-        }
-        
-        async function updateAccount(accountId) {
-            const newPaid = parseFloat(document.getElementById(`paid-${accountId}`).value);
-            try {
-                const response = await fetch(`${accountsApiUrl}/${accountId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ amountPaid: newPaid })
-                });
-                if (!response.ok) throw new Error('Update failed');
-                alert('Account updated successfully!');
-                loadAccounts();
-            } catch (err) {
-                console.error('Error updating account:', err);
-                alert('Failed to update account');
-            }
-        }
-        
-        async function deleteAccount(accountId) {
-            if (!confirm('Are you sure you want to delete this account?')) return;
-            try {
-                const res = await fetch(`${accountsApiUrl}/${accountId}`, { method: 'DELETE' });
-                if (!res.ok) throw new Error('Failed to delete account');
-                alert('Account deleted successfully!');
-                loadAccounts();
-            } catch (err) {
-                console.error('Error deleting account:', err);
-                alert('Failed to delete account.');
-            }
-        }
+            });
+    }
 
-        // --- Initial Load on Page Open ---
-        loadFaculty(); // NEW: Load faculty on page open
-        loadStudents();
-        loadAccounts();
+    window.editAccount = function(id, studentId, semester, tuitionFee, amountPaid) {
+        editingAccountId = id;
+        document.getElementById('accountStudentId').value = studentId;
+        document.getElementById('accountSemester').value = semester;
+        document.getElementById('accountTuitionFee').value = tuitionFee;
+        document.getElementById('accountAmountPaid').value = amountPaid;
+        document.querySelector('#accountForm button[type="submit"]').textContent = 'Update Account';
+    };
+
+    window.deleteAccount = function(id) {
+        if (!confirm('Are you sure you want to delete this account?')) return;
+        fetch(`${ACCOUNT_API_URL}/${id}`, { method: 'DELETE' })
+            .then(res => {
+                if (res.ok) fetchAndRenderAccounts();
+                else alert('Failed to delete account');
+            });
+    };
+
+    document.getElementById('accountForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const studentId = document.getElementById('accountStudentId').value;
+        const semester = document.getElementById('accountSemester').value;
+        const tuitionFee = parseFloat(document.getElementById('accountTuitionFee').value);
+        const amountPaid = parseFloat(document.getElementById('accountAmountPaid').value);
+        const balance = tuitionFee - amountPaid;
+        const method = editingAccountId ? 'PUT' : 'POST';
+        const url = editingAccountId ? `${ACCOUNT_API_URL}/${editingAccountId}` : ACCOUNT_API_URL;
+        const body = {
+            studentId,
+            semester,
+            tuitionFee,
+            amountPaid,
+            balance
+        };
+        fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        })
+        .then(async res => {
+            if (res.ok) {
+                fetchAndRenderAccounts();
+                this.reset();
+                editingAccountId = null;
+                document.querySelector('#accountForm button[type="submit"]').textContent = 'Add Account';
+            } else {
+                const errorText = await res.text();
+                alert('Failed to save account: ' + errorText);
+            }
+        });
+    });
+
+    // Fetch accounts on page load
+    fetchAndRenderAccounts();
+
+    // --- Section Add/Edit/Delete/Render Logic ---
+    const SECTION_API_URL = '/api/sections';
+    let editingSectionId = null;
+
+    function fetchAndRenderSections() {
+        fetch(SECTION_API_URL)
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('sectionTableBody');
+                tbody.innerHTML = '';
+                data.forEach(section => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${section.name ?? ''}</td>
+                        <td>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <button type="button" style="margin-right:8px;" onclick="editSection(${section.id}, '${section.name?.replace(/'/g, "&#39;")}')">Edit</button>
+                                <button type="button" onclick="deleteSection(${section.id})">Delete</button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+    }
+
+    window.editSection = function(id, name) {
+        editingSectionId = id;
+        document.getElementById('sectionId').value = id;
+        document.getElementById('sectionName').value = name;
+        document.querySelector('#sectionForm button[type="submit"]').textContent = 'Update Section';
+    };
+
+    window.deleteSection = function(id) {
+        if (!confirm('Are you sure you want to delete this section?')) return;
+        fetch(`${SECTION_API_URL}/${id}`, { method: 'DELETE' })
+            .then(res => {
+                if (res.ok) fetchAndRenderSections();
+                else alert('Failed to delete section');
+            });
+    };
+
+    document.getElementById('sectionForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const name = document.getElementById('sectionName').value;
+        const method = editingSectionId ? 'PUT' : 'POST';
+        const url = editingSectionId ? `${SECTION_API_URL}/${editingSectionId}` : SECTION_API_URL;
+        const body = { name };
+        fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        })
+        .then(async res => {
+            if (res.ok) {
+                fetchAndRenderSections();
+                this.reset();
+                editingSectionId = null;
+                document.querySelector('#sectionForm button[type="submit"]').textContent = 'Save Section';
+            } else {
+                const errorText = await res.text();
+                alert('Failed to save section: ' + errorText);
+            }
+        });
+    });
+
+    // Fetch sections on page load
+    fetchAndRenderSections();
+
+    // --- Schedule Add/Edit/Delete/Render Logic ---
+    const SCHEDULE_API_URL = '/api/schedules';
+    let editingScheduleId = null;
+
+    function fetchAndRenderSchedules(curriculumId) {
+        const tbody = document.getElementById('schedulesTableBody');
+        tbody.innerHTML = '';
+        if (!curriculumId) {
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#aaa;">Please select a curriculum.</td></tr>`;
+            return;
+        }
+        fetch(`/api/schedules/curriculum/${curriculumId}`)
+            .then(res => res.json())
+            .then(data => {
+                // Use a map to keep only the latest unique schedule per key
+                const uniqueMap = new Map();
+                data.forEach(schedule => {
+                    const key = [schedule.courseCode, schedule.day, schedule.time, schedule.room, schedule.facultyId].join('|');
+                    uniqueMap.set(key, schedule);
+                });
+                Array.from(uniqueMap.values()).forEach(schedule => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${schedule.courseCode ?? ''}</td>
+                        <td>${schedule.courseName ?? ''}</td>
+                        <td>${schedule.day ?? ''}</td>
+                        <td>${schedule.time ?? ''}</td>
+                        <td>${schedule.room ?? ''}</td>
+                        <td>${schedule.facultyName || schedule.faculty || 'N/A'}</td>
+                        <td>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <button type="button" class="schedule-edit-btn">Edit</button>
+                                <button type="button" class="schedule-delete-btn">Delete</button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                setTimeout(() => {
+                    document.querySelectorAll('#schedulesTableBody .schedule-edit-btn').forEach((btn, idx) => {
+                        btn.onclick = function() {
+                            const scheduleId = data[idx].id;
+                            editSchedule(scheduleId);
+                        };
+                    });
+                    document.querySelectorAll('#schedulesTableBody .schedule-delete-btn').forEach((btn, idx) => {
+                        btn.onclick = function() {
+                            const scheduleId = data[idx].id;
+                            deleteSchedule(scheduleId);
+                        };
+                    });
+                }, 100);
+            });
+    }
+
+    window.editSchedule = function(id) {
+        editingScheduleId = id;
+        fetch(`${SCHEDULE_API_URL}/${id}`)
+            .then(res => res.json())
+            .then(schedule => {
+                document.getElementById('scheduleId').value = id;
+                document.getElementById('scheduleStudentId').value = schedule.studentId;
+                document.getElementById('scheduleCourseCode').value = schedule.courseCode;
+                document.getElementById('scheduleCourseName').value = schedule.courseName;
+                document.getElementById('scheduleDay').value = schedule.day;
+                document.getElementById('scheduleTime').value = schedule.time;
+                document.getElementById('scheduleRoom').value = schedule.room;
+                document.getElementById('scheduleSubjectId').value = schedule.subjectId || '';
+                document.getElementById('scheduleCurriculumId').value = schedule.curriculumId || '';
+                document.querySelector('#scheduleForm button[type="submit"]').textContent = 'Update Schedule';
+            });
+    };
+
+    window.deleteSchedule = function(id) {
+        if (!confirm('Are you sure you want to delete this schedule?')) return;
+        fetch(`${SCHEDULE_API_URL}/${id}`, { method: 'DELETE' })
+            .then(res => {
+                if (res.ok) fetchAndRenderSchedules();
+                else alert('Failed to delete schedule');
+            });
+    };
+
+    document.getElementById('scheduleForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const studentId = document.getElementById('scheduleStudentId').value;
+        const courseCode = document.getElementById('scheduleCourseCode').value;
+        const courseName = document.getElementById('scheduleCourseName').value;
+        const day = document.getElementById('scheduleDay').value;
+        const time = document.getElementById('scheduleTime').value;
+        const room = document.getElementById('scheduleRoom').value;
+        const facultyId = document.getElementById('scheduleFacultySelect').value;
+        const subjectId = document.getElementById('scheduleSubjectId').value;
+        const curriculumId = document.getElementById('scheduleCurriculumId').value;
+        const method = editingScheduleId ? 'PUT' : 'POST';
+        const url = editingScheduleId ? `${SCHEDULE_API_URL}/${editingScheduleId}` : SCHEDULE_API_URL;
+        const body = {
+            studentId,
+            courseCode,
+            courseName,
+            day,
+            time,
+            room,
+            facultyId: facultyId ? Number(facultyId) : null,
+            subjectId: subjectId ? Number(subjectId) : null,
+            curriculumId: curriculumId ? Number(curriculumId) : null
+        };
+        fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        })
+        .then(async res => {
+            if (res.ok) {
+                fetchAndRenderSchedules();
+                this.reset();
+                editingScheduleId = null;
+                document.querySelector('#scheduleForm button[type="submit"]').textContent = 'Save Schedule';
+            } else {
+                const errorText = await res.text();
+                alert('Failed to save schedule: ' + errorText);
+            }
+        });
+    });
+
+    // Populate faculty dropdown
+    function populateFacultyDropdown() {
+        console.log('Populating faculty dropdown...');
+        fetch('/api/faculty')
+            .then(res => res.json())
+            .then(data => {
+                console.log('Faculty data:', data);
+                const select = document.getElementById('csFacultySelect');
+                if (!select) {
+                    console.log('csFacultySelect element not found!');
+                    return;
+                }
+                select.innerHTML = '<option value="">Select Faculty</option>';
+                data.forEach(faculty => {
+                    const option = document.createElement('option');
+                    option.value = faculty.id;
+                    option.textContent = faculty.fullName;
+                    select.appendChild(option);
+                });
+            });
+    }
+
+    // After the curriculum dropdown in the Schedules section, add:
+    const scheduleCurriculumSelect = document.getElementById('scheduleCurriculumSelect');
+    if (scheduleCurriculumSelect) {
+        scheduleCurriculumSelect.addEventListener('change', function() {
+            const curriculumId = this.value;
+            fetchAndRenderSchedules(curriculumId);
+            // ... existing code for curriculum subject table ...
+        });
+        // On page load, show empty or message
+        fetchAndRenderSchedules();
+    }
+
+    function populateScheduleFacultyDropdown() {
+        fetch('/api/faculty')
+            .then(res => res.json())
+            .then(data => {
+                const select = document.getElementById('scheduleFacultySelect');
+                if (!select) {
+                    console.log('scheduleFacultySelect element not found!');
+                    return;
+                }
+                select.innerHTML = '<option value="">Select Faculty</option>';
+                data.forEach(faculty => {
+                    const option = document.createElement('option');
+                    option.value = faculty.id;
+                    option.textContent = faculty.fullName;
+                    select.appendChild(option);
+                });
+            });
+    }
+    populateScheduleFacultyDropdown();
     </script>
 </body>
+
 </html>

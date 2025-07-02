@@ -24,10 +24,15 @@ public class Schedule {
     private Long studentId;
     private String courseCode;
     private String courseName;
+    private String subjectCode;
+    private String subjectName;
     private String day;       // e.g., "Monday", "Tue-Thu"
     private String time;      // e.g., "9:00 AM - 10:30 AM"
     private String room;
 
       @Column(name = "faculty_id")
     private Long facultyId; 
+
+    private Long curriculumId;
+    private Long subjectId;
 }

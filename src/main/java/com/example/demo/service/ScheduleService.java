@@ -1,12 +1,18 @@
 package com.example.demo.service;
 
-import com.example.demo.entity.Schedule;
-import com.example.demo.repository.ScheduleRepository;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.example.demo.entity.Schedule;
+import com.example.demo.repository.ScheduleRepository;
+import com.example.demo.repository.CurriculumRepository;
+import com.example.demo.entity.Curriculum;
+import com.example.demo.entity.Course;
+import com.example.demo.repository.SubjectRepository;
+import com.example.demo.entity.Subject;
 
 @Service
 public class ScheduleService {
@@ -14,8 +20,22 @@ public class ScheduleService {
     @Autowired
     private ScheduleRepository scheduleRepository;
 
+    @Autowired
+    private CurriculumRepository curriculumRepository;
+
+    @Autowired
+    private SubjectRepository subjectRepository;
+
     // Create or update
     public Schedule saveSchedule(Schedule schedule) {
+        // Set courseCode and courseName from subject if subjectId is present
+        if (schedule.getSubjectId() != null) {
+            Subject subject = subjectRepository.findById(schedule.getSubjectId()).orElse(null);
+            if (subject != null) {
+                schedule.setCourseCode(subject.getSubjectCode());
+                schedule.setCourseName(subject.getSubjectName());
+            }
+        }
         return scheduleRepository.save(schedule);
     }
 
@@ -39,8 +59,26 @@ public class ScheduleService {
         scheduleRepository.deleteById(id);
     }
 
-        public List<Schedule> getSchedulesByFacultyId(Long facultyId) {
+    public List<Schedule> getSchedulesByFacultyId(Long facultyId) {
         return scheduleRepository.findByFacultyId(facultyId);
+    }
+
+    public List<Schedule> getSchedulesByCurriculumId(Long curriculumId) {
+        return scheduleRepository.findByCurriculumId(curriculumId);
+    }
+
+    public void repairScheduleCourseFields() {
+        List<Schedule> schedules = scheduleRepository.findAll();
+        for (Schedule schedule : schedules) {
+            if (schedule.getSubjectId() != null) {
+                Subject subject = subjectRepository.findById(schedule.getSubjectId()).orElse(null);
+                if (subject != null) {
+                    schedule.setCourseCode(subject.getSubjectCode());
+                    schedule.setCourseName(subject.getSubjectName());
+                    scheduleRepository.save(schedule);
+                }
+            }
+        }
     }
 
 }
