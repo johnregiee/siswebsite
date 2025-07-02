@@ -30,4 +30,19 @@ public class Grade {
     private String semester;
     private String grade;
     private String comments;
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Long getStudentId() { return studentId; }
+    public void setStudentId(Long studentId) { this.studentId = studentId; }
+    public String getCourseCode() { return courseCode; }
+    public void setCourseCode(String courseCode) { this.courseCode = courseCode; }
+    public String getCourseName() { return courseName; }
+    public void setCourseName(String courseName) { this.courseName = courseName; }
+    public String getSemester() { return semester; }
+    public void setSemester(String semester) { this.semester = semester; }
+    public String getGrade() { return grade; }
+    public void setGrade(String grade) { this.grade = grade; }
+    public String getComments() { return comments; }
+    public void setComments(String comments) { this.comments = comments; }
 }

@@ -7,16 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.demo.entity.Curriculum;
 import com.example.demo.entity.CurriculumSubject;
 import com.example.demo.entity.CurriculumSubjectWithFacultyDto;
 import com.example.demo.entity.Schedule;
 import com.example.demo.entity.Subject;
-import com.example.demo.entity.Curriculum;
+import com.example.demo.repository.CurriculumRepository;
 import com.example.demo.repository.CurriculumSubjectRepository;
-import com.example.demo.repository.FacultyRepository;
 import com.example.demo.repository.ScheduleRepository;
 import com.example.demo.repository.SubjectRepository;
-import com.example.demo.repository.CurriculumRepository;
 
 @Service
 public class CurriculumSubjectService {
@@ -26,9 +25,6 @@ public class CurriculumSubjectService {
 
     @Autowired
     private ScheduleRepository scheduleRepository;
-
-    @Autowired
-    private FacultyRepository facultyRepository;
 
     @Autowired
     private SubjectRepository subjectRepository;

@@ -1,26 +1,17 @@
 package com.example.demo.entity;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@NoArgsConstructor
 public class CurriculumSubjectWithFacultyDto {
     private Long id;
-    private String courseCode;
-    private String courseName;
     private String subjectCode;
     private String subjectName;
-    private int units;
+    private Integer units;
     private String roomNumber;
     private String time;
     private String days;
     private String facultyName;
 
-    public CurriculumSubjectWithFacultyDto(Long id, String courseCode, String courseName, String subjectCode, String subjectName, int units, String roomNumber, String time, String days, String facultyName) {
+    public CurriculumSubjectWithFacultyDto(Long id, String subjectCode, String subjectName, Integer units, String roomNumber, String time, String days, String facultyName) {
         this.id = id;
-        this.courseCode = courseCode;
-        this.courseName = courseName;
         this.subjectCode = subjectCode;
         this.subjectName = subjectName;
         this.units = units;
@@ -29,4 +20,13 @@ public class CurriculumSubjectWithFacultyDto {
         this.days = days;
         this.facultyName = facultyName;
     }
+
+    public Long getId() { return id; }
+    public String getSubjectCode() { return subjectCode; }
+    public String getSubjectName() { return subjectName; }
+    public Integer getUnits() { return units; }
+    public String getRoomNumber() { return roomNumber; }
+    public String getTime() { return time; }
+    public String getDays() { return days; }
+    public String getFacultyName() { return facultyName; }
 } 

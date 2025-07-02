@@ -19,10 +19,13 @@ public interface CurriculumSubjectRepository extends JpaRepository<CurriculumSub
     @Query("SELECT cs FROM CurriculumSubject cs JOIN cs.curriculum c WHERE c.course.id = :courseId")
     List<CurriculumSubject> findByCourseId(Long courseId);
 
-    @Query("SELECT new com.example.demo.entity.CurriculumSubjectWithFacultyDto(cs.id, c.course.code, c.course.name, s.subjectCode, s.subjectName, cs.units, cs.roomNumber, cs.time, cs.days, null) " +
+    @Query("SELECT new com.example.demo.entity.CurriculumSubjectWithFacultyDto(cs.id, s.subjectCode, s.subjectName, cs.units, cs.roomNumber, cs.time, cs.days, f.fullName) " +
            "FROM CurriculumSubject cs " +
-           "JOIN cs.curriculum c " +
            "JOIN cs.subject s " +
-           "WHERE cs.curriculum.id = :curriculumId")
+           "LEFT JOIN Schedule sched ON sched.curriculumId = cs.curriculum.id AND sched.subjectId = cs.subject.id " +
+           "LEFT JOIN Faculty f ON sched.facultyId = f.id " +
+           "WHERE cs.curriculum.id = :curriculumId AND cs.isDeleted = false")
     List<CurriculumSubjectWithFacultyDto> findWithFacultyByCurriculumId(Long curriculumId);
+
+    List<CurriculumSubject> findByCurriculumIdAndIsDeletedFalse(Long curriculumId);
 }

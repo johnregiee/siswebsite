@@ -1,9 +1,9 @@
 package com.example.demo.controller;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Map;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,14 +17,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.entity.Enrollment;
-import com.example.demo.service.EnrollmentService;
-import com.example.demo.repository.CurriculumSubjectRepository;
 import com.example.demo.entity.CurriculumSubject;
-import com.example.demo.repository.ScheduleRepository;
-import com.example.demo.entity.Schedule;
-import com.example.demo.repository.FacultyRepository;
+import com.example.demo.entity.Enrollment;
 import com.example.demo.entity.Faculty;
+import com.example.demo.entity.Schedule;
+import com.example.demo.repository.CurriculumSubjectRepository;
+import com.example.demo.repository.FacultyRepository;
+import com.example.demo.repository.ScheduleRepository;
+import com.example.demo.service.EnrollmentService;
+import com.example.demo.controller.EnrollmentWithDetailsDto;
 
 @RestController
 @RequestMapping("/api/enrollments")
@@ -116,29 +117,4 @@ public class EnrollmentController {
     public List<Enrollment> getEnrollmentsForCourse(@PathVariable String courseCode) {
         return enrollmentService.getEnrollmentsByCourse(courseCode);
     }
-}
-
-// Add a DTO for curriculum enrollment
-class CurriculumEnrollmentRequest extends Enrollment {
-    private Long curriculumId;
-    public Long getCurriculumId() { return curriculumId; }
-    public void setCurriculumId(Long curriculumId) { this.curriculumId = curriculumId; }
-}
-
-// DTO for enrollment details
-class EnrollmentWithDetailsDto {
-    private String subjectCode;
-    private String subjectName;
-    private Integer units;
-    private String facultyName;
-    public EnrollmentWithDetailsDto(String subjectCode, String subjectName, Integer units, String facultyName) {
-        this.subjectCode = subjectCode;
-        this.subjectName = subjectName;
-        this.units = units;
-        this.facultyName = facultyName;
-    }
-    public String getSubjectCode() { return subjectCode; }
-    public String getSubjectName() { return subjectName; }
-    public Integer getUnits() { return units; }
-    public String getFacultyName() { return facultyName; }
 }

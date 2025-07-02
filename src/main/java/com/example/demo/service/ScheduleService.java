@@ -7,21 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.entity.Schedule;
-import com.example.demo.repository.ScheduleRepository;
-import com.example.demo.repository.CurriculumRepository;
-import com.example.demo.entity.Curriculum;
-import com.example.demo.entity.Course;
-import com.example.demo.repository.SubjectRepository;
 import com.example.demo.entity.Subject;
+import com.example.demo.repository.ScheduleRepository;
+import com.example.demo.repository.SubjectRepository;
 
 @Service
 public class ScheduleService {
 
     @Autowired
     private ScheduleRepository scheduleRepository;
-
-    @Autowired
-    private CurriculumRepository curriculumRepository;
 
     @Autowired
     private SubjectRepository subjectRepository;

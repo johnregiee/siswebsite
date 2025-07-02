@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.entity.Curriculum;
+import com.example.demo.entity.CurriculumSubjectWithFacultyDto;
+import com.example.demo.repository.CurriculumSubjectRepository;
 import com.example.demo.service.CurriculumService;
 
 @RestController
@@ -25,6 +27,9 @@ public class CurriculumController {
 
     @Autowired
     private CurriculumService curriculumService;
+
+    @Autowired
+    private CurriculumSubjectRepository curriculumSubjectRepository;
 
     // Create new curriculum
     @PostMapping
@@ -66,6 +71,13 @@ public class CurriculumController {
     public ResponseEntity<Void> deleteCurriculum(@PathVariable Long id) {
         boolean deleted = curriculumService.deleteCurriculum(id);
         return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+    }
+
+    // Get all subjects for a curriculum (for subject table refresh)
+    @GetMapping("/{curriculumId}/subjects")
+    public ResponseEntity<List<CurriculumSubjectWithFacultyDto>> getSubjectsForCurriculum(@PathVariable Long curriculumId) {
+        List<CurriculumSubjectWithFacultyDto> subjects = curriculumSubjectRepository.findWithFacultyByCurriculumId(curriculumId);
+        return ResponseEntity.ok(subjects);
     }
 
 }
