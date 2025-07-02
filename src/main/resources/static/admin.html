@@ -336,6 +336,7 @@
       </div>
     </div>
     <script>
+    var editingSectionId = null;
     document.addEventListener('DOMContentLoaded', function() {
         function showTab(sectionId) {
             document.querySelectorAll('main > section').forEach(function(sec) {
@@ -351,6 +352,10 @@
                 const selector = document.getElementById('scheduleCurriculumSelect');
                 const selectedId = selector ? selector.value : '';
                 fetchAndRenderSchedules(selectedId);
+            }
+            // Refresh All Sections table when Sections tab is shown
+            if (sectionId === 'sections') {
+                fetchAndRenderSections();
             }
         }
         // Show the first tab by default
@@ -609,6 +614,138 @@
             });
             // On page load, show empty or message
             fetchAndRenderSchedules();
+        }
+        const sectionTableBody = document.getElementById('sectionTableBody');
+        if (sectionTableBody) {
+            sectionTableBody.addEventListener('click', function(e) {
+                if (e.target && e.target.matches('button[data-id]')) {
+                    const row = e.target.closest('tr');
+                    const tds = row.querySelectorAll('td');
+                    const sectionName = tds[0].textContent.trim();
+                    const sectionId = e.target.getAttribute('data-id');
+                    if (e.target.textContent === 'Edit') {
+                        const tds = row.querySelectorAll('td');
+                        const sectionName = tds[0].textContent.trim();
+                        editingSectionId = sectionId;
+                        document.getElementById('sectionId').value = sectionId;
+                        document.getElementById('sectionName').value = sectionName;
+                        document.querySelector('#sectionForm button[type="submit"]').textContent = 'Update Section';
+                    }
+                    if (e.target.textContent === 'Delete') {
+                        if (!confirm('Are you sure you want to delete this section?')) return;
+                        fetch(`/api/sections/${sectionId}`, { method: 'DELETE' })
+                            .then(async res => {
+                                if (res.ok) {
+                                    alert('Section deleted!');
+                                    fetchAndRenderSections();
+                                } else {
+                                    const errorText = await res.text();
+                                    alert('Failed to delete section: ' + errorText);
+                                }
+                            })
+                            .catch(err => {
+                                alert('Network or server error: ' + err);
+                            });
+                    }
+                }
+            });
+        }
+        // Event delegation for Schedule Management table
+        const schedulesTableBody = document.getElementById('schedulesTableBody');
+        if (schedulesTableBody) {
+            schedulesTableBody.addEventListener('click', function(e) {
+                if (e.target && e.target.matches('button.schedule-edit-btn')) {
+                    const row = e.target.closest('tr');
+                    const tds = row.querySelectorAll('td');
+                    // Populate the Add/Edit Schedule form with row data
+                    document.getElementById('scheduleCourseCode').value = tds[0].textContent.trim();
+                    document.getElementById('scheduleCourseName').value = tds[1].textContent.trim();
+                    document.getElementById('scheduleDay').value = tds[2].textContent.trim();
+                    document.getElementById('scheduleTime').value = tds[3].textContent.trim();
+                    document.getElementById('scheduleRoom').value = tds[4].textContent.trim();
+                    // Faculty select by facultyId, using robust dropdown population
+                    const facultyId = e.target.getAttribute('data-faculty-id');
+                    populateScheduleFacultyDropdown(facultyId);
+                    // Store subject id for update
+                    document.getElementById('scheduleSubjectId').value = e.target.getAttribute('data-id');
+                    // Store schedule id for update
+                    document.getElementById('scheduleId').value = e.target.getAttribute('data-schedule-id');
+                    document.querySelector('#scheduleForm button[type="submit"]').textContent = 'Update Schedule';
+                }
+                if (e.target && e.target.matches('button.schedule-delete-btn')) {
+                    if (!confirm('Are you sure you want to delete this schedule?')) return;
+                    const subjectId = e.target.getAttribute('data-id');
+                    const curriculumId = document.getElementById('scheduleCurriculumSelect').value;
+                    fetch(`/api/schedules/curriculum/${curriculumId}/subject/${subjectId}`, { method: 'DELETE' })
+                        .then(async res => {
+                            if (res.ok) {
+                                alert('Schedule deleted!');
+                                fetchAndRenderSchedules(curriculumId);
+                            } else {
+                                const errorText = await res.text();
+                                alert('Failed to delete schedule: ' + errorText);
+                            }
+                        })
+                        .catch(err => {
+                            alert('Network or server error: ' + err);
+                        });
+                }
+            });
+        }
+        const scheduleForm = document.getElementById('scheduleForm');
+        if (scheduleForm) {
+            scheduleForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const scheduleId = document.getElementById('scheduleId').value;
+                const curriculumId = document.getElementById('scheduleCurriculumSelect').value;
+                const subjectId = document.getElementById('scheduleSubjectId').value;
+                const courseCode = document.getElementById('scheduleCourseCode').value;
+                const courseName = document.getElementById('scheduleCourseName').value;
+                const day = document.getElementById('scheduleDay').value;
+                const time = document.getElementById('scheduleTime').value;
+                const room = document.getElementById('scheduleRoom').value;
+                const facultyId = document.getElementById('scheduleFacultySelect').value;
+
+                const payload = {
+                    curriculumId,
+                    subjectId,
+                    courseCode,
+                    courseName,
+                    day,
+                    time,
+                    room,
+                    facultyId
+                };
+
+                let url, method;
+                if (scheduleId) {
+                    url = `/api/schedules/${scheduleId}`;
+                    method = 'PUT';
+                } else {
+                    url = '/api/schedules';
+                    method = 'POST';
+                }
+
+                fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                })
+                .then(async res => {
+                    if (res.ok) {
+                        alert(scheduleId ? 'Schedule updated!' : 'Schedule created!');
+                        fetchAndRenderSchedules(curriculumId);
+                        this.reset();
+                        document.querySelector('#scheduleForm button[type="submit"]').textContent = 'Save Schedule';
+                    } else {
+                        const errorText = await res.text();
+                        alert('Failed to save schedule: ' + errorText);
+                    }
+                })
+                .catch(err => {
+                    alert('Network or server error: ' + err);
+                });
+            });
         }
     });
     // --- Faculty Add/Render Logic ---
@@ -1049,18 +1186,18 @@
                 }
                 subjects.forEach(subject => {
                     const subj = subject.subject || subject;
+                    const sch = scheduleMap[subj.id] || {};
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td>${subj.subjectCode || ''}</td>
-                        <td>${subj.subjectName || ''}</td>
-                        <td>${subject.units || ''}</td>
-                        <td>${subject.roomNumber || ''}</td>
-                        <td>${subject.time || ''}</td>
-                        <td>${subject.days || ''}</td>
-                        <td>${subject.facultyName || ''}</td>
+                        <td>${sch.courseCode !== undefined ? sch.courseCode : subj.subjectCode || ''}</td>
+                        <td>${sch.courseName !== undefined ? sch.courseName : subj.subjectName || ''}</td>
+                        <td>${sch.day !== undefined ? sch.day : subj.days || ''}</td>
+                        <td>${sch.time !== undefined ? sch.time : subj.time || ''}</td>
+                        <td>${sch.room !== undefined ? sch.room : subj.roomNumber || ''}</td>
+                        <td>${sch.facultyName !== undefined ? sch.facultyName : subject.facultyName || ''}</td>
                         <td>
-                            <button class="edit-btn" data-id="${subject.id}">Edit</button>
-                            <button class="delete-btn" data-id="${subject.id}">Delete</button>
+                            <button type="button" class="schedule-edit-btn" data-id="${subject.id}" data-schedule-id="${sch.id || ''}" data-faculty-id="${sch.facultyId || ''}">Edit</button>
+                            <button type="button" class="schedule-delete-btn" data-id="${subject.id}">Delete</button>
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -1236,20 +1373,19 @@
                     return;
                 }
                 subjects.forEach(subject => {
-                    // Support both flat and nested subject objects
                     const subj = subject.subject || subject;
+                    const sch = scheduleMap[subj.id] || {};
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                        <td>${subj.subjectCode || ''}</td>
-                        <td>${subj.subjectName || ''}</td>
-                        <td>${subject.units || ''}</td>
-                        <td>${subject.roomNumber || ''}</td>
-                        <td>${subject.time || ''}</td>
-                        <td>${subject.days || ''}</td>
-                        <td>${subject.facultyName || ''}</td>
+                        <td>${sch.courseCode !== undefined ? sch.courseCode : subj.subjectCode || ''}</td>
+                        <td>${sch.courseName !== undefined ? sch.courseName : subj.subjectName || ''}</td>
+                        <td>${sch.day !== undefined ? sch.day : subj.days || ''}</td>
+                        <td>${sch.time !== undefined ? sch.time : subj.time || ''}</td>
+                        <td>${sch.room !== undefined ? sch.room : subj.roomNumber || ''}</td>
+                        <td>${sch.facultyName !== undefined ? sch.facultyName : subject.facultyName || ''}</td>
                         <td>
-                            <button class="edit-btn" data-id="${subject.id}">Edit</button>
-                            <button class="delete-btn" data-id="${subject.id}">Delete</button>
+                            <button type="button" class="schedule-edit-btn" data-id="${subject.id}" data-schedule-id="${sch.id || ''}" data-faculty-id="${sch.facultyId || ''}">Edit</button>
+                            <button type="button" class="schedule-delete-btn" data-id="${subject.id}">Delete</button>
                         </td>
                     `;
                     if (highlightSubjectId && (subject.id === highlightSubjectId || subj.id === highlightSubjectId)) {
@@ -1286,7 +1422,7 @@
             });
     }
 
-    function populateScheduleFacultyDropdown() {
+    function populateScheduleFacultyDropdown(selectedId) {
         fetch('/api/faculty')
             .then(res => res.json())
             .then(data => {
@@ -1302,9 +1438,12 @@
                     option.textContent = faculty.fullName;
                     select.appendChild(option);
                 });
+                // Set the value after options are populated
+                if (selectedId) {
+                    select.value = selectedId;
+                }
             });
     }
-    populateScheduleFacultyDropdown();
 
     function openEditModal(subject) {
         document.getElementById('editSubjectId').value = subject.id;
@@ -1358,8 +1497,8 @@
                         <td>${section.name ?? ''}</td>
                         <td>
                             <div style="display: flex; flex-direction: column; gap: 8px;">
-                                <button type="button" style="margin-right:8px;" onclick="editSection(${section.id}, '${section.name?.replace(/'/g, "&#39;")}')">Edit</button>
-                                <button type="button" onclick="deleteSection(${section.id})">Delete</button>
+                                <button type="button" data-id="${section.id}" style="margin-right:8px;">Edit</button>
+                                <button type="button" data-id="${section.id}">Delete</button>
                             </div>
                         </td>
                     `;
@@ -1393,21 +1532,19 @@
                 if (sch.subjectId) scheduleMap[sch.subjectId] = sch;
             });
             subjects.forEach(subject => {
-                // Use subject properties directly
-                const sch = scheduleMap[subject.id] || {};
+                const subj = subject.subject || subject;
+                const sch = scheduleMap[subj.id] || {};
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${sch.courseCode || subject.subjectCode || ''}</td>
-                    <td>${sch.courseName || subject.subjectName || ''}</td>
-                    <td>${sch.day || subject.days || ''}</td>
-                    <td>${sch.time || subject.time || ''}</td>
-                    <td>${sch.room || subject.roomNumber || ''}</td>
-                    <td>${sch.facultyName || subject.facultyName || ''}</td>
+                    <td>${sch.courseCode !== undefined ? sch.courseCode : subj.subjectCode || ''}</td>
+                    <td>${sch.courseName !== undefined ? sch.courseName : subj.subjectName || ''}</td>
+                    <td>${sch.day !== undefined ? sch.day : subj.days || ''}</td>
+                    <td>${sch.time !== undefined ? sch.time : subj.time || ''}</td>
+                    <td>${sch.room !== undefined ? sch.room : subj.roomNumber || ''}</td>
+                    <td>${sch.facultyName !== undefined ? sch.facultyName : subject.facultyName || ''}</td>
                     <td>
-                        ${sch.id ? `
-                            <button class="schedule-edit-btn" data-id="${sch.id}">Edit</button>
-                            <button class="schedule-delete-btn" data-id="${sch.id}">Delete</button>
-                        ` : `<button class="schedule-add-btn" data-subject-id="${subject.id}">Add</button>`}
+                        <button type="button" class="schedule-edit-btn" data-id="${subject.id}" data-schedule-id="${sch.id || ''}" data-faculty-id="${sch.facultyId || ''}">Edit</button>
+                        <button type="button" class="schedule-delete-btn" data-id="${subject.id}">Delete</button>
                     </td>
                 `;
                 tbody.appendChild(tr);

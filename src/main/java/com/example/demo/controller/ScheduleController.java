@@ -14,16 +14,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.entity.Course;
+import com.example.demo.entity.Curriculum;
+import com.example.demo.entity.CurriculumSubject;
 import com.example.demo.entity.Faculty;
 import com.example.demo.entity.Schedule;
+import com.example.demo.entity.Subject;
+import com.example.demo.repository.CurriculumRepository;
+import com.example.demo.repository.CurriculumSubjectRepository;
 import com.example.demo.repository.FacultyRepository;
 import com.example.demo.service.ScheduleService;
-import com.example.demo.entity.CurriculumSubject;
-import com.example.demo.repository.CurriculumSubjectRepository;
-import com.example.demo.entity.Subject;
-import com.example.demo.entity.Curriculum;
-import com.example.demo.repository.CurriculumRepository;
-import com.example.demo.entity.Course;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -87,8 +87,20 @@ public class ScheduleController {
 
     @PutMapping("/{id}")
     public Schedule updateSchedule(@PathVariable Long id, @RequestBody Schedule schedule) {
-        schedule.setId(id);
-        return scheduleService.saveSchedule(schedule);
+        Schedule existing = scheduleService.getScheduleById(id).orElseThrow();
+        // Update only allowed fields
+        existing.setCourseCode(schedule.getCourseCode());
+        existing.setCourseName(schedule.getCourseName());
+        existing.setDay(schedule.getDay());
+        existing.setTime(schedule.getTime());
+        existing.setRoom(schedule.getRoom());
+        existing.setFacultyId(schedule.getFacultyId());
+        existing.setCurriculumId(schedule.getCurriculumId());
+        existing.setSubjectId(schedule.getSubjectId());
+        existing.setSubjectCode(schedule.getSubjectCode());
+        existing.setSubjectName(schedule.getSubjectName());
+        // Add more fields here if needed
+        return scheduleService.saveSchedule(existing);
     }
 
     @GetMapping("/faculty/{facultyId}")
