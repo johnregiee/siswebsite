@@ -131,7 +131,6 @@
         <nav>
             <a class="nav-link" href="student-dashboard.html">Home</a>
             <a class="nav-link" href="enrollment.html">Enrollment</a>
-            <a class="nav-link" href="accounts.html">Accounts</a>
             <a class="nav-link" href="schedule.html">Schedule</a>
             <a class="nav-link active" href="grades.html">Grades</a>
         </nav>
@@ -211,7 +210,7 @@
     // Fetch and render grades for the logged-in student
     const studentId = sessionStorage.getItem('studentId');
     let allGrades = [];
-    function renderGradesTable(grades, facultyMap) {
+    function renderGradesTable(grades) {
         const tbody = document.querySelector('#gradesTable tbody');
         if (!grades.length) {
             tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#888;">No grades found.</td></tr>';
@@ -221,12 +220,11 @@
         tbody.innerHTML = '';
         let total = 0, count = 0;
         grades.forEach(g => {
-            const faculty = facultyMap[g.courseCode] || facultyMap[g.subjectCode] || '';
             tbody.innerHTML += `
                 <tr>
                     <td style='padding:10px 8px; text-align:left;'>${g.courseCode || ''}</td>
                     <td style='padding:10px 8px; text-align:left;'>${g.courseName || ''}</td>
-                    <td style='padding:10px 8px; text-align:left;'>${faculty}</td>
+                    <td style='padding:10px 8px; text-align:left;'>${g.faculty || ''}</td>
                     <td style='padding:10px 8px; text-align:left;'>${g.grade || ''}</td>
                 </tr>
             `;
@@ -251,53 +249,31 @@
     if (studentId) {
         Promise.all([
             fetch(`/api/grades/student/${studentId}`).then(res => res.json()),
-            fetch(`/api/schedules/student/${studentId}`).then(res => res.json()),
-            fetch('/api/curriculums').then(res => res.json()),
-            fetch('/api/curriculum-subjects').then(res => res.json())
-        ]).then(([grades, schedules, curriculums, curriculumSubjects]) => {
+            fetch(`/api/enrollments/student/${studentId}`).then(res => res.json()),
+            fetch('/api/curriculums').then(res => res.json())
+        ]).then(([grades, enrollments, curriculums]) => {
             allGrades = grades;
-            // After fetching schedules, build a subjectCode-to-facultyName map
-            const subjectFacultyMap = {};
-            schedules.forEach(s => {
-                if (s.courseCode && s.facultyName) {
-                    subjectFacultyMap[s.courseCode] = s.facultyName;
-                }
-            });
             // On curriculum filter change:
             document.getElementById('semesterFilter').onchange = function() {
                 const selectedCurriculumId = this.value;
-                if (!selectedCurriculumId) {
-                    renderGradesTable([], subjectFacultyMap);
-                    return;
+                let filteredEnrollments = enrollments;
+                if (selectedCurriculumId) {
+                    // If curriculumId is selected, filter enrollments by curriculum if possible (if you store curriculum info in enrollment)
+                    // Otherwise, skip filtering
                 }
-                // Fetch all subjects for the selected curriculum
-                fetch(`/api/curriculum-subjects/curriculum/${selectedCurriculumId}`)
-                    .then(res => res.json())
-                    .then(csList => {
-                        // For each subject, find grade if exists
-                        const rows = csList.map(cs => {
-                            const gradeObj = allGrades.find(g => g.subjectId == cs.subject.id);
-                            return {
-                                courseCode: cs.subject.subjectCode,
-                                courseName: cs.subject.subjectName,
-                                faculty: subjectFacultyMap[cs.subject.subjectCode] || '',
-                                grade: gradeObj ? gradeObj.grade : '',
-                            };
-                        });
-                        renderGradesTable(rows, subjectFacultyMap);
-                    });
+                // Render only enrolled subjects
+                const rows = filteredEnrollments.map(e => ({
+                    courseCode: e.subjectCode,
+                    courseName: e.subjectName,
+                    faculty: e.facultyName || '',
+                    grade: (allGrades.find(g => g.courseCode === e.subjectCode) || {}).grade || ''
+                }));
+                renderGradesTable(rows);
             };
-            // Initial render: show all subjects for the first curriculum if selected
-            const initialCurriculumSelect = document.getElementById('semesterFilter');
-            if (initialCurriculumSelect && initialCurriculumSelect.value) {
-                initialCurriculumSelect.onchange();
-            }
+            // Initial render: show all enrolled subjects
             populateCurriculumFilter(curriculums);
-            // Optionally, trigger the onchange handler to show subjects for the first curriculum
-            if (curriculums.length > 0) {
-                document.getElementById('semesterFilter').value = curriculums[0].id;
-                document.getElementById('semesterFilter').onchange();
-            }
+            document.getElementById('semesterFilter').value = '';
+            document.getElementById('semesterFilter').onchange();
         });
     }
     </script>

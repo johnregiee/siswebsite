@@ -183,7 +183,7 @@
             <button class="tab-btn" data-tab="students">Students</button>
             <button class="tab-btn" data-tab="subjects">Subjects</button>
             <button class="tab-btn" data-tab="curriculum">Curriculum</button>
-            <button class="tab-btn" data-tab="accounts">Accounts</button>
+            <!-- <button class="tab-btn" data-tab="accounts">Accounts</button> -->
             <button class="tab-btn" data-tab="courses">Courses</button>
             <button class="tab-btn" data-tab="sections">Sections</button>
             <button class="tab-btn" data-tab="schedules">Schedules</button>
@@ -1083,6 +1083,14 @@
         const password = document.getElementById('password').value;
         const courseId = document.getElementById('studentCourseSelect').value;
         const sectionId = document.getElementById('studentSectionSelect').value;
+        if (!courseId) {
+            alert('Please select a Course for the student.');
+            return;
+        }
+        if (!sectionId) {
+            alert('Please select a Section for the student.');
+            return;
+        }
         const method = editingStudentId ? 'PUT' : 'POST';
         const url = editingStudentId ? `${STUDENT_API_URL}/${editingStudentId}` : STUDENT_API_URL;
         const studentData = {
@@ -1090,8 +1098,8 @@
             name,
             email,
             password,
-            course: courseId ? { id: courseId } : null,
-            section: sectionId ? { id: sectionId } : null
+            courseId: courseId || null,
+            sectionId: sectionId || null
         };
         // Log request details
         if (method === 'PUT') {

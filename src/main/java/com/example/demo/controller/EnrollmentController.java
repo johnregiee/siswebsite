@@ -56,19 +56,30 @@ public class EnrollmentController {
             CurriculumSubject cs = curriculumSubjectRepository.findBySubject_SubjectCode(e.getCourseCode()).stream().findFirst().orElse(null);
             String facultyName = "";
             Integer units = null;
+            String roomNumber = "";
+            String time = "";
+            String days = "";
             if (cs != null) {
                 units = cs.getUnits();
                 Schedule sched = scheduleRepository.findByCurriculumIdAndSubjectId(cs.getCurriculum().getId(), cs.getSubject().getId());
-                if (sched != null && sched.getFacultyId() != null) {
-                    Faculty faculty = facultyRepository.findById(sched.getFacultyId()).orElse(null);
-                    facultyName = faculty != null ? faculty.getFullName() : "";
+                if (sched != null) {
+                    roomNumber = sched.getRoom();
+                    time = sched.getTime();
+                    days = sched.getDay();
+                    if (sched.getFacultyId() != null) {
+                        Faculty faculty = facultyRepository.findById(sched.getFacultyId()).orElse(null);
+                        facultyName = faculty != null ? faculty.getFullName() : "";
+                    }
                 }
             }
             dtos.add(new EnrollmentWithDetailsDto(
                 e.getCourseCode(),
                 e.getCourseName(),
                 units,
-                facultyName
+                facultyName,
+                roomNumber,
+                time,
+                days
             ));
         }
         return ResponseEntity.ok(dtos);
