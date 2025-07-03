@@ -7,6 +7,169 @@
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="admin.css" />
     <link href="https://fonts.googleapis.com/css?family=Montserrat:400,600,700&display=swap" rel="stylesheet">
+    <style>
+    /* ... existing styles ... */
+    /* Responsive wrapper for horizontal scrolling */
+    .curriculum-table-responsive {
+        width: 100%;
+        overflow-x: auto;
+    }
+    #curriculumSubjectsTable {
+        width: 100%;
+        table-layout: fixed;
+        border-collapse: separate;
+        border-spacing: 0;
+        min-width: 900px;
+    }
+    #curriculumSubjectsTable th, #curriculumSubjectsTable td {
+        padding: 12px 8px;
+        vertical-align: middle;
+        text-align: left;
+        background: #fff;
+        color: #222;
+        word-break: break-word;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    #curriculumSubjectsTable th {
+        background: #ffeaea;
+        color: #e85743;
+        font-weight: 600;
+        text-align: left;
+        vertical-align: middle;
+    }
+    #curriculumSubjectsTable th:nth-child(1), #curriculumSubjectsTable td:nth-child(1) { width: 110px; }
+    #curriculumSubjectsTable th:nth-child(2), #curriculumSubjectsTable td:nth-child(2) { width: 180px; }
+    #curriculumSubjectsTable th:nth-child(3), #curriculumSubjectsTable td:nth-child(3) { width: 60px; text-align: center; }
+    #curriculumSubjectsTable th:nth-child(4), #curriculumSubjectsTable td:nth-child(4) { width: 110px; text-align: center; }
+    #curriculumSubjectsTable th:nth-child(5), #curriculumSubjectsTable td:nth-child(5) { width: 120px; }
+    #curriculumSubjectsTable th:nth-child(6), #curriculumSubjectsTable td:nth-child(6) { width: 110px; }
+    #curriculumSubjectsTable th:nth-child(7), #curriculumSubjectsTable td:nth-child(7) { width: 120px; }
+    #curriculumSubjectsTable th:nth-child(8), #curriculumSubjectsTable td:nth-child(8) {
+        width: 110px;
+        text-align: center;
+        padding: 0 8px;
+    }
+    #curriculumSubjectsTable td:nth-child(8) {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background: #fff;
+        height: 100%;
+        padding: 12px 0;
+    }
+    #curriculumSubjectsTable td:nth-child(8) button {
+        display: block;
+        margin: 0 auto;
+        min-width: 90px;
+        width: 90px;
+    }
+    @media (max-width: 1100px) {
+        .curriculum-table-responsive {
+            overflow-x: auto;
+        }
+        #curriculumSubjectsTable {
+            min-width: 900px;
+        }
+    }
+    #schedulesTableBody th, #schedulesTableBody td {
+        padding: 10px 8px;
+        vertical-align: middle;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    #schedulesTableBody th {
+        background: #ffeaea;
+        color: #e85743;
+        font-weight: 600;
+    }
+    #schedulesTableBody td {
+        background: #fff;
+        color: #222;
+    }
+    #schedulesTableBody th,
+    #schedulesTableBody td {
+        text-align: left;
+    }
+    #schedulesTableBody th:nth-child(3),
+    #schedulesTableBody td:nth-child(3),
+    #schedulesTableBody th:nth-child(4),
+    #schedulesTableBody td:nth-child(4) {
+        text-align: right;
+    }
+    #schedulesTableBody th:nth-child(8),
+    #schedulesTableBody td:nth-child(8) {
+        text-align: center;
+        width: 100px;
+        max-width: 120px;
+        padding: 0 8px;
+    }
+    #schedulesTableBody td:nth-child(8) {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 6px;
+        height: 100%;
+        background: #fff;
+        padding: 10px 0;
+    }
+    #schedulesTableBody td:nth-child(8) button {
+        margin: 0;
+        min-width: 60px;
+        width: 80px;
+    }
+    #schedulesTableBody th:nth-child(2),
+    #schedulesTableBody td:nth-child(2) {
+        word-break: break-word;
+        white-space: normal;
+    }
+    .schedule-table {
+        width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
+        min-width: 900px;
+    }
+    .schedule-table th, .schedule-table td {
+        padding: 10px 8px;
+        border-bottom: 1px solid #f2dede;
+        vertical-align: middle;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .schedule-table th {
+        background: #ffeaea;
+        font-weight: 600;
+        text-align: left;
+    }
+    .schedule-table th:nth-child(1), .schedule-table td:nth-child(1) { width: 110px; text-align: left; }
+    .schedule-table th:nth-child(2), .schedule-table td:nth-child(2) { width: 180px; text-align: left; }
+    .schedule-table th:nth-child(3), .schedule-table td:nth-child(3) { width: 60px; text-align: center; }
+    .schedule-table th:nth-child(4), .schedule-table td:nth-child(4) { width: 80px; text-align: center; }
+    .schedule-table th:nth-child(5), .schedule-table td:nth-child(5) { width: 120px; text-align: center; }
+    .schedule-table th:nth-child(6), .schedule-table td:nth-child(6) { width: 120px; text-align: center; }
+    .schedule-table th:nth-child(7), .schedule-table td:nth-child(7) { width: 140px; text-align: left; }
+    .schedule-table th:nth-child(8), .schedule-table td:nth-child(8) { width: 100px; text-align: center; }
+    .schedule-table td .action-buttons {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        justify-content: center;
+    }
+    .schedule-table td .action-buttons button {
+        width: 80px;
+        margin: 0 auto;
+    }
+    @media (max-width: 1100px) {
+        .schedule-table { min-width: 900px; }
+    }
+    </style>
 </head>
 
 <body>
@@ -143,7 +306,7 @@
                 </table>
             </div>
             <h3 id="curriculumSubjectsHeading">Subjects Under Selected Curriculum</h3>
-            <div class="card-table">
+            <div class="curriculum-table-responsive">
                 <table id="curriculumSubjectsTable">
                     <thead>
                         <tr style="background:#ffeaea; color:#e85743;">
@@ -260,20 +423,23 @@
             <h2>Schedule Management</h2>
             <label for="scheduleCurriculumSelect" style="font-weight:600; margin-bottom:0.5em; display:block;">Select Curriculum:</label>
             <select id="scheduleCurriculumSelect" style="margin-bottom:1em;"><option value="">Select Curriculum</option></select>
-            <div class="card-table">
-                <table>
+            <div class="curriculum-table-responsive">
+                <table class="schedule-table">
                     <thead>
-                        <tr style="background:#ffeaea; color:#e85743;">
+                        <tr>
                             <th>Course Code</th>
                             <th>Course Name</th>
-                            <th>Day(s)</th>
-                            <th>Time</th>
+                            <th>Units</th>
                             <th>Room</th>
+                            <th>Time</th>
+                            <th>Day(s)</th>
                             <th>Faculty</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="schedulesTableBody"></tbody>
+                    <tbody id="schedulesTableBody">
+                        <!-- Rows rendered by JS -->
+                    </tbody>
                 </table>
             </div>
             <form id="scheduleForm" class="card-form">
@@ -408,13 +574,14 @@
                     opt.textContent = c.name;
                     selector.appendChild(opt);
                 });
-                // Do NOT auto-select the first curriculum
+                // Do NOT auto-select the first curriculum or load subjects
                 // selector.value = curriculums.length > 0 ? curriculums[0].id : '';
                 // if (selector.value && selector.value !== 'undefined') {
                 //     fetchAndRenderSchedules(selector.value);
                 // }
-                // Instead, show the default message until user selects
-                fetchAndRenderSchedules();
+                // Instead, clear the subjects table until a curriculum is selected
+                const tbody = document.querySelector('#curriculumSubjectsTable tbody');
+                if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#888;">No subjects found.</td></tr>';
             });
         // When curriculumSelector changes, update csCurriculumId in the form
         const curriculumSelector = document.getElementById('curriculumSelector');
@@ -452,11 +619,14 @@
                     opt.textContent = c.name;
                     selector.appendChild(opt);
                 });
-                // Auto-select first curriculum and load its subjects
-                if (curriculums.length > 0) {
-                    selector.value = curriculums[0].id;
-                    fetchAndRenderSubjectsUnderCurriculum(curriculums[0].id);
-                }
+                // Do NOT auto-select the first curriculum or load subjects
+                // selector.value = curriculums.length > 0 ? curriculums[0].id : '';
+                // if (selector.value && selector.value !== 'undefined') {
+                //     fetchAndRenderSubjectsUnderCurriculum(selector.value);
+                // }
+                // Instead, clear the subjects table until a curriculum is selected
+                const tbody = document.querySelector('#curriculumSubjectsTable tbody');
+                if (tbody) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#888;">No subjects found.</td></tr>';
             });
         // Ensure curriculum dropdown event listener is set up correctly
         const curriculumDropdown = document.getElementById('curriculumPageCurriculumSelect');
@@ -537,26 +707,36 @@
                     return;
                 }
 
-                fetch('/api/curriculum-subjects?facultyId=' + facultyId, {
-                    method: 'POST',
+                let url = '/api/curriculum-subjects?facultyId=' + facultyId;
+                let method = 'POST';
+                let body = JSON.stringify({
+                    curriculum: { id: curriculumId },
+                    subject: { id: subjectId },
+                    units: parseInt(units),
+                    roomNumber,
+                    time,
+                    days
+                });
+                if (editingCSId) {
+                    url = `/api/curriculum-subjects/${editingCSId}?facultyId=${facultyId}`;
+                    method = 'PUT';
+                }
+
+                fetch(url, {
+                    method,
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        curriculum: { id: curriculumId },
-                        subject: { id: subjectId },
-                        units: parseInt(units),
-                        roomNumber,
-                        time,
-                        days
-                    })
+                    body
                 })
                 .then(async res => {
                     if (res.ok) {
-                        alert('Subject added to curriculum!');
+                        alert(editingCSId ? 'Subject updated!' : 'Subject added to curriculum!');
                         this.reset();
                         refreshCurriculumSubjects(curriculumId);
+                        editingCSId = null;
+                        document.querySelector('#curriculumSubjectForm button[type="submit"]').textContent = 'Save Subject to Curriculum';
                     } else {
                         const errorText = await res.text();
-                        alert('Failed to add subject: ' + errorText);
+                        alert('Failed to save subject: ' + errorText);
                     }
                 })
                 .catch(err => {
@@ -745,6 +925,24 @@
                 .catch(err => {
                     alert('Network or server error: ' + err);
                 });
+            });
+        }
+        // Add event delegation for Edit and Delete buttons in Subjects Under Selected Curriculum table
+        const curriculumSubjectsTableBody = document.querySelector('#curriculumSubjectsTable tbody');
+        if (curriculumSubjectsTableBody) {
+            curriculumSubjectsTableBody.addEventListener('click', function(e) {
+                if (e.target && e.target.classList.contains('schedule-edit-btn')) {
+                    const subjectId = e.target.getAttribute('data-id');
+                    // Find the subject object by ID
+                    const cs = (window.lastCurriculumSubjectsList || []).find(s => String(s.id) === String(subjectId));
+                    if (cs) {
+                        window.editCurriculumSubject(cs);
+                    }
+                }
+                if (e.target && e.target.classList.contains('schedule-delete-btn')) {
+                    const subjectId = e.target.getAttribute('data-id');
+                    deleteCurriculumSubject(subjectId);
+                }
             });
         }
     });
@@ -1146,29 +1344,32 @@
             });
     };
 
-    document.getElementById('curriculumForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const name = document.getElementById('curriculumName').value;
-        const method = editingCurriculumId ? 'PUT' : 'POST';
-        const url = editingCurriculumId ? `${CURRICULUM_API_URL}/${editingCurriculumId}` : CURRICULUM_API_URL;
-        const body = { name };
-        fetch(url, {
-            method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
-        })
-        .then(async res => {
-            if (res.ok) {
-                fetchAndRenderCurriculums();
-                this.reset();
-                editingCurriculumId = null;
-                document.querySelector('#curriculumForm button[type="submit"]').textContent = 'Save Curriculum';
-            } else {
-                const errorText = await res.text();
-                alert('Failed to save curriculum: ' + errorText);
-            }
+    var curriculumForm = document.getElementById('curriculumForm');
+    if (curriculumForm) {
+        curriculumForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('curriculumName').value;
+            const method = editingCurriculumId ? 'PUT' : 'POST';
+            const url = editingCurriculumId ? `${CURRICULUM_API_URL}/${editingCurriculumId}` : CURRICULUM_API_URL;
+            const body = { name };
+            fetch(url, {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            })
+            .then(async res => {
+                if (res.ok) {
+                    fetchAndRenderCurriculums();
+                    this.reset();
+                    editingCurriculumId = null;
+                    document.querySelector('#curriculumForm button[type="submit"]').textContent = 'Save Curriculum';
+                } else {
+                    const errorText = await res.text();
+                    alert('Failed to save curriculum: ' + errorText);
+                }
+            });
         });
-    });
+    }
 
     // Fetch curriculums on page load
     fetchAndRenderCurriculums();
@@ -1178,6 +1379,7 @@
         fetch(`/api/curriculums/${curriculumId}/subjects`)
             .then(res => res.json())
             .then(subjects => {
+                window.lastCurriculumSubjectsList = subjects; // Store globally for edit lookup
                 const tbody = document.querySelector('#curriculumSubjectsTable tbody');
                 tbody.innerHTML = '';
                 if (!subjects || !subjects.length) {
@@ -1185,18 +1387,18 @@
                     return;
                 }
                 subjects.forEach(subject => {
-                    const subj = subject.subject || subject;
-                    const sch = scheduleMap[subj.id] || {};
                     const tr = document.createElement('tr');
+                    tr.setAttribute('data-cs-id', subject.id); // Store id for lookup
                     tr.innerHTML = `
-                        <td>${sch.courseCode !== undefined ? sch.courseCode : subj.subjectCode || ''}</td>
-                        <td>${sch.courseName !== undefined ? sch.courseName : subj.subjectName || ''}</td>
-                        <td>${sch.day !== undefined ? sch.day : subj.days || ''}</td>
-                        <td>${sch.time !== undefined ? sch.time : subj.time || ''}</td>
-                        <td>${sch.room !== undefined ? sch.room : subj.roomNumber || ''}</td>
-                        <td>${sch.facultyName !== undefined ? sch.facultyName : subject.facultyName || ''}</td>
+                        <td>${subject.subjectCode || ''}</td>
+                        <td>${subject.subjectName || ''}</td>
+                        <td>${subject.units != null ? subject.units : ''}</td>
+                        <td>${subject.roomNumber || ''}</td>
+                        <td>${subject.time || ''}</td>
+                        <td>${subject.days || ''}</td>
+                        <td>${subject.facultyName || ''}</td>
                         <td>
-                            <button type="button" class="schedule-edit-btn" data-id="${subject.id}" data-schedule-id="${sch.id || ''}" data-faculty-id="${sch.facultyId || ''}">Edit</button>
+                            <button type="button" class="schedule-edit-btn" data-id="${subject.id}">Edit</button>
                             <button type="button" class="schedule-delete-btn" data-id="${subject.id}">Delete</button>
                         </td>
                     `;
@@ -1204,6 +1406,7 @@
                 });
             })
             .catch(err => {
+                console.error('Failed to load subjects:', err);
                 const tbody = document.querySelector('#curriculumSubjectsTable tbody');
                 tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#e85743;">Failed to load subjects.</td></tr>';
             });
@@ -1283,41 +1486,13 @@
     populateCSSubjectDropdown();
     populateCSCurriculumDropdown(selectedCurriculumId);
 
-    // Patch fetchAndRenderSubjectsUnderCurriculum to add Edit/Delete buttons and update curriculum dropdown
-    const origFetchAndRenderSubjectsUnderCurriculum = fetchAndRenderSubjectsUnderCurriculum;
-    fetchAndRenderSubjectsUnderCurriculum = function(curriculumId) {
-        selectedCurriculumId = curriculumId;
-        populateCSCurriculumDropdown(curriculumId);
-        origFetchAndRenderSubjectsUnderCurriculum(curriculumId);
-        setTimeout(() => {
-            const rows = document.querySelectorAll('#curriculumSubjectsTable tbody tr');
-            rows.forEach((row, idx) => {
-                // Add Edit/Delete buttons if not present
-                if (!row.querySelector('.cs-edit-btn')) {
-                    const csId = row.getAttribute('data-cs-id') || (window.lastScheduleCSList && window.lastScheduleCSList[idx]?.id);
-                    const td = document.createElement('td');
-                    td.innerHTML = `
-                        <div style="display: flex; flex-direction: column; gap: 8px;">
-                            <button type="button" class="cs-edit-btn">Edit</button>
-                            <button type="button" class="cs-delete-btn">Delete</button>
-                        </div>
-                    `;
-                    row.appendChild(td);
-                    td.querySelector('.cs-edit-btn').onclick = () => editCurriculumSubject(csId, idx);
-                    td.querySelector('.cs-delete-btn').onclick = () => deleteCurriculumSubject(csId);
-                }
-            });
-        }, 100);
-    };
-
-    // Edit CurriculumSubject
-    window.editCurriculumSubject = function(csId, idx) {
-        const cs = window.lastScheduleCSList && window.lastScheduleCSList[idx];
+    // Edit CurriculumSubject (new version: takes subject object)
+    window.editCurriculumSubject = function(cs) {
         if (!cs) return;
-        editingCSId = csId;
+        editingCSId = cs.id;
         populateFacultyDropdown();
-        document.getElementById('csCurriculumId').value = cs.curriculum?.id || '';
-        document.getElementById('csSubjectId').value = cs.subject?.id || '';
+        document.getElementById('csCurriculumId').value = cs.curriculumId || cs.curriculum?.id || '';
+        document.getElementById('csSubjectId').value = cs.subjectId || cs.subject?.id || '';
         document.getElementById('csUnits').value = cs.units;
         document.getElementById('csRoomNumber').value = cs.roomNumber || '';
         document.getElementById('csTime').value = cs.time || '';
@@ -1366,6 +1541,7 @@
             .then(res => res.json())
             .then(subjects => {
                 console.log('Subjects API response:', subjects);
+                window.lastCurriculumSubjectsList = subjects; // Store globally for edit lookup
                 const tbody = document.querySelector('#curriculumSubjectsTable tbody');
                 tbody.innerHTML = '';
                 if (!subjects || !subjects.length) {
@@ -1373,22 +1549,22 @@
                     return;
                 }
                 subjects.forEach(subject => {
-                    const subj = subject.subject || subject;
-                    const sch = scheduleMap[subj.id] || {};
                     const tr = document.createElement('tr');
+                    tr.setAttribute('data-cs-id', subject.id); // Store id for lookup
                     tr.innerHTML = `
-                        <td>${sch.courseCode !== undefined ? sch.courseCode : subj.subjectCode || ''}</td>
-                        <td>${sch.courseName !== undefined ? sch.courseName : subj.subjectName || ''}</td>
-                        <td>${sch.day !== undefined ? sch.day : subj.days || ''}</td>
-                        <td>${sch.time !== undefined ? sch.time : subj.time || ''}</td>
-                        <td>${sch.room !== undefined ? sch.room : subj.roomNumber || ''}</td>
-                        <td>${sch.facultyName !== undefined ? sch.facultyName : subject.facultyName || ''}</td>
+                        <td>${subject.subjectCode || ''}</td>
+                        <td>${subject.subjectName || ''}</td>
+                        <td>${subject.units != null ? subject.units : ''}</td>
+                        <td>${subject.roomNumber || ''}</td>
+                        <td>${subject.time || ''}</td>
+                        <td>${subject.days || ''}</td>
+                        <td>${subject.facultyName || ''}</td>
                         <td>
-                            <button type="button" class="schedule-edit-btn" data-id="${subject.id}" data-schedule-id="${sch.id || ''}" data-faculty-id="${sch.facultyId || ''}">Edit</button>
+                            <button type="button" class="schedule-edit-btn" data-id="${subject.id}">Edit</button>
                             <button type="button" class="schedule-delete-btn" data-id="${subject.id}">Delete</button>
                         </td>
                     `;
-                    if (highlightSubjectId && (subject.id === highlightSubjectId || subj.id === highlightSubjectId)) {
+                    if (highlightSubjectId && (subject.id === highlightSubjectId || subject.subjectId === highlightSubjectId)) {
                         tr.style.background = '#fff7d6'; // highlight color
                     }
                     tbody.appendChild(tr);
@@ -1426,6 +1602,7 @@
         fetch('/api/faculty')
             .then(res => res.json())
             .then(data => {
+                console.log('Schedule Faculty data:', data); // Debug log
                 const select = document.getElementById('scheduleFacultySelect');
                 if (!select) {
                     console.log('scheduleFacultySelect element not found!');
@@ -1527,29 +1704,25 @@
                 tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#e85743;">No subjects found for this curriculum (ID: ${curriculumId}).<br>Check if subjects are assigned to this curriculum and not soft-deleted.</td></tr>`;
                 return;
             }
-            const scheduleMap = {};
-            schedules.forEach(sch => {
-                if (sch.subjectId) scheduleMap[sch.subjectId] = sch;
-            });
             subjects.forEach(subject => {
-                const subj = subject.subject || subject;
-                const sch = scheduleMap[subj.id] || {};
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${sch.courseCode !== undefined ? sch.courseCode : subj.subjectCode || ''}</td>
-                    <td>${sch.courseName !== undefined ? sch.courseName : subj.subjectName || ''}</td>
-                    <td>${sch.day !== undefined ? sch.day : subj.days || ''}</td>
-                    <td>${sch.time !== undefined ? sch.time : subj.time || ''}</td>
-                    <td>${sch.room !== undefined ? sch.room : subj.roomNumber || ''}</td>
-                    <td>${sch.facultyName !== undefined ? sch.facultyName : subject.facultyName || ''}</td>
+                    <td>${subject.subjectCode || ''}</td>
+                    <td>${subject.subjectName || ''}</td>
+                    <td>${subject.units != null ? subject.units : ''}</td>
+                    <td>${subject.roomNumber || ''}</td>
+                    <td>${subject.time || ''}</td>
+                    <td>${subject.days || ''}</td>
+                    <td>${subject.facultyName || ''}</td>
                     <td>
-                        <button type="button" class="schedule-edit-btn" data-id="${subject.id}" data-schedule-id="${sch.id || ''}" data-faculty-id="${sch.facultyId || ''}">Edit</button>
-                        <button type="button" class="schedule-delete-btn" data-id="${subject.id}">Delete</button>
+                        <div class="action-buttons">
+                            <button type="button" class="schedule-edit-btn" data-id="${subject.id}">Edit</button>
+                            <button type="button" class="schedule-delete-btn" data-id="${subject.id}">Delete</button>
+                        </div>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
-            // Attach event listeners for add/edit/delete as needed
         }).catch((err) => {
             tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#e85743;">Failed to load schedule. Error: ${err}</td></tr>`;
         });

@@ -78,8 +78,12 @@ public ResponseEntity<List<CurriculumSubject>> getByCurriculumId(@PathVariable L
     // Delete a CurriculumSubject
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCurriculumSubject(@PathVariable Long id) {
-        boolean deleted = curriculumSubjectService.delete(id);
-        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+        try {
+            boolean deleted = curriculumSubjectService.delete(id);
+            return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).build();
+        }
     }
 
     @GetMapping("/curriculum/{curriculumId}/faculty-details")
