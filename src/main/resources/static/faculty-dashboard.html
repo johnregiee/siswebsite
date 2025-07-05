@@ -265,22 +265,25 @@
               email = studentObj.email || '';
             }
           } catch {}
-          // Fetch grade for this student and course
-          let grade = '';
-          try {
-            const gradeRes = await fetch(`/api/grades/student/${studentId}/course/${courseCode}`);
-            if (gradeRes.ok) {
-              const gradeObj = await gradeRes.json();
-              grade = gradeObj && gradeObj.grade ? gradeObj.grade : '';
-            }
-          } catch {}
-          tbody.innerHTML += `<tr>
-            <td>${studentNumber}</td>
-            <td>${name}</td>
-            <td>${email}</td>
-            <td><input type='text' style='width:60px;' id='gradingGradeInput-${studentId}' value='${grade}' /></td>
-            <td><button onclick='saveGradingGrade(${studentId}, "${courseCode}")'>Save</button></td>
-          </tr>`;
+          // Only render row if at least one of studentNumber, name, or email is non-empty
+          if (studentNumber || name || email) {
+            // Fetch grade for this student and course
+            let grade = '';
+            try {
+              const gradeRes = await fetch(`/api/grades/student/${studentId}/course/${courseCode}`);
+              if (gradeRes.ok) {
+                const gradeObj = await gradeRes.json();
+                grade = gradeObj && gradeObj.grade ? gradeObj.grade : '';
+              }
+            } catch {}
+            tbody.innerHTML += `<tr>
+              <td>${studentNumber}</td>
+              <td>${name}</td>
+              <td>${email}</td>
+              <td><input type='text' style='width:60px;' id='gradingGradeInput-${studentId}' value='${grade}' /></td>
+              <td><button onclick='saveGradingGrade(${studentId}, "${courseCode}")'>Save</button></td>
+            </tr>`;
+          }
         }
       });
     }

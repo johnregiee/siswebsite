@@ -131,7 +131,6 @@
         <nav>
             <a class="nav-link" href="student-dashboard.html">Home</a>
             <a class="nav-link" href="enrollment.html">Enrollment</a>
-            <a class="nav-link" href="accounts.html">Accounts</a>
             <a class="nav-link active" href="schedule.html">Schedule</a>
             <a class="nav-link" href="grades.html">Grades</a>
         </nav>
@@ -171,11 +170,10 @@
                             <th style="text-align:left; padding:10px 8px;">Time</th>
                             <th style="text-align:left; padding:10px 8px;">Day(s)</th>
                             <th style="text-align:left; padding:10px 8px;">Faculty</th>
-                            <th style="text-align:left; padding:10px 8px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="scheduleTableBody">
-                        <tr><td colspan="6" style="text-align:center; color:#888;">Loading schedule...</td></tr>
+                        <tr><td colspan="7" style="text-align:center; color:#888;">Loading schedule...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -202,59 +200,34 @@
         }
 
         const tableBody = document.getElementById('scheduleTableBody');
-        tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#888;">Loading schedule...</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#888;">Loading schedule...</td></tr>';
 
-        fetch(`http://localhost:8080/api/schedules/student/${studentId}`)
+        fetch(`http://localhost:8080/api/enrollments/student/${studentId}`)
             .then(res => res.json())
-            .then(schedules => {
+            .then(enrollments => {
                 tableBody.innerHTML = '';
-                if (!schedules.length) {
-                    tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#888;">No schedule found.</td></tr>';
+                // Filter to only active enrollments (not dropped/deleted)
+                const active = enrollments.filter(e => !e.status || !['deleted','dropped'].includes(e.status.toLowerCase()));
+                if (!active.length) {
+                    tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#888;">No schedule found.</td></tr>';
                 } else {
-                    schedules.forEach(schedule => {
+                    active.forEach(e => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td style='padding:10px 8px; text-align:left;'>${schedule.subjectCode || ''}</td>
-                            <td style='padding:10px 8px; text-align:left;'>${schedule.subjectName || ''}</td>
-                            <td style='padding:10px 8px; text-align:left;'>${schedule.units || ''}</td>
-                            <td style='padding:10px 8px; text-align:left;'>${schedule.room || ''}</td>
-                            <td style='padding:10px 8px; text-align:left;'>${schedule.time || ''}</td>
-                            <td style='padding:10px 8px; text-align:left;'>${schedule.days || ''}</td>
-                            <td style='padding:10px 8px; text-align:left;'>${schedule.facultyName || schedule.faculty || 'N/A'}</td>
-                            <td style='padding:10px 8px; text-align:left;'>
-                                <button type='button' class='schedule-edit-btn'>Edit</button>
-                                <button type='button' class='schedule-delete-btn' data-id='${schedule.id}'>Delete</button>
-                            </td>
+                            <td style='padding:10px 8px; text-align:left;'>${e.subjectCode || ''}</td>
+                            <td style='padding:10px 8px; text-align:left;'>${e.subjectName || ''}</td>
+                            <td style='padding:10px 8px; text-align:left;'>${e.units != null ? e.units : ''}</td>
+                            <td style='padding:10px 8px; text-align:left;'>${e.roomNumber || ''}</td>
+                            <td style='padding:10px 8px; text-align:left;'>${e.time || ''}</td>
+                            <td style='padding:10px 8px; text-align:left;'>${e.days || ''}</td>
+                            <td style='padding:10px 8px; text-align:left;'>${e.facultyName || ''}</td>
                         `;
                         tableBody.appendChild(row);
                     });
                 }
-                setTimeout(() => {
-                    document.querySelectorAll('.schedule-edit-btn').forEach((btn, idx) => {
-                        btn.onclick = function() {
-                            alert('Edit functionality coming soon! Row: ' + (idx + 1));
-                        };
-                    });
-                    document.querySelectorAll('.schedule-delete-btn').forEach((btn) => {
-                        btn.onclick = function() {
-                            const scheduleId = btn.getAttribute('data-id');
-                            if (confirm('Are you sure you want to delete this schedule?')) {
-                                fetch(`/api/schedules/${scheduleId}`, { method: 'DELETE' })
-                                    .then(res => {
-                                        if (res.ok) {
-                                            // Refresh the table
-                                            window.location.reload();
-                                        } else {
-                                            alert('Failed to delete schedule.');
-                                        }
-                                    });
-                            }
-                        };
-                    });
-                }, 100);
             })
             .catch(() => {
-                tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#888;">Failed to load schedule.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#888;">Failed to load schedule.</td></tr>';
             });
     });
 
@@ -272,69 +245,6 @@
         sessionStorage.clear();
         window.location.href = 'login.html';
     });
-
-    async function getStudentIdByStudentNumber(studentNumber) {
-        const res = await fetch('/api/admin/student');
-        const students = await res.json();
-        const student = students.find(s => s.studentNumber === studentNumber);
-        return student ? student.id : null;
-    }
-
-    async function showStudentSchedule(studentNumber) {
-        const studentId = await getStudentIdByStudentNumber(studentNumber);
-        const tbody = document.getElementById('scheduleTableBody');
-        if (!studentId) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#888;">Student not found.</td></tr>';
-            return;
-        }
-        const res = await fetch(`/api/schedules/student/${studentId}`);
-        const schedules = await res.json();
-        if (!schedules.length) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#888;">No schedule found.</td></tr>';
-            return;
-        }
-        tbody.innerHTML = '';
-        schedules.forEach(sch => {
-            tbody.innerHTML += `<tr>
-                <td style='padding:10px 8px; text-align:left;'>${sch.subjectCode || ''}</td>
-                <td style='padding:10px 8px; text-align:left;'>${sch.subjectName || ''}</td>
-                <td style='padding:10px 8px; text-align:left;'>${sch.units || ''}</td>
-                <td style='padding:10px 8px; text-align:left;'>${sch.room || ''}</td>
-                <td style='padding:10px 8px; text-align:left;'>${sch.time || ''}</td>
-                <td style='padding:10px 8px; text-align:left;'>${sch.days || ''}</td>
-                <td style='padding:10px 8px; text-align:left;'>${sch.facultyName || sch.faculty || 'N/A'}</td>
-                <td style='padding:10px 8px; text-align:left;'>
-                    <button type='button' class='schedule-edit-btn'>Edit</button>
-                    <button type='button' class='schedule-delete-btn' data-id='${sch.id}'>Delete</button>
-                </td>
-            </tr>`;
-        });
-        setTimeout(() => {
-            document.querySelectorAll('.schedule-edit-btn').forEach((btn, idx) => {
-                btn.onclick = function() {
-                    alert('Edit functionality coming soon! Row: ' + (idx + 1));
-                };
-            });
-            document.querySelectorAll('.schedule-delete-btn').forEach((btn) => {
-                btn.onclick = function() {
-                    const scheduleId = btn.getAttribute('data-id');
-                    if (confirm('Are you sure you want to delete this schedule?')) {
-                        fetch(`/api/schedules/${scheduleId}`, { method: 'DELETE' })
-                            .then(res => {
-                                if (res.ok) {
-                                    // Refresh the table
-                                    window.location.reload();
-                                } else {
-                                    alert('Failed to delete schedule.');
-                                }
-                            });
-                    }
-                };
-            });
-        }, 100);
-    }
-    // TODO: Replace 'SIS-00001' with the logged-in student's number dynamically
-    showStudentSchedule('SIS-00001');
     </script>
 </body>
 </html> 

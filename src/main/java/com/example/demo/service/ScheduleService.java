@@ -22,12 +22,14 @@ public class ScheduleService {
 
     // Create or update
     public Schedule saveSchedule(Schedule schedule) {
-        // Set courseCode and courseName from subject if subjectId is present
+        // Set courseCode, courseName, subjectCode, and subjectName from subject if subjectId is present
         if (schedule.getSubjectId() != null) {
             Subject subject = subjectRepository.findById(schedule.getSubjectId()).orElse(null);
             if (subject != null) {
                 schedule.setCourseCode(subject.getSubjectCode());
                 schedule.setCourseName(subject.getSubjectName());
+                schedule.setSubjectCode(subject.getSubjectCode());
+                schedule.setSubjectName(subject.getSubjectName());
             }
         }
         return scheduleRepository.save(schedule);

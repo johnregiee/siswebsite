@@ -184,7 +184,6 @@
     <nav>
             <a class="nav-link active" href="student-dashboard.html">Home</a>
             <a class="nav-link" href="enrollment.html">Enrollment</a>
-            <a class="nav-link" href="accounts.html">Accounts</a>
             <a class="nav-link" href="schedule.html">Schedule</a>
             <a class="nav-link" href="grades.html">Grades</a>
         </nav>
@@ -294,21 +293,6 @@
             </div>
         </div>
             <div class="card">
-            <h2>Accounts</h2>
-            <p>Your financial statement and balance.</p>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Semester</th>
-                        <th>Tuition Fee</th>
-                        <th>Amount Paid</th>
-                        <th>Balance</th>
-                    </tr>
-                </thead>
-                <tbody id="accountsTableBody"></tbody>
-            </table>
-        </div>
-            <div class="card">
             <h2>My Class Schedule</h2>
             <p>Here is your schedule for the current semester.</p>
                 <table>
@@ -406,45 +390,6 @@
                     } catch (error) {
                         console.error('Error loading schedule:', error);
                         tableBody.html('<tr><td colspan="5" style="color: red;">Could not load schedule. Please try again later.</td></tr>');
-                    }
-                }
-
-                async function loadStudentAccounts() {
-                    const tableBody = $('#accountsTableBody');
-                    tableBody.html('<tr><td colspan="4">Loading accounts...</td></tr>');
-                    
-                    // Get studentId and validate it
-                    const studentId = sessionStorage.getItem("studentId");
-                    if (!studentId) {
-                        tableBody.html('<tr><td colspan="4" style="color:red;">Error: Student ID not found. Please log in again.</td></tr>');
-                        console.error('Student ID not found in sessionStorage');
-                        return;
-                    }
-                    
-                    try {
-                        const response = await fetch(`http://localhost:8080/api/accounts/student/${studentId}`);
-                        if (!response.ok) throw new Error('Failed to fetch accounts');
-
-                        const data = await response.json();
-                        tableBody.empty();
-
-                        if (data.length === 0) {
-                            tableBody.html('<tr><td colspan="4">No account information available.</td></tr>');
-                        } else {
-                            data.forEach(account => {
-                                const row = `
-                                <tr>
-                                    <td>${account.semester}</td>
-                                    <td>₱${account.tuitionFee.toFixed(2)}</td>
-                                    <td>₱${account.amountPaid.toFixed(2)}</td>
-                                    <td>₱${account.balance.toFixed(2)}</td>
-                                </tr>`;
-                                tableBody.append(row);
-                            });
-                        }
-                    } catch (error) {
-                        console.error('Error loading accounts:', error);
-                        tableBody.html('<tr><td colspan="4" style="color: red;">Could not load accounts.</td></tr>');
                     }
                 }
 
@@ -548,25 +493,6 @@
                     }
                 }
 
-                // --- MODIFY THE EXISTING CLICK HANDLER ---
-                // Find your existing nav click handler and add the 'else if' part
-                $('.nav-links span').on('click', function () {
-                    const targetId = $(this).data('target');
-
-                    $('.section').removeClass('active');
-                    $('#' + targetId).addClass('active');
-
-                    if (targetId === 'accountsSection') {
-                        loadStudentAccounts();
-                    } else if (targetId === 'scheduleSection') {
-                        loadStudentSchedule();
-                    } else if (targetId === 'gradesSection') { // <-- ADD THIS BLOCK
-                        loadStudentGrades();
-                    }
-                });
-
-                // (Your enrollment functions would go here too, I've left them out for brevity)
-
                 // --- EVENT HANDLERS ---
 
                 // Navigation click handler
@@ -578,16 +504,13 @@
                     $('#' + targetId).addClass('active');
 
                     // Load data for the selected section
-                    if (targetId === 'accountsSection') {
-                        loadStudentAccounts();
-                    } else if (targetId === 'scheduleSection') {
+                    if (targetId === 'scheduleSection') {
                         loadStudentSchedule();
-                    } else if (targetId === 'enrollmentSection') {
-                        // loadStudentEnrollments();
+                    } else if (targetId === 'gradesSection') {
+                        loadStudentGrades();
                     }
                 });
 
-                loadStudentAccounts();
                 loadStudentSchedule();
                 loadStudentGrades();
 
