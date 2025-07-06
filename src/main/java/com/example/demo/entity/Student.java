@@ -33,4 +33,8 @@ public class Student {
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "section_id", nullable = true)
     private Section section;
+
+    private Long curriculumId;
+    public Long getCurriculumId() { return curriculumId; }
+    public void setCurriculumId(Long curriculumId) { this.curriculumId = curriculumId; }
 }

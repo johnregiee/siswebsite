@@ -32,10 +32,47 @@
   </header>
   <main class="main-content-wrapper">
     <section id="overview" class="card" style="display:block;">
-      <h2>Welcome, <span id="facultyName">Faculty Name</span>!</h2>
-      <div class="faculty-email" id="facultyEmail">faculty@email.com</div>
-      <div class="dashboard-date" id="dashboardDate">Date & Time</div>
-      <!-- Quick stats and schedule summary go here -->
+      <div style="margin-bottom: 2.5em;">
+        <h2 style="color:#e85743; font-size:2.2em; font-weight:700; margin-bottom:0.2em;">Welcome, <span id="facultyName">Faculty Name</span>!</h2>
+        <div class="faculty-email" id="facultyEmail" style="color:#888; font-size:1.1em;">faculty@email.com</div>
+        <div class="dashboard-date" id="dashboardDate" style="color:#aaa; font-size:1em;">Date & Time</div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:32px;">
+        <div class="card" style="background:#fff; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.06); padding:28px 32px 24px 32px;">
+          <h2 style="color:#e85743; font-size:1.5em; font-weight:700; margin-bottom:0.5em;">Subjects / Classes Assigned</h2>
+          <table style="width:100%; border-collapse:separate; border-spacing:0; background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 1px 6px rgba(0,0,0,0.04);">
+            <thead>
+              <tr style="background:#ffeaea; color:#e85743;">
+                <th style="padding:10px 8px;">Course Code</th>
+                <th style="padding:10px 8px;">Course Name</th>
+                <th style="padding:10px 8px;">Day(s)</th>
+                <th style="padding:10px 8px;">Time</th>
+                <th style="padding:10px 8px;">Room</th>
+              </tr>
+            </thead>
+            <tbody id="overviewSubjectsTableBody">
+              <tr><td colspan="5" style="text-align:center; color:#888;">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card" style="background:#fff; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.06); padding:28px 32px 24px 32px;">
+          <h2 style="color:#e85743; font-size:1.5em; font-weight:700; margin-bottom:0.5em;">My Class Schedule</h2>
+          <table style="width:100%; border-collapse:separate; border-spacing:0; background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 1px 6px rgba(0,0,0,0.04);">
+            <thead>
+              <tr style="background:#ffeaea; color:#e85743;">
+                <th style="padding:10px 8px;">Course Code</th>
+                <th style="padding:10px 8px;">Course Name</th>
+                <th style="padding:10px 8px;">Day(s)</th>
+                <th style="padding:10px 8px;">Time</th>
+                <th style="padding:10px 8px;">Room</th>
+              </tr>
+            </thead>
+            <tbody id="overviewScheduleTableBody">
+              <tr><td colspan="5" style="text-align:center; color:#888;">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </section>
     <section id="subjects" class="card" style="display:none;">
       <h2>Subjects / Classes Management</h2>
@@ -82,6 +119,7 @@
             <th>Student Number</th>
             <th>Name</th>
             <th>Email</th>
+            <th>Course Name</th>
           </tr>
         </thead>
         <tbody>
@@ -167,7 +205,12 @@
             return;
           }
           tbody.innerHTML = '';
+          const seen = new Set();
           schedules.forEach(sch => {
+            if (String(sch.facultyId) !== String(facultyId)) return;
+            const key = (sch.courseCode || '') + '|' + (sch.courseName || '');
+            if (seen.has(key)) return;
+            seen.add(key);
             tbody.innerHTML += `
               <tr>
                 <td>${sch.courseCode || ''}</td>
@@ -189,7 +232,12 @@
             return;
           }
           tbody.innerHTML = '';
+          const seen = new Set();
           schedules.forEach(sch => {
+            if (String(sch.facultyId) !== String(facultyId)) return;
+            const key = (sch.courseCode || '') + '|' + (sch.courseName || '');
+            if (seen.has(key)) return;
+            seen.add(key);
             const tr = document.createElement('tr');
             tr.innerHTML = `
               <td>${sch.courseCode || ''}</td>
@@ -215,6 +263,7 @@
           // Use a Set to avoid duplicate course codes
           const seen = new Set();
           schedules.forEach(sch => {
+            if (String(sch.facultyId) !== String(facultyId)) return;
             if (!seen.has(sch.courseCode)) {
               seen.add(sch.courseCode);
               const opt = document.createElement('option');
@@ -286,6 +335,53 @@
           }
         }
       });
+      // --- Overview summary logic (student-dashboard style) ---
+      fetch(`http://localhost:8080/api/schedules/faculty/${facultyId}`)
+        .then(res => res.json())
+        .then(schedules => {
+          // Subjects/Classes Assigned
+          const subjectsTbody = document.getElementById('overviewSubjectsTableBody');
+          if (!schedules.length) {
+            subjectsTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#888;">No subjects/classes assigned.</td></tr>';
+          } else {
+            subjectsTbody.innerHTML = '';
+            const seen = new Set();
+            schedules.forEach(sch => {
+              if (String(sch.facultyId) !== String(facultyId)) return;
+              const key = (sch.courseCode || '') + '|' + (sch.courseName || '');
+              if (seen.has(key)) return;
+              seen.add(key);
+              subjectsTbody.innerHTML += `<tr>
+                <td>${sch.courseCode || ''}</td>
+                <td>${sch.courseName || ''}</td>
+                <td>${sch.day || ''}</td>
+                <td>${sch.time || ''}</td>
+                <td>${sch.room || ''}</td>
+              </tr>`;
+            });
+          }
+          // My Class Schedule (show same as subjects for faculty, or filter for upcoming if needed)
+          const scheduleTbody = document.getElementById('overviewScheduleTableBody');
+          if (!schedules.length) {
+            scheduleTbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#888;">You have no schedules assigned yet.</td></tr>';
+          } else {
+            scheduleTbody.innerHTML = '';
+            const seen = new Set();
+            schedules.forEach(sch => {
+              if (String(sch.facultyId) !== String(facultyId)) return;
+              const key = (sch.courseCode || '') + '|' + (sch.courseName || '');
+              if (seen.has(key)) return;
+              seen.add(key);
+              scheduleTbody.innerHTML += `<tr>
+                <td>${sch.courseCode || ''}</td>
+                <td>${sch.courseName || ''}</td>
+                <td>${sch.day || ''}</td>
+                <td>${sch.time || ''}</td>
+                <td>${sch.room || ''}</td>
+              </tr>`;
+            });
+          }
+        });
     }
     // Save grade from grading tab
     function saveGradingGrade(studentId, courseCode) {
@@ -391,19 +487,19 @@
     // Add logic to load students for the first subject/class when Students tab is selected
     function loadFacultyStudentList(courseCode) {
       const tbody = document.querySelector('#facultyStudentTable tbody');
-      tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#888;">Loading...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#888;">Loading...</td></tr>';
       fetch(`/api/enrollments/course/${courseCode}`)
         .then(res => res.json())
         .then(async enrollments => {
           if (!enrollments.length) {
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#888;">No students enrolled.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#888;">No students enrolled.</td></tr>';
             return;
           }
           const seenNames = new Set();
           tbody.innerHTML = '';
           for (const e of enrollments) {
             const studentId = e.studentId || e.id;
-            let studentNumber = '', name = '', email = '';
+            let studentNumber = '', name = '', email = '', courseName = '';
             try {
               const studentRes = await fetch(`/api/admin/student/${studentId}`);
               if (studentRes.ok) {
@@ -411,6 +507,7 @@
                 studentNumber = studentObj.studentNumber || '';
                 name = studentObj.name || '';
                 email = studentObj.email || '';
+                courseName = studentObj.course ? (studentObj.course.name || '') : '';
               }
             } catch {}
             // Only add row if name is unique
@@ -420,6 +517,7 @@
                 <td>${studentNumber}</td>
                 <td>${name}</td>
                 <td>${email}</td>
+                <td>${courseName}</td>
               </tr>`;
             }
           }
@@ -437,7 +535,7 @@
             loadFacultyStudentList(schedules[0].courseCode);
           } else {
             const tbody = document.querySelector('#facultyStudentTable tbody');
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#888;">No classes found.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#888;">No classes found.</td></tr>';
           }
         });
     });
@@ -454,6 +552,71 @@
     document.addEventListener('click', function() {
       logoutDropdown.style.display = 'none';
     });
+    // Add auto-refresh for faculty subjects and schedule tables
+    function refreshFacultyTables() {
+      if (!facultyId) return;
+      // Refresh Class Schedule
+      fetch(`http://localhost:8080/api/schedules/faculty/${facultyId}`)
+        .then(res => res.json())
+        .then(schedules => {
+          const tbody = document.querySelector('#facultyScheduleTable tbody');
+          if (!schedules.length) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#888;">No schedule found.</td></tr>';
+            return;
+          }
+          tbody.innerHTML = '';
+          const seen = new Set();
+          schedules.forEach(sch => {
+            if (String(sch.facultyId) !== String(facultyId)) return;
+            const key = (sch.courseCode || '') + '|' + (sch.courseName || '');
+            if (seen.has(key)) return;
+            seen.add(key);
+            tbody.innerHTML += `
+              <tr>
+                <td>${sch.courseCode || ''}</td>
+                <td>${sch.courseName || ''}</td>
+                <td>${sch.day || ''}</td>
+                <td>${sch.time || ''}</td>
+                <td>${sch.room || ''}</td>
+              </tr>
+            `;
+          });
+        });
+      // Refresh Subjects / Classes Management
+      fetch(`http://localhost:8080/api/schedules/faculty/${facultyId}`)
+        .then(res => res.json())
+        .then(schedules => {
+          const tbody = document.querySelector('#facultySubjectsTable tbody');
+          if (!schedules.length) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#888;">No subjects found.</td></tr>';
+            return;
+          }
+          tbody.innerHTML = '';
+          const seen = new Set();
+          schedules.forEach(sch => {
+            if (String(sch.facultyId) !== String(facultyId)) return;
+            const key = (sch.courseCode || '') + '|' + (sch.courseName || '');
+            if (seen.has(key)) return;
+            seen.add(key);
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${sch.courseCode || ''}</td>
+              <td>${sch.courseName || ''}</td>
+              <td>${sch.day || ''}</td>
+              <td>${sch.time || ''}</td>
+              <td>${sch.room || ''}</td>
+            `;
+            tr.style.cursor = 'pointer';
+            tr.addEventListener('click', function() {
+              showStudentListModal(sch.courseCode);
+            });
+            tbody.appendChild(tr);
+          });
+        });
+    }
+    if (facultyId) {
+      setInterval(refreshFacultyTables, 10000); // auto-refresh every 10 seconds
+    }
   </script>
 </body>
 </html>

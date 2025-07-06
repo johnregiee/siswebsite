@@ -1,0 +1,26 @@
+﻿
+
+StatusCode        : 200
+StatusDescription : 
+Content           : [{"facultyName":null,"id":14,"studentId":null,"courseCode":"COMP 
+                    002","courseName":"Computer Programming 1","day":"Monday and Thursday","time":"1:00 
+                    - 10:00 PM","room":"103","facultyId":13},{"facultyN...
+RawContent        : HTTP/1.1 200 
+                    Vary: Origin,Access-Control-Request-Method,Access-Control-Request-Headers
+                    Transfer-Encoding: chunked
+                    Content-Type: application/json
+                    Date: Sat, 05 Jul 2025 08:45:00 GMT
+                    
+                    [{"facultyN...
+Forms             : {}
+Headers           : {[Vary, Origin,Access-Control-Request-Method,Access-Control-Request-Headers], 
+                    [Transfer-Encoding, chunked], [Content-Type, application/json], [Date, Sat, 05 Jul 
+                    2025 08:45:00 GMT]}
+Images            : {}
+InputFields       : {}
+Links             : {}
+ParsedHtml        : mshtml.HTMLDocumentClass
+RawContentLength  : 10500
+
+
+

@@ -1,0 +1,25 @@
+﻿
+
+StatusCode        : 200
+StatusDescription : 
+Content           : [{"id":24,"studentId":null,"courseCode":"COMP 001","courseName":"Introduction to 
+                    Computing","subjectCode":"COMP 001","subjectName":"Introduction to 
+                    Computing","day":"Tuesday","time":"8:00 - 11:00 PM",...
+RawContent        : HTTP/1.1 200 
+                    Vary: Origin,Access-Control-Request-Method,Access-Control-Request-Headers
+                    Transfer-Encoding: chunked
+                    Keep-Alive: timeout=60
+                    Connection: keep-alive
+                    Content-Type: application/json
+                    Da...
+Forms             : {}
+Headers           : {[Vary, Origin,Access-Control-Request-Method,Access-Control-Request-Headers], 
+                    [Transfer-Encoding, chunked], [Keep-Alive, timeout=60], [Connection, keep-alive]...}
+Images            : {}
+InputFields       : {}
+Links             : {}
+ParsedHtml        : mshtml.HTMLDocumentClass
+RawContentLength  : 2603
+
+
+

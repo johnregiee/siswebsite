@@ -1,0 +1,24 @@
+﻿
+
+StatusCode        : 200
+StatusDescription : 
+Content           : []
+RawContent        : HTTP/1.1 200 
+                    Vary: Origin,Access-Control-Request-Method,Access-Control-Request-Headers
+                    Transfer-Encoding: chunked
+                    Content-Type: application/json
+                    Date: Sat, 05 Jul 2025 09:00:04 GMT
+                    
+                    []
+Forms             : {}
+Headers           : {[Vary, Origin,Access-Control-Request-Method,Access-Control-Request-Headers], 
+                    [Transfer-Encoding, chunked], [Content-Type, application/json], [Date, Sat, 05 Jul 
+                    2025 09:00:04 GMT]}
+Images            : {}
+InputFields       : {}
+Links             : {}
+ParsedHtml        : mshtml.HTMLDocumentClass
+RawContentLength  : 2
+
+
+

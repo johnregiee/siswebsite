@@ -150,6 +150,12 @@ public class ScheduleController {
         return "Done";
     }
 
+    @GetMapping("/repair-faculty-assignments")
+    public String repairFacultyAssignments() {
+        scheduleService.updateFacultyAssignmentsBySubjectName();
+        return "Done";
+    }
+
     public static class ScheduleWithFacultyDto {
         public Long id;
         public Long studentId;

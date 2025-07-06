@@ -22,4 +22,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     Schedule findByCurriculumIdAndSubjectId(Long curriculumId, Long subjectId);
 
     List<Schedule> findByCurriculumId(Long curriculumId);
+
+    List<Schedule> findAllByCurriculumIdAndSubjectId(Long curriculumId, Long subjectId);
 }

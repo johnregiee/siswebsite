@@ -30,11 +30,15 @@ public class Curriculum {
     private String name;
     private String description;
 
-    @ManyToOne
+    @ManyToOne(fetch = jakarta.persistence.FetchType.EAGER)
     @JoinColumn(name = "course_id")
     private Course course;
 
     @OneToMany(mappedBy = "curriculum", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<CurriculumSubject> curriculumSubjects;
+
+    public Long getCourseId() {
+        return course != null ? course.getId() : null;
+    }
 }

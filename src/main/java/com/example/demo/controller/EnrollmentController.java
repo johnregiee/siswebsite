@@ -21,10 +21,13 @@ import com.example.demo.entity.CurriculumSubject;
 import com.example.demo.entity.Enrollment;
 import com.example.demo.entity.Faculty;
 import com.example.demo.entity.Schedule;
+import com.example.demo.repository.CurriculumRepository;
 import com.example.demo.repository.CurriculumSubjectRepository;
 import com.example.demo.repository.FacultyRepository;
 import com.example.demo.repository.ScheduleRepository;
+import com.example.demo.repository.StudentRepository;
 import com.example.demo.service.EnrollmentService;
+import com.example.demo.service.GradeService;
 
 @RestController
 @RequestMapping("/api/enrollments")
@@ -42,6 +45,15 @@ public class EnrollmentController {
 
     @Autowired
     private FacultyRepository facultyRepository;
+
+    @Autowired
+    private StudentRepository studentRepository;
+
+    @Autowired
+    private CurriculumRepository curriculumRepository;
+
+    @Autowired
+    private GradeService gradeService;
 
     @GetMapping
     public ResponseEntity<List<Enrollment>> getAllEnrollments() {
@@ -91,6 +103,10 @@ public class EnrollmentController {
         Object curriculumIdObj = payload.get("curriculumId");
         if (curriculumIdObj != null) {
             Long curriculumId = Long.valueOf(curriculumIdObj.toString());
+            studentRepository.findById(studentId).ifPresent(student -> {
+                student.setCurriculumId(curriculumId);
+                studentRepository.save(student);
+            });
             List<CurriculumSubject> subjects = curriculumSubjectRepository.findByCurriculumId(curriculumId);
             for (CurriculumSubject cs : subjects) {
                 Enrollment newEnrollment = new Enrollment();
@@ -126,5 +142,52 @@ public class EnrollmentController {
     @GetMapping("/course/{courseCode}")
     public List<Enrollment> getEnrollmentsForCourse(@PathVariable String courseCode) {
         return enrollmentService.getEnrollmentsByCourse(courseCode);
+    }
+
+    @GetMapping("/student/{studentId}/curriculum")
+    public ResponseEntity<?> getStudentCurriculum(@PathVariable Long studentId) {
+        return studentRepository.findById(studentId)
+            .map(student -> {
+                Long curriculumId = student.getCurriculumId();
+                if (curriculumId == null) return ResponseEntity.ok().body(null);
+                return curriculumRepository.findById(curriculumId)
+                    .map(curriculum -> ResponseEntity.ok().body(Map.of(
+                        "id", curriculum.getId(),
+                        "name", curriculum.getName()
+                    )))
+                    .orElse(ResponseEntity.ok().body(null));
+            })
+            .orElse(ResponseEntity.notFound().build());
+    }
+
+    // Endpoint to check if a student's curriculum is done (all subjects have grades)
+    @GetMapping("/student/{studentId}/curriculum/done")
+    public ResponseEntity<Boolean> isCurriculumDone(@PathVariable Long studentId) {
+        // Get the student
+        return studentRepository.findById(studentId)
+            .map(student -> {
+                Long curriculumId = student.getCurriculumId();
+                if (curriculumId == null) return ResponseEntity.ok(false);
+                // Get all subjects in the curriculum
+                var curriculumOpt = curriculumRepository.findById(curriculumId);
+                if (curriculumOpt.isEmpty()) return ResponseEntity.ok(false);
+                var curriculum = curriculumOpt.get();
+                var subjects = curriculum.getCurriculumSubjects();
+                if (subjects == null || subjects.isEmpty()) return ResponseEntity.ok(false);
+                // For each subject, check if a grade exists for the student and subject code
+                for (var cs : subjects) {
+                    if (cs.isDeleted()) continue;
+                    var subject = cs.getSubject();
+                    if (subject == null) continue;
+                    String subjectCode = subject.getSubjectCode();
+                    // Use GradeService to check for grade
+                    var gradeOpt = gradeService.getGradeByStudentIdAndCourseCode(studentId, subjectCode);
+                    if (gradeOpt.isEmpty() || gradeOpt.get().getGrade() == null || gradeOpt.get().getGrade().isBlank()) {
+                        return ResponseEntity.ok(false);
+                    }
+                }
+                return ResponseEntity.ok(true);
+            })
+            .orElse(ResponseEntity.ok(false));
     }
 }

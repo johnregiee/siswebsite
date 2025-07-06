@@ -11,5 +11,5 @@ import com.example.demo.entity.Curriculum;
 @Repository
 public interface CurriculumRepository extends JpaRepository<Curriculum, Long> {
     Optional<Curriculum> findByName(String name);
-    List<Curriculum> findByCourseId(Long courseId);
+    List<Curriculum> findByCourse_Id(Long courseId);
 }

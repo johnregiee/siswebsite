@@ -88,7 +88,7 @@ public class CourseController {
 
     @GetMapping("/{id}/curriculums")
     public List<Curriculum> getCurriculumsByCourse(@PathVariable Long id) {
-        return curriculumRepository.findByCourseId(id);
+        return curriculumRepository.findByCourse_Id(id);
     }
 
     @GetMapping("/{id}/enrollments")

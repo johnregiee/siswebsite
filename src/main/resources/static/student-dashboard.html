@@ -298,11 +298,13 @@
                 <table>
                 <thead>
                     <tr>
-                        <th>Course Code</th>
-                        <th>Course Name</th>
-                        <th>Day(s)</th>
+                        <th>Subject Code</th>
+                        <th>Subject Name</th>
+                        <th>Units</th>
+                        <th>Room Number</th>
                         <th>Time</th>
-                        <th>Room</th>
+                        <th>Day(s)</th>
+                        <th>Faculty</th>
                     </tr>
                 </thead>
                     <tbody id="scheduleTableBody"></tbody>
@@ -352,44 +354,49 @@
 
                 // --- ALL API-LOADING FUNCTIONS ---
 
-                // Function to load student's schedule
+                // Function to load student's schedule (unified with schedule.html)
                 async function loadStudentSchedule() {
                     const tableBody = $('#scheduleTableBody');
-                    tableBody.html('<tr><td colspan="4">Loading schedule...</td></tr>');
+                    tableBody.html('<tr><td colspan="7">Loading schedule...</td></tr>');
                     
                     // Get studentId and validate it
                     const studentId = sessionStorage.getItem("studentId");
                     if (!studentId) {
-                        tableBody.html('<tr><td colspan="4" style="color:red;">Error: Student ID not found. Please log in again.</td></tr>');
+                        tableBody.html('<tr><td colspan="7" style="color:red;">Error: Student ID not found. Please log in again.</td></tr>');
                         console.error('Student ID not found in sessionStorage');
                         return;
                     }
                     
                     try {
-                        const response = await fetch(`http://localhost:8080/api/schedules/student/${studentId}`);
-                        if (!response.ok) throw new Error('Failed to fetch schedule from server.');
+                        const response = await fetch(`http://localhost:8080/api/enrollments/student/${studentId}`);
+                        if (!response.ok) throw new Error('Failed to fetch enrollments from server.');
 
-                        const schedules = await response.json();
+                        const enrollments = await response.json();
                         tableBody.empty(); // Clear the loading message
 
-                        if (schedules.length === 0) {
-                            tableBody.html('<tr><td colspan="5">You have no schedules assigned yet.</td></tr>');
+                        // Filter to only active enrollments (not dropped/deleted)
+                        const active = enrollments.filter(e => !e.status || !['deleted','dropped'].includes(e.status.toLowerCase()));
+                        
+                        if (active.length === 0) {
+                            tableBody.html('<tr><td colspan="7">No schedule found.</td></tr>');
                         } else {
-                            schedules.forEach(schedule => {
+                            active.forEach(enrollment => {
                                 const row = `
                                 <tr>
-                                    <td>${schedule.courseCode}</td>
-                                    <td>${schedule.courseName}</td>
-                                    <td>${schedule.day}</td>
-                                    <td>${schedule.time}</td>
-                                    <td>${schedule.room}</td>
+                                    <td>${enrollment.subjectCode || ''}</td>
+                                    <td>${enrollment.subjectName || ''}</td>
+                                    <td>${enrollment.units != null ? enrollment.units : ''}</td>
+                                    <td>${enrollment.roomNumber || ''}</td>
+                                    <td>${enrollment.time || ''}</td>
+                                    <td>${enrollment.days || ''}</td>
+                                    <td>${enrollment.facultyName || ''}</td>
                                 </tr>`;
                                 tableBody.append(row);
                             });
                         }
                     } catch (error) {
                         console.error('Error loading schedule:', error);
-                        tableBody.html('<tr><td colspan="5" style="color: red;">Could not load schedule. Please try again later.</td></tr>');
+                        tableBody.html('<tr><td colspan="7" style="color: red;">Could not load schedule. Please try again later.</td></tr>');
                     }
                 }
 

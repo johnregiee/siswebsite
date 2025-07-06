@@ -225,7 +225,7 @@
                 <h3>Add / Edit Student</h3>
                 <fieldset style="display:flex; flex-wrap:wrap; gap: 16px 12px; align-items:center; border:none; padding:0;">
                     <input type="hidden" id="studentId" />
-                    <input type="text" id="studentNumber" placeholder="Student Number" required style="flex:1 1 180px; min-width:150px;" />
+                    <input type="text" id="studentNumber" placeholder="Student Number" required style="flex:1 1 180px; min-width:150px;" pattern="SIS-\d{4}" title="Format: SIS-0000" />
                     <input type="text" id="name" placeholder="Name" required style="flex:1 1 180px; min-width:150px;" />
                     <input type="email" id="email" placeholder="Email" required style="flex:1 1 180px; min-width:150px;" />
                     <input type="password" id="password" placeholder="Password" required style="flex:1 1 180px; min-width:150px;" />
@@ -650,8 +650,10 @@
                 e.preventDefault();
                 const name = document.getElementById('newCurriculumName').value.trim();
                 if (!name) return;
-                fetch('/api/curriculums', {
-                    method: 'POST',
+                const method = editingCurriculumId ? 'PUT' : 'POST';
+                const url = editingCurriculumId ? `${CURRICULUM_API_URL}/${editingCurriculumId}` : CURRICULUM_API_URL;
+                fetch(url, {
+                    method,
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name })
                 })
@@ -659,28 +661,11 @@
                     if (res.ok) {
                         document.getElementById('newCurriculumName').value = '';
                         fetchAndRenderCurriculums();
-                        // Also refresh the curriculum dropdown
-                        fetch('/api/curriculums')
-                            .then(res => res.json())
-                            .then(curriculums => {
-                                const selector = document.getElementById('curriculumPageCurriculumSelect');
-                                if (!selector) return;
-                                selector.innerHTML = '<option value="">Select Curriculum</option>';
-                                curriculums.forEach(c => {
-                                    const opt = document.createElement('option');
-                                    opt.value = c.id;
-                                    opt.textContent = c.name;
-                                    selector.appendChild(opt);
-                                });
-                                if (curriculums.length > 0) {
-                                    selector.value = curriculums[0].id;
-                                    fetchAndRenderSubjectsUnderCurriculum(curriculums[0].id);
-                                }
-                            });
-                        populateCSCurriculumDropdown();
+                        editingCurriculumId = null;
+                        document.querySelector('#saveCurriculumBtn').textContent = 'Save Curriculum';
                     } else {
                         const errorText = await res.text();
-                        alert('Failed to create curriculum: ' + errorText);
+                        alert('Failed to save curriculum: ' + errorText);
                     }
                 })
                 .catch(err => {
@@ -1324,7 +1309,7 @@
                     tr.innerHTML = `
                         <td>${c.name}</td>
                         <td>
-                            <button onclick="editCurriculum(${c.id})">Edit</button>
+                            <button onclick="editCurriculum(${c.id}, '${c.name.replace(/'/g, "&#39;")}')">Edit</button>
                             <button onclick="deleteCurriculum(${c.id})">Delete</button>
                         </td>
                     `;
@@ -1335,9 +1320,8 @@
 
     window.editCurriculum = function(id, name) {
         editingCurriculumId = id;
-        document.getElementById('curriculumId').value = id;
-        document.getElementById('curriculumName').value = name;
-        document.querySelector('#curriculumForm button[type="submit"]').textContent = 'Update Curriculum';
+        document.getElementById('newCurriculumName').value = name;
+        document.querySelector('#saveCurriculumBtn').textContent = 'Update Curriculum';
     };
 
     window.deleteCurriculum = function(id) {
@@ -1367,14 +1351,18 @@
             })
             .then(async res => {
                 if (res.ok) {
+                    document.getElementById('newCurriculumName').value = '';
                     fetchAndRenderCurriculums();
-                    this.reset();
                     editingCurriculumId = null;
-                    document.querySelector('#curriculumForm button[type="submit"]').textContent = 'Save Curriculum';
+                    document.querySelector('#saveCurriculumBtn').textContent = 'Save Curriculum';
                 } else {
                     const errorText = await res.text();
                     alert('Failed to save curriculum: ' + errorText);
                 }
+            })
+            .catch(err => {
+                console.error('Error creating curriculum:', err);
+                alert('Error creating curriculum: ' + err);
             });
         });
     }
@@ -1734,6 +1722,19 @@
         }).catch((err) => {
             tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#e85743;">Failed to load schedule. Error: ${err}</td></tr>`;
         });
+    }
+
+    // Add custom validation for Student Number format (SIS-0000)
+    const studentNumberInput = document.getElementById('studentNumber');
+    if (studentNumberInput) {
+      studentNumberInput.addEventListener('input', function() {
+        const pattern = /^SIS-\d{4}$/;
+        if (!pattern.test(this.value)) {
+          this.setCustomValidity('Student Number must be in the format SIS-0000');
+        } else {
+          this.setCustomValidity('');
+        }
+      });
     }
     </script>
 </body>

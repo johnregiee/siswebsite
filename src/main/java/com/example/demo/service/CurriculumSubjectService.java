@@ -121,23 +121,20 @@ public class CurriculumSubjectService {
                 ? updated.getCurriculum().getCourse().getCode() : null;
             String courseName = (updated.getCurriculum() != null && updated.getCurriculum().getCourse() != null)
                 ? updated.getCurriculum().getCourse().getName() : null;
-            // Also update or create the schedule with the assigned faculty
-            if (curriculumId != null && subjectId != null && updated.getRoomNumber() != null && updated.getTime() != null && updated.getDays() != null && facultyId != null) {
-                Schedule scheduleToUpdate = scheduleRepository.findByCurriculumIdAndSubjectId(curriculumId, subjectId);
-                if (scheduleToUpdate == null) {
-                    scheduleToUpdate = new Schedule();
-                    scheduleToUpdate.setCurriculumId(curriculumId);
-                    scheduleToUpdate.setSubjectId(subjectId);
+            // Update all schedules for this curriculum and subject
+            if (curriculumId != null && subjectId != null) {
+                List<Schedule> schedules = scheduleRepository.findAllByCurriculumIdAndSubjectId(curriculumId, subjectId);
+                for (Schedule scheduleToUpdate : schedules) {
+                    scheduleToUpdate.setCourseCode(courseCode);
+                    scheduleToUpdate.setCourseName(courseName);
+                    scheduleToUpdate.setSubjectCode(subjectCode);
+                    scheduleToUpdate.setSubjectName(subjectName);
+                    scheduleToUpdate.setRoom(updated.getRoomNumber());
+                    scheduleToUpdate.setTime(updated.getTime());
+                    scheduleToUpdate.setDay(updated.getDays());
+                    scheduleToUpdate.setFacultyId(facultyId); // This will set to null if unassigned
+                    scheduleRepository.save(scheduleToUpdate);
                 }
-                scheduleToUpdate.setCourseCode(courseCode);
-                scheduleToUpdate.setCourseName(courseName);
-                scheduleToUpdate.setSubjectCode(subjectCode);
-                scheduleToUpdate.setSubjectName(subjectName);
-                scheduleToUpdate.setRoom(updated.getRoomNumber());
-                scheduleToUpdate.setTime(updated.getTime());
-                scheduleToUpdate.setDay(updated.getDays());
-                scheduleToUpdate.setFacultyId(facultyId);
-                scheduleRepository.save(scheduleToUpdate);
             }
             return saved;
         });

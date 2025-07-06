@@ -179,6 +179,7 @@
                 <p>Welcome to the enrollment section. Here you can enroll in courses for the upcoming semester.</p>
                 <div id="enrolledSubjectsContainer" style="margin-top:2.5rem;">
                   <h3 style="color:#e85743;">Enrolled Subjects</h3>
+                  <div id="curriculumName" style="font-weight:600; margin-bottom:10px;"></div>
                   <table id="enrolledSubjectsTable" style="width:100%; border-collapse:collapse; background:#fff; border-radius:10px; box-shadow:0 1px 6px rgba(0,0,0,0.04);">
                     <thead>
                       <tr style="background:#ffeaea; color:#e85743;">
@@ -191,7 +192,7 @@
                     <tbody></tbody>
                   </table>
                 </div>
-                <button class="enroll-btn" onclick="document.getElementById('enrollModal').style.display='flex'">Enroll Now</button>
+                <button class="enroll-btn" onclick="openEnrollModal()">Enroll Now</button>
                 <!-- Enrollment Modal -->
                 <div id="enrollModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.18); z-index:2000; align-items:center; justify-content:center;">
                   <div style="background:#fff; border-radius:12px; padding:2rem 2.5rem; min-width:320px; max-width:90vw; box-shadow:0 4px 24px rgba(0,0,0,0.15); position:relative;">
@@ -199,15 +200,16 @@
                     <h2 style="color:#e85743; margin-top:0;">Enroll Student</h2>
                     <form id="enrollForm">
                       <div style="margin-bottom:1.3rem;">
-                        <label for="studentId" style="font-weight:600;">Student ID:</label>
+                        <label for="studentId" style="font-weight:600;">Student Number:</label>
                         <input type="text" id="studentId" name="studentId" style="width:100%; padding:0.6rem; border-radius:7px; border:1.5px solid #e0e0e0; font-size:1.1rem; margin-top:0.3rem;" required />
                       </div>
                       <div style="margin-bottom:1.3rem;">
                         <label for="curriculumSelect" style="font-weight:600;">Curriculum:</label>
                         <select id="curriculumSelect" name="curriculumSelect" style="width:100%; padding:0.6rem; border-radius:7px; border:1.5px solid #e0e0e0; font-size:1.1rem; margin-top:0.3rem;" required>
-                          <option value="">Loading curriculums...</option>
+                          <option value="">Select a curriculum</option>
                         </select>
                       </div>
+                      <button type="button" onclick="populateCurriculums()">Check Student Number</button>
                       <button type="submit" class="enroll-btn" style="width:100%;">Submit Enrollment</button>
                     </form>
                   </div>
@@ -253,25 +255,133 @@
     });
     // Populate curriculum dropdown on modal open
     async function populateCurriculums() {
+      alert('populateCurriculums called');
       const select = document.getElementById('curriculumSelect');
       select.innerHTML = '<option value="">Loading curriculums...</option>';
+      const studentNumber = document.getElementById('studentId').value.trim();
+      console.log('Student number entered:', studentNumber);
+      if (!studentNumber) {
+        select.innerHTML = '<option value="">No matching curriculums</option>';
+        return;
+      }
+      let studentCourseId = null;
+      let student = null;
+      try {
+        const res = await fetch('/api/admin/student');
+        const students = await res.json();
+        student = students.find(s => (s.studentNumber || s.student_number) === studentNumber);
+        if (student && student.course && student.course.id) {
+          studentCourseId = student.course.id;
+          console.log('Student courseId:', studentCourseId, 'Student:', student);
+        } else {
+          console.log('Student or student.course not found:', student);
+          select.innerHTML = '<option value="">No matching curriculums</option>';
+          return;
+        }
+      } catch (e) {
+        console.log('Error fetching student:', e);
+        select.innerHTML = '<option value="">No matching curriculums</option>';
+        return;
+      }
       try {
         const res = await fetch('/api/curriculums');
         const curriculums = await res.json();
         select.innerHTML = '<option value="">Select a curriculum</option>';
+        let found = false;
         curriculums.forEach(c => {
-          select.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+          console.log('Curriculum:', c.name, 'courseId:', c.courseId, c);
+          if (studentCourseId && c.courseId == studentCourseId) {
+            select.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+            found = true;
+            alert('Matching curriculum found and added: ' + c.name);
+          }
         });
-      } catch {
+        console.log('Dropdown found any matching curriculum?', found);
+        if (!found) {
+          select.innerHTML = '<option value="">No matching curriculums</option>';
+        }
+      } catch (e) {
+        console.log('Error fetching curriculums:', e);
         select.innerHTML = '<option value="">Failed to load curriculums</option>';
       }
     }
+    // Only allow curriculum dropdown to be populated after student number is entered
     document.querySelector('.enroll-btn').addEventListener('click', populateCurriculums);
+    // Helper: Get student ID by student number
+    async function getStudentIdByStudentNumber(studentNumber) {
+      const res = await fetch('/api/admin/student');
+      const students = await res.json();
+      const student = students.find(s => (s.studentNumber || s.student_number) === studentNumber);
+      return student ? student.id : null;
+    }
     // Helper: Show enrolled subjects for a student
-    async function showEnrolledSubjects(studentId) {
+    async function showEnrolledSubjects(studentNumberOrId) {
       const container = document.getElementById('enrolledSubjectsContainer');
       const tbody = document.querySelector('#enrolledSubjectsTable tbody');
-      // Set loading message only once, right before fetch
+      const curriculumDiv = document.getElementById('curriculumName');
+      curriculumDiv.style.display = 'block';
+      curriculumDiv.textContent = 'Curriculum: Loading...';
+      const enrollBtn = document.querySelector('.enroll-btn');
+      enrollBtn.disabled = true;
+      enrollBtn.style.opacity = 0.5;
+      enrollBtn.title = '';
+      // Always resolve studentId from student number if needed
+      let studentId = studentNumberOrId;
+      if (typeof studentNumberOrId === 'string' && isNaN(Number(studentNumberOrId))) {
+        studentId = await getStudentIdByStudentNumber(studentNumberOrId);
+      }
+      if (studentId) {
+        try {
+          const res = await fetch(`/api/enrollments/student/${studentId}/curriculum`);
+          let hasCurriculum = false;
+          if (res.ok) {
+            const curriculum = await res.json();
+            if (curriculum && curriculum.name) {
+              curriculumDiv.textContent = `Curriculum: ${curriculum.name}`;
+              hasCurriculum = true;
+            } else {
+              curriculumDiv.textContent = 'Curriculum: Not assigned';
+            }
+          } else {
+            curriculumDiv.textContent = 'Curriculum: Not assigned';
+          }
+          if (!hasCurriculum) {
+            enrollBtn.disabled = false;
+            enrollBtn.style.opacity = 1;
+            enrollBtn.title = '';
+          } else {
+            try {
+              const doneRes = await fetch(`/api/enrollments/student/${studentId}/curriculum/done`);
+              if (doneRes.ok) {
+                const isDone = await doneRes.json();
+                if (isDone) {
+                  enrollBtn.disabled = false;
+                  enrollBtn.style.opacity = 1;
+                  enrollBtn.title = '';
+                } else {
+                  enrollBtn.disabled = true;
+                  enrollBtn.style.opacity = 0.5;
+                  enrollBtn.title = 'You can only enroll when all grades are submitted.';
+                }
+              }
+            } catch {
+              enrollBtn.disabled = true;
+              enrollBtn.style.opacity = 0.5;
+              enrollBtn.title = 'Unable to check curriculum status.';
+            }
+          }
+        } catch {
+          curriculumDiv.textContent = 'Curriculum: Not assigned';
+          enrollBtn.disabled = false;
+          enrollBtn.style.opacity = 1;
+          enrollBtn.title = '';
+        }
+      } else {
+        curriculumDiv.textContent = 'Curriculum: Not assigned';
+        enrollBtn.disabled = false;
+        enrollBtn.style.opacity = 1;
+        enrollBtn.title = '';
+      }
       tbody.innerHTML = '<tr><td colspan="2" style="text-align:center; color:#888;">Loading enrolled subjects...</td></tr>';
       if (!studentId) {
         container.style.display = 'none';
@@ -280,9 +390,7 @@
       try {
         const res = await fetch(`/api/enrollments/student/${studentId}`);
         const enrollments = await res.json();
-        // Always clear loading message before adding new rows
         tbody.innerHTML = '';
-        // Filter to unique subjects by code+name and only show active ones
         const unique = {};
         enrollments.forEach(e => {
           if (e.status && (e.status.toLowerCase() === 'dropped' || e.status.toLowerCase() === 'deleted')) return;
@@ -308,16 +416,21 @@
     }
     // On student ID input blur, show enrolled subjects
     document.getElementById('studentId').addEventListener('blur', function() {
-      const studentId = this.value.trim();
-      showEnrolledSubjects(studentId);
+      const studentNumber = this.value.trim();
+      showEnrolledSubjects(studentNumber);
     });
-    // Helper: Get student ID by student number
-    async function getStudentIdByStudentNumber(studentNumber) {
-      const res = await fetch('/api/admin/student');
-      const students = await res.json();
-      const student = students.find(s => s.studentNumber === studentNumber);
-      return student ? student.id : null;
+    // Show enrolled subjects for the logged-in student on page load
+    async function showEnrolledSubjectsForLoggedInStudent() {
+      const studentNumber = sessionStorage.getItem('studentNumber');
+      if (!studentNumber) {
+        const tbody = document.querySelector('#enrolledSubjectsTable tbody');
+        tbody.innerHTML = '<tr><td colspan="2" style="text-align:center; color:#e85743;">Not logged in.</td></tr>';
+        return;
+      }
+      const studentId = await getStudentIdByStudentNumber(studentNumber);
+      showEnrolledSubjects(studentId);
     }
+    showEnrolledSubjectsForLoggedInStudent();
     // After successful enrollment, refresh enrolled subjects
     document.getElementById('enrollForm').onsubmit = async function(e) {
       e.preventDefault();
@@ -351,18 +464,11 @@
         alert('Error connecting to server.');
       }
     };
-    // Show enrolled subjects for the logged-in student on page load
-    async function showEnrolledSubjectsForLoggedInStudent() {
-      const studentNumber = sessionStorage.getItem('studentNumber');
-      if (!studentNumber) {
-        const tbody = document.querySelector('#enrolledSubjectsTable tbody');
-        tbody.innerHTML = '<tr><td colspan="2" style="text-align:center; color:#e85743;">Not logged in.</td></tr>';
-        return;
-      }
-      const studentId = await getStudentIdByStudentNumber(studentNumber);
-      showEnrolledSubjects(studentId);
+    function openEnrollModal() {
+      document.getElementById('enrollModal').style.display = 'flex';
+      document.getElementById('curriculumSelect').innerHTML = '<option value="">Select a curriculum</option>';
+      document.getElementById('studentId').value = '';
     }
-    showEnrolledSubjectsForLoggedInStudent();
     </script>
 </body>
 </html> 

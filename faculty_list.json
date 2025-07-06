@@ -1,0 +1,26 @@
+﻿
+
+StatusCode        : 200
+StatusDescription : 
+Content           : [{"id":15,"fullName":"Lei 
+                    Dizon","email":"lei@example.com","password":"12345"},{"id":16,"fullName":"Amari Pena
+                    randa","email":"amari@example.com","password":"12345"},{"id":17,"fullName":"Wiss 
+                    Montoya",...
+RawContent        : HTTP/1.1 200 
+                    Vary: Origin,Access-Control-Request-Method,Access-Control-Request-Headers
+                    Transfer-Encoding: chunked
+                    Keep-Alive: timeout=60
+                    Connection: keep-alive
+                    Content-Type: application/json
+                    Da...
+Forms             : {}
+Headers           : {[Vary, Origin,Access-Control-Request-Method,Access-Control-Request-Headers], 
+                    [Transfer-Encoding, chunked], [Keep-Alive, timeout=60], [Connection, keep-alive]...}
+Images            : {}
+InputFields       : {}
+Links             : {}
+ParsedHtml        : mshtml.HTMLDocumentClass
+RawContentLength  : 429
+
+
+
