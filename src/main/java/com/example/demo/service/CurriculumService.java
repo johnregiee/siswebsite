@@ -49,4 +49,8 @@ public class CurriculumService {
             return true;
         }).orElse(false);
     }
+
+    public List<Curriculum> getCurriculumsByCourseId(Long courseId) {
+        return curriculumRepository.findByCourse_Id(courseId);
+    }
 }

@@ -247,34 +247,41 @@
         });
     }
     if (studentId) {
-        Promise.all([
-            fetch(`/api/grades/student/${studentId}`).then(res => res.json()),
-            fetch(`/api/enrollments/student/${studentId}`).then(res => res.json()),
-            fetch(`/api/admin/student/${studentId}/curriculum-history`).then(res => res.json())
-        ]).then(([grades, enrollments, curriculums]) => {
-            allGrades = grades;
-            // On curriculum filter change:
-            document.getElementById('semesterFilter').onchange = function() {
-                const selectedCurriculumId = this.value;
-                let filteredEnrollments = enrollments;
-                if (selectedCurriculumId) {
-                    // If curriculumId is selected, filter enrollments by curriculum if possible (if you store curriculum info in enrollment)
-                    // Otherwise, skip filtering
+        fetch(`/api/admin/student/${studentId}`)
+            .then(res => res.json())
+            .then(student => {
+                const courseId = student.course ? student.course.id : null;
+                if (courseId) {
+                    Promise.all([
+                        fetch(`/api/grades/student/${studentId}`).then(res => res.json()),
+                        fetch(`/api/enrollments/student/${studentId}`).then(res => res.json()),
+                        fetch(`/api/curriculums/course/${courseId}`).then(res => res.json())
+                    ]).then(([grades, enrollments, curriculums]) => {
+                        allGrades = grades;
+                        // On curriculum filter change:
+                        document.getElementById('semesterFilter').onchange = function() {
+                            const selectedCurriculumId = this.value;
+                            let filteredEnrollments = enrollments;
+                            if (selectedCurriculumId) {
+                                // If curriculumId is selected, filter enrollments by curriculum if possible (if you store curriculum info in enrollment)
+                                // Otherwise, skip filtering
+                            }
+                            // Render only enrolled subjects
+                            const rows = filteredEnrollments.map(e => ({
+                                courseCode: e.subjectCode,
+                                courseName: e.subjectName,
+                                faculty: e.facultyName || '',
+                                grade: (allGrades.find(g => g.courseCode === e.subjectCode) || {}).grade || ''
+                            }));
+                            renderGradesTable(rows);
+                        };
+                        // Initial render: show all enrolled subjects
+                        populateCurriculumFilter(curriculums);
+                        document.getElementById('semesterFilter').value = '';
+                        document.getElementById('semesterFilter').onchange();
+                    });
                 }
-                // Render only enrolled subjects
-                const rows = filteredEnrollments.map(e => ({
-                    courseCode: e.subjectCode,
-                    courseName: e.subjectName,
-                    faculty: e.facultyName || '',
-                    grade: (allGrades.find(g => g.courseCode === e.subjectCode) || {}).grade || ''
-                }));
-                renderGradesTable(rows);
-            };
-            // Initial render: show all enrolled subjects
-            populateCurriculumFilter(curriculums);
-            document.getElementById('semesterFilter').value = '';
-            document.getElementById('semesterFilter').onchange();
-        });
+            });
     }
     </script>
 </body>

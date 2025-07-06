@@ -140,6 +140,25 @@
             background: linear-gradient(90deg, #ff7e5f 0%, #e85743 100%);
             transform: translateY(-2px);
         }
+        .check-student-btn {
+            background: linear-gradient(90deg, #ff7e5f, #feb47b);
+            color: #fff;
+            border: none;
+            border-radius: 7px;
+            padding: 0.7rem 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: background 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(255,126,95,0.08);
+        }
+        .check-student-btn:hover, .check-student-btn:focus {
+            background: linear-gradient(90deg, #feb47b, #ff7e5f);
+            box-shadow: 0 4px 16px rgba(255,126,95,0.15);
+            outline: none;
+        }
     </style>
 </head>
 <body>
@@ -209,7 +228,7 @@
                           <option value="">Select a curriculum</option>
                         </select>
                       </div>
-                      <button type="button" onclick="populateCurriculums()">Check Student Number</button>
+                      <button type="button" class="check-student-btn" onclick="populateCurriculums()">Check Student Number</button>
                       <button type="submit" class="enroll-btn" style="width:100%;">Submit Enrollment</button>
                     </form>
                   </div>
@@ -284,20 +303,14 @@
         return;
       }
       try {
-        const res = await fetch('/api/curriculums');
+        const res = await fetch(`/api/curriculums/course/${studentCourseId}`);
         const curriculums = await res.json();
         select.innerHTML = '<option value="">Select a curriculum</option>';
-        let found = false;
-        curriculums.forEach(c => {
-          console.log('Curriculum:', c.name, 'courseId:', c.courseId, c);
-          if (studentCourseId && c.courseId == studentCourseId) {
+        if (curriculums.length > 0) {
+          curriculums.forEach(c => {
             select.innerHTML += `<option value="${c.id}">${c.name}</option>`;
-            found = true;
-            alert('Matching curriculum found and added: ' + c.name);
-          }
-        });
-        console.log('Dropdown found any matching curriculum?', found);
-        if (!found) {
+          });
+        } else {
           select.innerHTML = '<option value="">No matching curriculums</option>';
         }
       } catch (e) {

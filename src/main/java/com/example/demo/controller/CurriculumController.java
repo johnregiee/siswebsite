@@ -80,4 +80,10 @@ public class CurriculumController {
         return ResponseEntity.ok(subjects);
     }
 
+    // Get all curriculums for a given course/program
+    @GetMapping("/course/{courseId}")
+    public ResponseEntity<List<Curriculum>> getCurriculumsByCourseId(@PathVariable Long courseId) {
+        return ResponseEntity.ok(curriculumService.getCurriculumsByCourseId(courseId));
+    }
+
 }
