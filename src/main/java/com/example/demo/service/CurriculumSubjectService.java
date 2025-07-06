@@ -65,8 +65,8 @@ public class CurriculumSubjectService {
                 scheduleToUpdate.setCurriculumId(curriculumId);
                 scheduleToUpdate.setSubjectId(subjectId);
             }
-            scheduleToUpdate.setCourseCode(courseCode);
-            scheduleToUpdate.setCourseName(courseName);
+            scheduleToUpdate.setCourseCode(subjectCode);
+            scheduleToUpdate.setCourseName(subjectName);
             scheduleToUpdate.setSubjectCode(subjectCode);
             scheduleToUpdate.setSubjectName(subjectName);
             scheduleToUpdate.setRoom(curriculumSubject.getRoomNumber());
@@ -115,8 +115,12 @@ public class CurriculumSubjectService {
 
             Long curriculumId = updated.getCurriculum() != null ? updated.getCurriculum().getId() : null;
             Long subjectId = updated.getSubject() != null ? updated.getSubject().getId() : null;
-            String subjectCode = updated.getSubject() != null ? updated.getSubject().getSubjectCode() : null;
-            String subjectName = updated.getSubject() != null ? updated.getSubject().getSubjectName() : null;
+            Subject subjectEntity = null;
+            if (subjectId != null) {
+                subjectEntity = subjectRepository.findById(subjectId).orElse(null);
+            }
+            String subjectCode = subjectEntity != null ? subjectEntity.getSubjectCode() : null;
+            String subjectName = subjectEntity != null ? subjectEntity.getSubjectName() : null;
             String courseCode = (updated.getCurriculum() != null && updated.getCurriculum().getCourse() != null)
                 ? updated.getCurriculum().getCourse().getCode() : null;
             String courseName = (updated.getCurriculum() != null && updated.getCurriculum().getCourse() != null)
@@ -125,8 +129,8 @@ public class CurriculumSubjectService {
             if (curriculumId != null && subjectId != null) {
                 List<Schedule> schedules = scheduleRepository.findAllByCurriculumIdAndSubjectId(curriculumId, subjectId);
                 for (Schedule scheduleToUpdate : schedules) {
-                    scheduleToUpdate.setCourseCode(courseCode);
-                    scheduleToUpdate.setCourseName(courseName);
+                    scheduleToUpdate.setCourseCode(subjectCode);
+                    scheduleToUpdate.setCourseName(subjectName);
                     scheduleToUpdate.setSubjectCode(subjectCode);
                     scheduleToUpdate.setSubjectName(subjectName);
                     scheduleToUpdate.setRoom(updated.getRoomNumber());

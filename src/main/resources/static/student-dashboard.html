@@ -320,7 +320,6 @@
                         <th>Course Code</th>
                         <th>Course Name</th>
                         <th>Grade</th>
-                        <th>Comments</th>
                     </tr>
                 </thead>
                     <tbody id="gradesTableBody"></tbody>
@@ -402,12 +401,12 @@
 
                 async function loadStudentGrades() {
                     const tableBody = $('#gradesTableBody');
-                    tableBody.html('<tr><td colspan="5">Loading grades...</td></tr>');
+                    tableBody.html('<tr><td colspan="4">Loading grades...</td></tr>');
                     
                     // Get studentId and validate it
                     const studentId = sessionStorage.getItem("studentId");
                     if (!studentId) {
-                        tableBody.html('<tr><td colspan="5" style="color:red;">Error: Student ID not found. Please log in again.</td></tr>');
+                        tableBody.html('<tr><td colspan="4" style="color:red;">Error: Student ID not found. Please log in again.</td></tr>');
                         console.error('Student ID not found in sessionStorage');
                         return;
                     }
@@ -426,7 +425,7 @@
                             fetch(`http://localhost:8080/api/enrollments/student/${studentId}`),
                             fetch(`http://localhost:8080/api/grades/student/${studentId}`),
                             courseId ? fetch(`http://localhost:8080/api/curriculum-subjects/course/${courseId}`) : Promise.resolve({ ok: false }),
-                            fetch(`http://localhost:8080/api/schedules/student/${studentId}`)
+                            fetch(`http://localhost:8080/api/schedules/by-student-curriculum/${studentId}`)
                         ]);
                         if (!enrollmentsRes.ok) throw new Error('Failed to fetch enrollments');
                         if (!gradesRes.ok) throw new Error('Failed to fetch grades');
@@ -474,7 +473,7 @@
                         });
                         const uniqueEnrollments = Object.values(unique);
                         if (uniqueEnrollments.length === 0) {
-                            tableBody.html('<tr><td colspan="5">No enrolled subjects.</td></tr>');
+                            tableBody.html('<tr><td colspan="4">No enrolled subjects.</td></tr>');
                         } else {
                             uniqueEnrollments.forEach(e => {
                                 const key = (e.courseCode || e.subjectCode || '') + '|' + (e.courseName || e.subjectName || '');
@@ -482,21 +481,19 @@
                                 const facultyName = facultyMap[e.courseCode] || facultyMap[e.subjectCode] || '';
                                 console.log(`Enrollment: ${e.courseCode || e.subjectCode}, Faculty lookup: ${facultyName}`);
                                 const gradeValue = grade ? `<strong>${grade.grade}</strong>` : '<span style="color:#e74c3c;">Not graded yet</span>';
-                                const comments = grade ? (grade.comments || '') : '';
                                 const row = `
                                     <tr>
                                         <td>${facultyName}</td>
                                         <td>${e.courseCode || e.subjectCode || ''}</td>
                                         <td>${e.courseName || e.subjectName || ''}</td>
                                         <td>${gradeValue}</td>
-                                        <td>${comments}</td>
                                     </tr>`;
                                 tableBody.append(row);
                             });
                         }
                     } catch (error) {
                         console.error('Error loading grades:', error);
-                        tableBody.html('<tr><td colspan="5" style="color: red;">Could not load grades. Please try again later.</td></tr>');
+                        tableBody.html('<tr><td colspan="4" style="color: red;">Could not load grades. Please try again later.</td></tr>');
                     }
                 }
 

@@ -113,6 +113,10 @@
     </section>
     <section id="students" class="card" style="display:none;">
       <h2>Student List / Class Roster</h2>
+      <div style="margin-bottom:1em;">
+        <label for="courseFilter" style="font-weight:600;">Filter by Course Name:</label>
+        <select id="courseFilter" style="margin-left:1em; padding:0.4em 1em; border-radius:6px; border:1.5px solid #e0e0e0;"></select>
+      </div>
       <table id="facultyStudentTable" style="width:100%; margin-top:16px;">
         <thead>
           <tr>
@@ -523,22 +527,121 @@
           }
         });
     }
-    // When Students tab is clicked, load students for the first subject/class
+    // --- Students tab: Filter by Course logic ---
+    function populateCourseFilter(schedules) {
+      const select = document.getElementById('courseFilter');
+      if (!select) return;
+      select.innerHTML = '';
+      const seen = new Set();
+      schedules.forEach(sch => {
+        if (!seen.has(sch.courseName)) {
+          seen.add(sch.courseName);
+          const opt = document.createElement('option');
+          opt.value = sch.courseName;
+          opt.text = sch.courseName;
+          select.appendChild(opt);
+        }
+      });
+    }
+    // When Students tab is clicked, load all students for all courses, then populate filter by unique student course names
     const studentsTab = document.querySelector('.tab-btn[data-tab="students"]');
     studentsTab.addEventListener('click', function() {
-      // Fetch faculty's subjects/classes
       fetch(`http://localhost:8080/api/schedules/faculty/${facultyId}`)
         .then(res => res.json())
-        .then(schedules => {
-          if (schedules.length > 0) {
-            // Use the first subject/class's courseCode
-            loadFacultyStudentList(schedules[0].courseCode);
-          } else {
+        .then(async schedules => {
+          if (!schedules.length) {
             const tbody = document.querySelector('#facultyStudentTable tbody');
             tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#888;">No classes found.</td></tr>';
+            return;
           }
+          // Gather all unique courseCodes
+          const courseCodes = Array.from(new Set(schedules.map(sch => sch.courseCode)));
+          // Fetch all enrollments for these course codes
+          let allEnrollments = [];
+          let fetches = courseCodes.map(code => fetch(`/api/enrollments/course/${code}`).then(res => res.json()));
+          const results = await Promise.all(fetches);
+          results.forEach(enrollments => { allEnrollments = allEnrollments.concat(enrollments); });
+          // Fetch all unique students and their course names
+          const seenStudentIds = new Set();
+          const studentCourseMap = {};
+          for (const e of allEnrollments) {
+            const studentId = e.studentId || e.id;
+            if (!seenStudentIds.has(studentId)) {
+              seenStudentIds.add(studentId);
+              try {
+                const studentRes = await fetch(`/api/admin/student/${studentId}`);
+                if (studentRes.ok) {
+                  const studentObj = await studentRes.json();
+                  if (studentObj.course && studentObj.course.name) {
+                    studentCourseMap[studentId] = studentObj.course.name;
+                  }
+                }
+              } catch {}
+            }
+          }
+          // Populate filter with unique course names
+          const select = document.getElementById('courseFilter');
+          select.innerHTML = '';
+          const uniqueCourseNames = Array.from(new Set(Object.values(studentCourseMap)));
+          uniqueCourseNames.forEach(name => {
+            const opt = document.createElement('option');
+            opt.value = name;
+            opt.text = name;
+            select.appendChild(opt);
+          });
+          // Show students for the first course name by default
+          if (uniqueCourseNames.length > 0) {
+            loadFacultyStudentListByStudentCourseName(uniqueCourseNames[0], studentCourseMap, allEnrollments);
+            select.value = uniqueCourseNames[0];
+          } else {
+            const tbody = document.querySelector('#facultyStudentTable tbody');
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#888;">No students found.</td></tr>';
+          }
+          // On filter change, reload students
+          select.onchange = function() {
+            loadFacultyStudentListByStudentCourseName(this.value, studentCourseMap, allEnrollments);
+          };
         });
     });
+    // New function to load students by their degree program (course name)
+    function loadFacultyStudentListByStudentCourseName(courseName, studentCourseMap, allEnrollments) {
+      const tbody = document.querySelector('#facultyStudentTable tbody');
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#888;">Loading...</td></tr>';
+      // Filter enrollments to students with the selected course name
+      const filteredStudentIds = Object.entries(studentCourseMap)
+        .filter(([_, name]) => name === courseName)
+        .map(([id, _]) => id);
+      if (!filteredStudentIds.length) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#888;">No students found.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = '';
+      const seenNames = new Set();
+      allEnrollments.forEach(async e => {
+        const studentId = String(e.studentId || e.id);
+        if (!filteredStudentIds.includes(studentId)) return;
+        let studentNumber = '', name = '', email = '', courseName = '';
+        try {
+          const studentRes = await fetch(`/api/admin/student/${studentId}`);
+          if (studentRes.ok) {
+            const studentObj = await studentRes.json();
+            studentNumber = studentObj.studentNumber || '';
+            name = studentObj.name || '';
+            email = studentObj.email || '';
+            courseName = studentObj.course ? (studentObj.course.name || '') : '';
+          }
+        } catch {}
+        if (!seenNames.has(name) && name) {
+          seenNames.add(name);
+          tbody.innerHTML += `<tr>
+            <td>${studentNumber}</td>
+            <td>${name}</td>
+            <td>${email}</td>
+            <td>${courseName}</td>
+          </tr>`;
+        }
+      });
+    }
     function logout() {
       sessionStorage.clear();
       window.location.href = 'login.html';

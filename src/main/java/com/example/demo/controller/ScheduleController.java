@@ -23,6 +23,7 @@ import com.example.demo.entity.Subject;
 import com.example.demo.repository.CurriculumRepository;
 import com.example.demo.repository.CurriculumSubjectRepository;
 import com.example.demo.repository.FacultyRepository;
+import com.example.demo.repository.StudentRepository;
 import com.example.demo.service.ScheduleService;
 
 @CrossOrigin(origins = "*")
@@ -38,6 +39,8 @@ public class ScheduleController {
     private CurriculumSubjectRepository curriculumSubjectRepository;
     @Autowired
     private CurriculumRepository curriculumRepository;
+    @Autowired
+    private StudentRepository studentRepository;
 
     // Get all schedules
     @GetMapping
@@ -154,6 +157,24 @@ public class ScheduleController {
     public String repairFacultyAssignments() {
         scheduleService.updateFacultyAssignmentsBySubjectName();
         return "Done";
+    }
+
+    // Get all schedules for a student's curriculum
+    @GetMapping("/by-student-curriculum/{studentId}")
+    public List<ScheduleWithFacultyDto> getSchedulesByStudentCurriculum(@PathVariable Long studentId) {
+        if (studentRepository.findById(studentId).isEmpty()) return List.of();
+        var student = studentRepository.findById(studentId).get();
+        Long curriculumId = student.getCurriculumId();
+        if (curriculumId == null) return List.of();
+        List<Schedule> schedules = scheduleService.getSchedulesByCurriculumId(curriculumId);
+        return schedules.stream().map(sch -> {
+            String facultyName = null;
+            if (sch.getFacultyId() != null) {
+                facultyName = facultyRepository.findById(sch.getFacultyId())
+                    .map(Faculty::getFullName).orElse(null);
+            }
+            return new ScheduleWithFacultyDto(sch, facultyName);
+        }).toList();
     }
 
     public static class ScheduleWithFacultyDto {

@@ -26,15 +26,23 @@ public class ScheduleService {
 
     // Create or update
     public Schedule saveSchedule(Schedule schedule) {
-        // Set courseCode, courseName, subjectCode, and subjectName from subject if subjectId is present
+        // Always set courseCode, courseName, subjectCode, and subjectName from subject if subjectId or subjectCode is present
+        Subject subject = null;
         if (schedule.getSubjectId() != null) {
-            Subject subject = subjectRepository.findById(schedule.getSubjectId()).orElse(null);
+            subject = subjectRepository.findById(schedule.getSubjectId()).orElse(null);
+        } else if (schedule.getSubjectCode() != null) {
+            subject = subjectRepository.findBySubjectCode(schedule.getSubjectCode());
             if (subject != null) {
-                schedule.setCourseCode(subject.getSubjectCode());
-                schedule.setCourseName(subject.getSubjectName());
-                schedule.setSubjectCode(subject.getSubjectCode());
-                schedule.setSubjectName(subject.getSubjectName());
+                schedule.setSubjectId(subject.getId());
             }
+        } else {
+            throw new IllegalArgumentException("Cannot create or update schedule: subjectId or subjectCode is required to set course code and name.");
+        }
+        if (subject != null) {
+            schedule.setCourseCode(subject.getSubjectCode());
+            schedule.setCourseName(subject.getSubjectName());
+            schedule.setSubjectCode(subject.getSubjectCode());
+            schedule.setSubjectName(subject.getSubjectName());
         }
         return scheduleRepository.save(schedule);
     }

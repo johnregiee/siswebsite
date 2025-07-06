@@ -250,7 +250,7 @@
         Promise.all([
             fetch(`/api/grades/student/${studentId}`).then(res => res.json()),
             fetch(`/api/enrollments/student/${studentId}`).then(res => res.json()),
-            fetch('/api/curriculums').then(res => res.json())
+            fetch(`/api/admin/student/${studentId}/curriculum-history`).then(res => res.json())
         ]).then(([grades, enrollments, curriculums]) => {
             allGrades = grades;
             // On curriculum filter change:

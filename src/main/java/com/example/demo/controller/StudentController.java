@@ -22,6 +22,8 @@ import com.example.demo.entity.Student;
 import com.example.demo.repository.CourseRepository;
 import com.example.demo.repository.SectionRepository;
 import com.example.demo.service.StudentService;
+import com.example.demo.service.StudentCurriculumHistoryService;
+import com.example.demo.repository.CurriculumRepository;
 
 @RestController
 @RequestMapping("/api/admin/student")
@@ -34,6 +36,10 @@ public class StudentController {
     private CourseRepository courseRepository;
     @Autowired
     private SectionRepository sectionRepository;
+    @Autowired
+    private StudentCurriculumHistoryService studentCurriculumHistoryService;
+    @Autowired
+    private CurriculumRepository curriculumRepository;
 
     // Existing login endpoint
     @PostMapping("/login")
@@ -123,6 +129,25 @@ public class StudentController {
             }});
         }
         return ResponseEntity.status(404).body("Student not found");
+    }
+
+    // Get all curriculums (current and previous) for a student
+    @GetMapping("/{studentId}/curriculum-history")
+    public List<Object> getCurriculumHistory(@PathVariable Long studentId) {
+        var history = studentCurriculumHistoryService.getHistoryForStudent(studentId);
+        List<Object> result = new java.util.ArrayList<>();
+        for (var h : history) {
+            var curriculumOpt = curriculumRepository.findById(h.getCurriculumId());
+            curriculumOpt.ifPresent(curriculum -> {
+                var map = new java.util.HashMap<String, Object>();
+                map.put("id", curriculum.getId());
+                map.put("name", curriculum.getName());
+                map.put("startDate", h.getStartDate());
+                map.put("endDate", h.getEndDate());
+                result.add(map);
+            });
+        }
+        return result;
     }
 
     // Inner class for login request DTO

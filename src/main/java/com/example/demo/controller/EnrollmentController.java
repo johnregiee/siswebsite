@@ -28,6 +28,7 @@ import com.example.demo.repository.ScheduleRepository;
 import com.example.demo.repository.StudentRepository;
 import com.example.demo.service.EnrollmentService;
 import com.example.demo.service.GradeService;
+import com.example.demo.service.StudentCurriculumHistoryService;
 
 @RestController
 @RequestMapping("/api/enrollments")
@@ -54,6 +55,9 @@ public class EnrollmentController {
 
     @Autowired
     private GradeService gradeService;
+
+    @Autowired
+    private StudentCurriculumHistoryService studentCurriculumHistoryService;
 
     @GetMapping
     public ResponseEntity<List<Enrollment>> getAllEnrollments() {
@@ -106,6 +110,8 @@ public class EnrollmentController {
             studentRepository.findById(studentId).ifPresent(student -> {
                 student.setCurriculumId(curriculumId);
                 studentRepository.save(student);
+                // Update curriculum history
+                studentCurriculumHistoryService.addCurriculumHistory(studentId, curriculumId);
             });
             List<CurriculumSubject> subjects = curriculumSubjectRepository.findByCurriculumId(curriculumId);
             for (CurriculumSubject cs : subjects) {
